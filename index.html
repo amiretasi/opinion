@@ -77,14 +77,14 @@
         <section class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 rtl-grid">
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-2xl font-bold text-[#003B73] mb-4 text-center">حجم گازسوزی در گذر زمان</h2>
-                <p class="text-center text-gray-600 mb-4">روند حجم گازهای مشعل سوزانده‌شده در ایران نشان‌دهنده یک بحران پایدار و رو به رشد در سال‌های اخیر است. این نمودار، حجم هدررفت را در سال‌های کلیدی نمایش می‌دهد.</p>
+                <p class="text-center text-gray-600 mb-4">روند حجم گازهای مشعل سوزانده‌شده در ایران نشان‌دهنده یک بحران پایدار است. داده‌های ۲۰۲۴ و ۲۰۲۵ بر اساس روندهای فعلی و پیشرفت پروژه‌ها تخمین زده شده‌اند.</p>
                 <div class="chart-container h-[300px] md:h-[350px]">
                     <canvas id="volumeTrendChart"></canvas>
                 </div>
             </div>
             <div class="bg-white rounded-lg shadow-md p-6">
                 <h2 class="text-2xl font-bold text-[#003B73] mb-4 text-center">زیان اقتصادی انباشته</h2>
-                <p class="text-center text-gray-600 mb-4">هر شعله مشعل، دلارهایی است که به دود تبدیل می‌شود. ارزش اقتصادی گازهای سوزانده‌شده در سال‌های منتخب، عمق این زیان ملی را آشکار می‌سازد.</p>
+                <p class="text-center text-gray-600 mb-4">ارزش اقتصادی گازهای سوزانده‌شده، عمق این زیان ملی را آشکار می‌سازد. ارقام آینده بر اساس قیمت‌های پیش‌بینی‌شده گاز برآورد شده‌اند.</p>
                 <div class="chart-container h-[300px] md:h-[350px]">
                     <canvas id="economicLossChart"></canvas>
                 </div>
@@ -207,14 +207,17 @@
 
 
         const volumeData = {
-            labels: ['۱۹۹۷', '۲۰۰۵', '۲۰۱۲', '۲۰۱۸', '۲۰۲۱', '۲۰۲۳'],
+            labels: ['۱۹۹۷', '۲۰۰۵', '۲۰۱۲', '۲۰۱۸', '۲۰۲۱', '۲۰۲۳', '۲۰۲۴ (تخمین)', '۲۰۲۵ (پیش‌بینی)'],
             datasets: [{
                 label: 'میلیارد متر مکعب',
-                data: [11.5, 13.8, 10.9, 17.8, 17.4, 20.4],
+                data: [11.5, 13.8, 10.9, 17.8, 17.4, 20.4, 20.8, 19.5],
                 borderColor: '#0074B7',
                 backgroundColor: 'rgba(0, 116, 183, 0.2)',
                 fill: true,
-                tension: 0.4
+                tension: 0.4,
+                pointBackgroundColor: ['#0074B7', '#0074B7', '#0074B7', '#0074B7', '#0074B7', '#0074B7', '#FFA500', '#FFA500'],
+                pointBorderColor: '#FFFFFF',
+                pointRadius: 5
             }]
         };
         new Chart(document.getElementById('volumeTrendChart'), {
@@ -229,11 +232,20 @@
         });
 
         const economicLossData = {
-            labels: ['۱۹۹۷', '۲۰۰۵', '۲۰۱۸', '۲۰۲۱', '۲۰۲۲', '۲۰۲۳'],
+            labels: ['۱۹۹۷', '۲۰۰۵', '۲۰۱۸', '۲۰۲۱', '۲۰۲۲', '۲۰۲۳', '۲۰۲۴ (تخمین)', '۲۰۲۵ (پیش‌بینی)'],
             datasets: [{
                 label: 'زیان تقریبی (میلیون دلار)',
-                data: [1020, 4550, 2000, 2460, 4120, 1840],
-                backgroundColor: '#003B73',
+                data: [1020, 4550, 2000, 2460, 4120, 1840, 1850, 1750],
+                backgroundColor: [
+                    '#003B73',
+                    '#003B73',
+                    '#003B73',
+                    '#003B73',
+                    '#003B73',
+                    '#003B73',
+                    '#0074B7',
+                    '#6497b1'
+                ],
                 borderRadius: 5
             }]
         };
@@ -310,3 +322,4 @@
     </script>
 </body>
 </html>
+
