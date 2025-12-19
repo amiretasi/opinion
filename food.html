@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>سیستم جامع مدیریت استراتژیک (نسخه ۱۹.۶ - مقیاس ۱۲۰۰ پرس)</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.0/papaparse.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/fonts/webfonts/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <style>
+        body { font-family: 'Vazirmatn', 'Tahoma', sans-serif; background-color: #f8fafc; }
+        .num-font { font-family: 'Tahoma', sans-serif; font-weight: 700; letter-spacing: 0.5px; }
+        
+        .tab-btn { background-color: #e2e8f0; color: #475569; transition: all 0.2s; white-space: nowrap; }
+        .tab-btn.active { background-color: #1e293b; color: white; border-bottom: 3px solid #3b82f6; }
+        .tab-btn:hover:not(.active) { background-color: #cbd5e1; }
+
+        .editable-input { background-color: #fff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 6px 4px; width: 100%; text-align: center; font-family: 'Tahoma'; font-size: 0.95rem; font-weight: bold; color: #1e293b; transition: border 0.2s; box-shadow: inset 0 1px 2px rgba(0,0,0,0.05); }
+        .editable-input:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1); }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        .var-high-pos { color: #dc2626; background-color: #fef2f2; border: 1px solid #fecaca; }
+        .var-ok { color: #16a34a; background-color: #f0fdf4; border: 1px solid #bbf7d0; }
+        .var-low-neg { color: #d97706; background-color: #fffbeb; border: 1px solid #fde68a; }
+        
+        .method-card { border: 1px solid #e2e8f0; border-radius: 12px; padding: 16px; background: white; transition: transform 0.2s; height: 100%; display: flex; flex-direction: column; }
+        .method-card:hover { transform: translateY(-2px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
+        .method-title { font-weight: 900; font-size: 1rem; margin-bottom: 12px; border-bottom: 2px solid #f1f5f9; padding-bottom: 8px; }
+
+        .chart-container { position: relative; height: 300px; width: 100%; }
+        
+        /* Table Styles */
+        th { font-weight: 800; font-size: 0.75rem; color: #64748b; }
+        td { font-size: 0.85rem; }
+    </style>
+</head>
+<body class="text-slate-800 h-screen flex flex-col overflow-hidden bg-slate-50">
+
+    <!-- Header -->
+    <header class="bg-white shadow-md z-50 shrink-0 border-b border-slate-200">
+        <div class="container mx-auto px-4 py-2 flex flex-col gap-3">
+            <div class="flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-slate-800 p-2 rounded-lg text-white shadow-lg">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 7h6m0 10v-3m-3 3h.01M9 17h.01M9 14h.01M12 14h.01M15 11h.01M12 11h.01M9 11h.01M7 21h10a2 2 0 002-2V5a2 2 0 00-2-2H7a2 2 0 00-2 2v14a2 2 0 002 2z" />
+                        </svg>
+                    </div>
+                    <div>
+                        <h1 class="text-base font-black tracking-tight text-slate-900">داشبورد کنترل استراتژیک (Rev19.6)</h1>
+                        <div class="flex gap-2 text-[11px] text-slate-500 font-medium">
+                            <span class="text-slate-400">پنل مدیریت کارفرما</span>
+                            <span class="text-slate-300">|</span>
+                            <span class="text-emerald-600 font-bold">نسخه با ظرفیت ۱۲۰۰ پرس</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="document.getElementById('priceInput').click()" class="bg-slate-700 hover:bg-slate-800 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow ring-1 ring-slate-600">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path></svg> 
+                        بروزرسانی نرخ‌ها
+                    </button>
+                    <input type="file" id="priceInput" accept=".csv" class="hidden" />
+                </div>
+            </div>
+
+            <div class="flex overflow-x-auto gap-2 pb-1 custom-scrollbar">
+                <div class="flex gap-1 bg-slate-100 p-1 rounded-lg border border-slate-200 shrink-0">
+                    <button onclick="switchTab('detail')" id="btn-detail" class="tab-btn active px-3 py-1.5 rounded-md text-xs font-bold">1. آنالیز مواد</button>
+                    <button onclick="switchTab('labor')" id="btn-labor" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold">2. سربار و حقوق</button>
+                    <button onclick="switchTab('financial')" id="btn-financial" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold">3. برآورد کارفرما</button>
+                </div>
+                <div class="flex gap-1 bg-blue-50 p-1 rounded-lg border border-blue-100 shrink-0">
+                    <button onclick="switchTab('contractor')" id="btn-contractor" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold text-blue-800">4. نرخ پیمانکار</button>
+                    <button onclick="switchTab('comparison')" id="btn-comparison" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold text-blue-800">5. تحلیل انحراف</button>
+                </div>
+                <div class="flex gap-1 bg-red-50 p-1 rounded-lg border border-red-100 shrink-0">
+                    <button onclick="switchTab('reverse')" id="btn-reverse" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold text-red-800">6. تحلیل معکوس</button>
+                    <button onclick="switchTab('dashboard')" id="btn-dashboard" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold text-red-800">7. داشبورد</button>
+                </div>
+                <div class="flex gap-1 bg-emerald-50 p-1 rounded-lg border border-emerald-100 shrink-0">
+                    <button onclick="switchTab('purchasing')" id="btn-purchasing" class="tab-btn px-3 py-1.5 rounded-md text-xs font-bold text-emerald-800">8. تدارکات و خرید</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <div class="flex-1 overflow-hidden relative">
+        
+        <!-- TAB 1: Detail (Materials) -->
+        <div id="tab-detail" class="tab-content absolute inset-0 flex z-10 bg-slate-50">
+            <aside class="w-64 bg-white border-l border-slate-200 flex flex-col shadow-xl z-20">
+                <div class="p-3 border-b border-slate-100 bg-slate-50">
+                    <input type="text" id="searchDish" placeholder="جستجوی غذا..." class="w-full text-xs p-2.5 bg-white border border-slate-300 rounded-lg outline-none text-center font-bold shadow-sm focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition">
+                </div>
+                <div id="menuList" class="flex-1 overflow-y-auto p-2 space-y-1 custom-scrollbar"></div>
+            </aside>
+            <main class="flex-1 p-4 lg:p-6 overflow-y-auto custom-scrollbar flex flex-col gap-4 lg:gap-6">
+                <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <h2 id="dishTitle" class="text-2xl font-black text-slate-800">...</h2>
+                        <div class="flex gap-2 mt-2">
+                            <span id="dishCxDisplay" class="text-xs bg-yellow-50 text-yellow-700 px-3 py-1 rounded-full border border-yellow-200 font-bold"></span>
+                        </div>
+                    </div>
+                    <div class="text-left border-r-4 border-blue-500 pr-4 pl-2">
+                        <div class="text-xs text-slate-400 font-bold uppercase tracking-wider">هزینه مواد مستقیم</div>
+                        <div class="text-3xl font-black text-blue-800 num-font" id="materialCostDisplay">0</div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full pb-10">
+                    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 flex flex-col overflow-hidden h-[500px] lg:h-auto">
+                        <div class="bg-slate-50 px-5 py-3 border-b text-sm font-bold text-slate-700 flex justify-between items-center sticky top-0 z-10">
+                            <span>BOM (ویرایش مقدار و نرخ)</span>
+                            <span class="text-[10px] text-slate-400 font-normal bg-white px-2 py-1 rounded border">تغییرات آنی</span>
+                        </div>
+                        <div class="overflow-auto flex-1 custom-scrollbar">
+                            <table class="w-full relative">
+                                <thead class="bg-slate-50 text-slate-500 text-xs font-bold sticky top-0 border-b z-10 shadow-sm">
+                                    <tr>
+                                        <th class="px-4 py-3 text-right bg-slate-50">ماده</th>
+                                        <th class="px-2 py-3 text-center w-24 bg-slate-50">مقدار</th>
+                                        <th class="px-2 py-3 text-center w-16 bg-slate-50">واحد</th>
+                                        <th class="px-4 py-3 text-center w-32 bg-slate-50">نرخ (ریال)</th>
+                                        <th class="px-4 py-3 text-left w-32 bg-slate-50">هزینه (ریال)</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="bomTableBody" class="divide-y divide-slate-100 text-sm"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="bg-white rounded-2xl p-5 shadow-sm border border-slate-200 flex flex-col">
+                        <h3 class="text-sm font-bold text-slate-500 mb-4 text-center">ترکیب هزینه</h3>
+                        <div class="chart-container flex-1">
+                            <canvas id="costChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </main>
+        </div>
+
+        <!-- TAB 2: Labor & Overhead -->
+        <div id="tab-labor" class="tab-content hidden absolute inset-0 bg-slate-100 p-4 lg:p-6 overflow-auto custom-scrollbar">
+            <div class="max-w-6xl mx-auto w-full space-y-6 pb-10">
+                <!-- Metrics -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="text-xs text-slate-400 mb-2 font-bold uppercase">پرس سالانه (۱۲۰۰×۳۶۵)</div>
+                        <input type="number" id="totalMealsInput" class="w-full font-black text-2xl text-indigo-600 num-font outline-none border-b border-dashed border-indigo-200 pb-1 bg-transparent" value="438000" onchange="recalcAll()">
+                    </div>
+                    <div class="bg-red-50 p-5 rounded-2xl shadow-sm border border-red-200">
+                        <div class="text-xs text-red-500 mb-2 font-bold uppercase">سربار عملیاتی (هر پرس)</div>
+                        <div class="font-bold text-xl text-red-700 num-font" id="operationalOverheadDisplay">0</div>
+                        <div class="text-[10px] text-red-400 mt-1">حمل، لباس، مصرفی + شوینده</div>
+                    </div>
+                    <div class="bg-gray-50 p-5 rounded-2xl shadow-sm border border-gray-200">
+                        <div class="text-xs text-gray-500 mb-2 font-bold uppercase">کسورات زیرساختی (هر پرس)</div>
+                        <div class="font-black text-2xl text-gray-700 num-font" id="deductionsDisplay">0</div>
+                        <div class="text-[10px] text-gray-400 mt-1">اجاره محل + استهلاک تجهیزات</div>
+                    </div>
+                    <div class="bg-white p-5 rounded-2xl shadow-sm border border-slate-200">
+                        <div class="text-xs text-slate-400 mb-2 font-bold uppercase">جمع کل سربار و کسورات</div>
+                        <div class="font-bold text-xl text-slate-700 num-font" id="totalOverheadDisplay">0</div>
+                    </div>
+                </div>
+                
+                <!-- Inputs Section -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <!-- Overhead Settings -->
+                    <div class="bg-white rounded-2xl shadow-sm border p-6 space-y-6">
+                        <h3 class="font-bold text-base text-slate-800 border-b pb-3 mb-2 flex justify-between">
+                            <span>آنالیز دقیق هزینه‌های سربار</span>
+                            <span class="text-xs bg-slate-100 px-2 py-1 rounded">دستورالعمل ۱۹.۶</span>
+                        </h3>
+                        <div class="space-y-3">
+                            <h4 class="text-xs font-bold text-orange-600 uppercase border-b border-orange-100 pb-1">الف) سربار عملیاتی (Operational)</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[10px] text-slate-500 block mb-1">شوینده (سالانه)</label>
+                                    <input type="text" id="annualDetergent" class="w-full bg-orange-50 text-center font-bold num-font text-slate-700 border rounded p-1" value="2400000000" onchange="recalcAll()">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-500 block mb-1">حمل و نقل (سالانه)</label>
+                                    <input type="text" id="annualTransport" class="w-full bg-slate-50 text-center font-bold num-font text-slate-700 border rounded p-1" value="10500000000" onchange="recalcAll()">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-500 block mb-1">لباس فرم (سالانه)</label>
+                                    <input type="text" id="annualUniform" class="w-full bg-slate-50 text-center font-bold num-font text-slate-700 border rounded p-1" value="646000000" onchange="recalcAll()">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-500 block mb-1">اقلام مصرفی (سالانه)</label>
+                                    <input type="text" id="annualConsumable" class="w-full bg-slate-50 text-center font-bold num-font text-slate-700 border rounded p-1" value="66300000" onchange="recalcAll()">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="space-y-3 mt-4">
+                            <h4 class="text-xs font-bold text-gray-600 uppercase border-b border-gray-100 pb-1">ب) کسورات زیرساختی (Deductions)</h4>
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="text-[10px] text-slate-500 block mb-1">اجاره ماهانه محل</label>
+                                    <input type="text" id="monthlyRent" class="w-full bg-gray-50 text-center font-bold num-font text-gray-800 border rounded p-1" value="300000000" onchange="recalcAll()">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] text-slate-500 block mb-1">ارزش تجهیزات</label>
+                                    <input type="text" id="equipmentValue" class="w-full bg-gray-50 text-center font-bold num-font text-gray-800 border rounded p-1" value="7000000000" onchange="recalcAll()">
+                                </div>
+                                <div class="col-span-2 flex items-center gap-2">
+                                    <span class="text-[10px] text-slate-500">دوره استهلاک (سال):</span>
+                                    <input type="number" id="depreciationYears" class="w-16 bg-white text-center font-bold num-font border rounded p-1" value="3" onchange="recalcAll()">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Labor Table -->
+                    <div class="bg-white rounded-2xl shadow-sm border flex flex-col overflow-hidden h-[500px]">
+                        <div class="p-4 border-b bg-slate-50 text-sm font-bold text-slate-700">جدول حقوق و دستمزد</div>
+                        <div class="flex-1 overflow-auto custom-scrollbar">
+                            <table class="w-full text-sm">
+                                <thead class="bg-slate-100 text-xs sticky top-0 z-10">
+                                    <tr>
+                                        <th class="px-2 py-2 text-right">عنوان</th>
+                                        <th class="px-2 py-2 text-center">تعداد</th>
+                                        <th class="px-2 py-2 text-center">حقوق ماهانه</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="laborTableBody" class="divide-y"></tbody>
+                            </table>
+                        </div>
+                        <div class="p-4 bg-indigo-50 text-center border-t border-indigo-100 flex justify-between items-center px-8 shadow-inner">
+                            <span class="text-xs font-bold text-indigo-600 uppercase">هزینه دستمزد هر پرس</span>
+                            <span id="avgLaborCost" class="num-font text-xl font-black text-indigo-800">0</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 3: Financial (Internal Estimate) -->
+        <div id="tab-financial" class="tab-content hidden absolute inset-0 bg-slate-100 p-4 lg:p-6 overflow-hidden flex flex-col">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col h-full overflow-hidden">
+                <div class="px-6 py-4 border-b bg-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <h2 class="font-bold text-lg text-slate-800">برآورد قیمت تمام شده کارفرما (Employer Estimate)</h2>
+                    <div class="flex gap-4">
+                        <div class="flex flex-col items-center bg-white px-3 py-1 rounded border shadow-sm"><span class="text-[9px] text-slate-400 font-bold uppercase">بیمه</span><div class="flex items-center gap-1"><input type="number" id="insurancePct" class="w-12 text-center font-bold text-sm outline-none" value="7.78" onchange="renderFinancialTab()">%</div></div>
+                        <div class="flex flex-col items-center bg-white px-3 py-1 rounded border shadow-sm"><span class="text-[9px] text-slate-400 font-bold uppercase">مالیات سود</span><div class="flex items-center gap-1"><input type="number" id="taxPct" class="w-12 text-center font-bold text-sm outline-none text-red-600" value="2.5" onchange="renderFinancialTab()">%</div></div>
+                        <div class="flex flex-col items-center bg-white px-3 py-1 rounded border shadow-sm"><span class="text-[9px] text-slate-400 font-bold uppercase">حاشیه سود</span><div class="flex items-center gap-1"><input type="number" id="profitPct" class="w-12 text-center font-bold text-sm outline-none text-green-600" value="10" onchange="renderFinancialTab()">%</div></div>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto custom-scrollbar">
+                    <table class="w-full text-sm text-left border-collapse">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-100 sticky top-0 z-10 font-bold shadow-sm">
+                            <tr>
+                                <th class="px-4 py-3 text-right border-b bg-slate-100">نام غذا</th>
+                                <th class="px-2 py-3 text-center border-b border-l bg-blue-50 text-blue-800">مواد مستقیم</th>
+                                <th class="px-2 py-3 text-center border-b border-l bg-indigo-50 text-indigo-800">دستمزد</th>
+                                <th class="px-2 py-3 text-center border-b border-l bg-orange-50 text-orange-800">سربار عملیاتی<br><span class="text-[9px]">(حمل، لباس، شوینده)</span></th>
+                                <th class="px-4 py-3 text-center border-b border-l bg-gray-50 text-gray-700">کسورات<br><span class="text-[9px]">(اجاره+استهلاک)</span></th>
+                                <th class="px-4 py-3 text-center border-b border-l font-black text-blue-800 bg-blue-50">قیمت تمام شده<br><span class="text-[9px]">(Full Cost)</span></th>
+                                <th class="px-4 py-3 text-center border-b border-l text-gray-500">بیمه</th>
+                                <th class="px-4 py-3 text-center border-b border-l text-green-600 font-bold">سود خالص</th>
+                                <th class="px-4 py-3 text-center border-b border-l text-gray-500">مالیات</th>
+                                <th class="px-4 py-3 text-left border-b border-l bg-slate-800 text-white">قیمت نهایی فروش<br><span class="text-[9px]">(Selling Price)</span></th>
+                            </tr>
+                        </thead>
+                        <tbody id="financialTableBody" class="divide-y divide-slate-100 bg-white font-medium"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 4: Contractor Input -->
+        <div id="tab-contractor" class="tab-content hidden absolute inset-0 bg-slate-100 p-4 lg:p-6 overflow-hidden flex flex-col">
+            <div class="bg-white rounded-2xl shadow-lg border border-blue-200 flex flex-col h-full overflow-hidden">
+                <div class="px-6 py-4 border-b border-blue-200 bg-blue-50 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-black text-blue-900 text-lg">نرخ‌های پیشنهادی پیمانکار</h2>
+                        <p class="text-xs text-blue-600">ورود دستی یا آپلود فایل Book1.csv</p>
+                    </div>
+                    <div class="flex gap-2">
+                        <label class="cursor-pointer bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg text-xs font-bold transition flex items-center gap-2 shadow-lg shadow-blue-500/30">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"></path></svg>
+                            <span>آپلود Book1.csv</span>
+                            <input type="file" id="contractorUpload" accept=".csv" class="hidden" />
+                        </label>
+                        <button onclick="copyInternalToContractor()" class="text-xs bg-white border border-blue-300 text-blue-600 px-3 py-2 rounded-lg hover:bg-blue-100 transition font-bold">کپی قیمت‌های کارفرما</button>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto custom-scrollbar">
+                    <table class="w-full text-sm text-left">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-50 sticky top-0 z-10 font-bold shadow-sm">
+                            <tr>
+                                <th class="px-6 py-4 text-right bg-slate-50">نام غذا</th>
+                                <th class="px-6 py-4 text-center bg-gray-100 border-x">قیمت محاسباتی کارفرما</th>
+                                <th class="px-6 py-4 text-center bg-blue-50 text-blue-800 w-1/3 border-r border-blue-100">قیمت پیمانکار (ریال)</th>
+                                <th class="px-6 py-4 text-left bg-slate-50">وضعیت</th>
+                            </tr>
+                        </thead>
+                        <tbody id="contractorInputBody" class="divide-y divide-slate-100 bg-white"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 5: Comparison -->
+        <div id="tab-comparison" class="tab-content hidden absolute inset-0 bg-slate-100 p-4 lg:p-6 overflow-hidden flex flex-col">
+            <div class="max-w-6xl mx-auto w-full space-y-6 pb-10 flex flex-col h-full">
+                <!-- Average Price Card -->
+                <div class="bg-indigo-900 text-white p-5 rounded-2xl shadow-lg flex justify-between items-center shrink-0">
+                    <div>
+                        <h3 class="text-sm font-bold text-indigo-200 uppercase mb-1">میانگین وزنی قیمت هر پرس (Weighted Average)</h3>
+                        <p class="text-xs text-indigo-300">بر اساس توزیع یکنواخت مصرف سالانه</p>
+                    </div>
+                    <div class="flex gap-8 text-center">
+                        <div>
+                            <div class="text-[10px] text-indigo-300 uppercase">برآورد کارفرما</div>
+                            <div class="text-2xl font-black num-font" id="avgPriceInternal">0</div>
+                        </div>
+                        <div class="border-r border-indigo-700 pr-8">
+                            <div class="text-[10px] text-indigo-300 uppercase">پیشنهاد پیمانکار</div>
+                            <div class="text-2xl font-black num-font text-yellow-400" id="avgPriceContractor">0</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col flex-1 overflow-hidden min-h-[500px]">
+                    <div class="px-6 py-4 border-b border-slate-200 bg-slate-50"><h2 class="font-black text-slate-800 text-lg">تحلیل انحراف (Gap Analysis)</h2></div>
+                    <div class="flex-1 overflow-auto custom-scrollbar">
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-100 sticky top-0 z-10 font-bold shadow-sm">
+                                <tr>
+                                    <th class="px-4 py-3 text-right bg-slate-100">نام غذا</th>
+                                    <th class="px-4 py-3 text-center bg-slate-100">قیمت کارفرما</th>
+                                    <th class="px-4 py-3 text-center bg-slate-100">قیمت پیمانکار</th>
+                                    <th class="px-4 py-3 text-center bg-slate-100">اختلاف (ریال)</th>
+                                    <th class="px-4 py-3 text-center bg-slate-100">انحراف (%)</th>
+                                    <th class="px-4 py-3 text-left bg-slate-100">تحلیل</th>
+                                </tr>
+                            </thead>
+                            <tbody id="comparisonTableBody" class="divide-y divide-slate-100 bg-white"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 6: Reverse Analysis -->
+        <div id="tab-reverse" class="tab-content hidden absolute inset-0 bg-slate-100 p-4 lg:p-6 overflow-hidden flex flex-col">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col h-full overflow-hidden">
+                <div class="px-6 py-4 border-b bg-slate-50 flex flex-col sm:flex-row justify-between items-center gap-4">
+                    <div>
+                        <h2 class="font-bold text-lg text-red-800">تحلیل معکوس و کشف قیمت (Reverse Engineering)</h2>
+                        <span class="text-xs text-slate-500">بازسازی جدول آنالیز بر اساس سود انتخابی</span>
+                    </div>
+                    
+                    <div class="flex gap-4 items-center bg-red-50 px-4 py-2 rounded-lg border border-red-100">
+                        <span class="text-xs font-bold text-red-700">شبیه‌سازی پیمانکار:</span>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-500">سود مورد انتظار (%):</span>
+                            <input type="number" id="reverseProfit" class="w-12 text-center font-bold text-sm bg-white border border-red-200 rounded" value="10" onchange="renderReverseAnalysis()">
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span class="text-[10px] text-slate-500">کسورات قانونی (%):</span>
+                            <input type="number" id="reverseTax" class="w-12 text-center font-bold text-sm bg-white border border-red-200 rounded" value="5" onchange="renderReverseAnalysis()">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="flex-1 overflow-auto custom-scrollbar flex flex-col">
+                    <table class="w-full text-sm text-left border-collapse mb-6">
+                        <thead class="text-xs text-slate-500 uppercase bg-slate-100 sticky top-0 z-10 font-bold shadow-sm">
+                            <tr>
+                                <th class="px-4 py-3 text-right bg-slate-100">نام غذا</th>
+                                <th class="px-4 py-3 text-center bg-slate-800 text-white">قیمت پیمانکار</th>
+                                <th class="px-2 py-3 text-center bg-red-50 text-red-800">حاشیه سود+مالیات<br><span class="text-[9px]">(User Defined)</span></th>
+                                <th class="px-2 py-3 text-center bg-slate-200">سربار و دستمزد<br><span class="text-[9px]">(استاندارد کارفرما)</span></th>
+                                <th class="px-4 py-3 text-center border-x-2 border-emerald-500 bg-emerald-50 font-black text-emerald-800">بودجه باقیمانده مواد<br><span class="text-[9px]">(Implied Material)</span></th>
+                                <th class="px-4 py-3 text-center bg-slate-100 text-slate-500">هزینه مواد استاندارد<br><span class="text-[9px]">(Market Price)</span></th>
+                                <th class="px-4 py-3 text-left bg-slate-100">کیفیت احتمالی</th>
+                            </tr>
+                        </thead>
+                        <tbody id="reverseTableBody" class="divide-y divide-slate-100 bg-white font-medium"></tbody>
+                    </table>
+
+                    <div class="px-6 pb-6">
+                        <h3 class="text-sm font-bold text-red-700 mb-4 border-b border-red-200 pb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path></svg>
+                            کشف قیمت مواد اساسی (بر اساس بودجه پیمانکار)
+                        </h3>
+                        <div class="bg-red-50 p-4 rounded-xl border border-red-100">
+                            <p class="text-xs text-red-600 mb-3 leading-5">
+                                این جدول نشان می‌دهد که پیمانکار برای رسیدن به سود <span id="lblSimProfit" class="font-black">10%</span>، باید مواد اولیه را با چه قیمتی تامین کند. اگر قیمت "کشف شده" بسیار پایین‌تر از بازار باشد، به معنی استفاده از مواد نامرغوب (گوشت منجمد، برنج خارجی، روغن پالم و...) است.
+                            </p>
+                            <table class="w-full text-sm text-left">
+                                <thead class="text-xs text-red-800 uppercase bg-red-100/50">
+                                    <tr>
+                                        <th class="px-4 py-2 text-right">کالای اساسی</th>
+                                        <th class="px-4 py-2 text-center">قیمت روز بازار (کارفرما)</th>
+                                        <th class="px-4 py-2 text-center font-black text-red-700">قیمت کشف شده (پیمانکار)</th>
+                                        <th class="px-4 py-2 text-left">تحلیل کیفی</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="reverseCommoditiesBody" class="divide-y divide-red-200/50"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 7: Dashboard -->
+        <div id="tab-dashboard" class="tab-content hidden absolute inset-0 bg-slate-100 p-4 lg:p-6 overflow-auto custom-scrollbar">
+            <div class="max-w-6xl mx-auto space-y-6 pb-10">
+                <!-- Top Cards -->
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase">میانگین اختلاف قیمت</h3>
+                        <div class="text-4xl font-black num-font text-slate-800" id="dashAvgDiff">0%</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase">تعداد اقلام گران (ریسک مالی)</h3>
+                        <div class="text-4xl font-black num-font text-red-600" id="dashHighRisk">0</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 bg-green-50 border-green-100">
+                        <h3 class="text-xs font-bold text-green-600 mb-2 uppercase">تعداد اقلام ارزان (ریسک کیفیت)</h3>
+                        <div class="text-4xl font-black num-font text-green-800" id="dashLowRisk">0</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200">
+                        <h3 class="text-xs font-bold text-slate-400 mb-2 uppercase">تفاوت بودجه سالانه</h3>
+                        <div class="text-xl font-black num-font text-blue-600" id="dashSavings">0</div>
+                        <span class="text-[9px] text-slate-400">تومان</span>
+                    </div>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-2 bg-white p-6 rounded-2xl shadow-sm border border-slate-200 relative">
+                        <h3 class="text-sm font-bold text-slate-700 mb-4">نمودار استراتژیک (۱۰ قلم اصلی)</h3>
+                        <div class="chart-container">
+                            <canvas id="strategicChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 flex flex-col h-96">
+                        <h3 class="text-sm font-bold text-slate-700 mb-4">توصیه نهایی سیستم</h3>
+                        <div id="finalRecommendation" class="flex-1 text-sm leading-6 text-slate-600 bg-slate-50 p-4 rounded-xl border border-slate-100 overflow-y-auto custom-scrollbar"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- TAB 8: Purchasing -->
+        <div id="tab-purchasing" class="tab-content hidden absolute inset-0 bg-slate-100 p-4 lg:p-6 overflow-hidden flex flex-col">
+            <div class="bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col h-full overflow-hidden">
+                <div class="px-6 py-4 border-b bg-slate-50 flex justify-between items-center">
+                    <div>
+                        <h2 class="font-bold text-lg text-emerald-800">مدیریت خرید و تدارکات (Purchasing)</h2>
+                        <p class="text-xs text-emerald-600">محاسبه حجم خرید سالانه/ماهانه و مقایسه بودجه کل</p>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <span class="text-xs text-slate-500">توزیع مصرف:</span>
+                        <select id="consumptionModel" class="text-xs border rounded p-1" onchange="renderPurchasingTab()">
+                            <option value="equal">توزیع یکنواخت (همه غذاها برابر)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex-1 overflow-auto custom-scrollbar p-6">
+                    <!-- Budget Summary -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-6">
+                        <div class="bg-slate-50 p-4 rounded-xl border">
+                            <h4 class="text-xs font-bold text-slate-500 mb-2">بودجه کل سالانه (برآورد کارفرما)</h4>
+                            <div class="text-2xl font-black text-slate-800 num-font" id="totalBudgetInternal">0</div>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <h4 class="text-xs font-bold text-blue-500 mb-2">بودجه کل سالانه (پیشنهاد پیمانکار)</h4>
+                            <div class="text-2xl font-black text-blue-800 num-font" id="totalBudgetContractor">0</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-bold text-slate-500 mb-2">اختلاف کل سالانه</h4>
+                            <div class="text-2xl font-black num-font" id="totalBudgetDiff">0</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                        <div class="bg-slate-50 p-4 rounded-xl border">
+                            <h4 class="text-xs font-bold text-slate-500 mb-2">بودجه میانگین ماهانه (کارفرما)</h4>
+                            <div class="text-xl font-black text-slate-800 num-font" id="monthlyBudgetInternal">0</div>
+                        </div>
+                        <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
+                            <h4 class="text-xs font-bold text-blue-500 mb-2">بودجه میانگین ماهانه (پیمانکار)</h4>
+                            <div class="text-xl font-black text-blue-800 num-font" id="monthlyBudgetContractor">0</div>
+                        </div>
+                        <div class="bg-white p-4 rounded-xl border border-slate-200">
+                            <h4 class="text-xs font-bold text-slate-500 mb-2">اختلاف میانگین ماهانه</h4>
+                            <div class="text-xl font-black num-font" id="monthlyBudgetDiff">0</div>
+                        </div>
+                    </div>
+
+                    <!-- Annual List -->
+                    <div class="mb-8">
+                        <h3 class="text-sm font-bold text-slate-700 mb-4 border-b pb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            لیست خرید مواد اولیه (سالانه)
+                        </h3>
+                        <table class="w-full text-sm text-left mb-6">
+                            <thead class="text-xs text-slate-500 uppercase bg-slate-100">
+                                <tr>
+                                    <th class="px-4 py-2 text-right">نام ماده اولیه</th>
+                                    <th class="px-4 py-2 text-center">مقدار کل سالانه</th>
+                                    <th class="px-4 py-2 text-center">واحد</th>
+                                    <th class="px-4 py-2 text-center">گردش مالی تقریبی</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchasingTableBody" class="divide-y divide-slate-100"></tbody>
+                        </table>
+                    </div>
+
+                    <!-- Monthly List -->
+                    <div>
+                        <h3 class="text-sm font-bold text-indigo-700 mb-4 border-b pb-2 flex items-center gap-2">
+                            <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                            برنامه خرید ماهانه (تامین نقدینگی)
+                        </h3>
+                        <table class="w-full text-sm text-left">
+                            <thead class="text-xs text-indigo-800 uppercase bg-indigo-50">
+                                <tr>
+                                    <th class="px-4 py-2 text-right">نام ماده اولیه</th>
+                                    <th class="px-4 py-2 text-center">مقدار مورد نیاز ماهانه</th>
+                                    <th class="px-4 py-2 text-center">واحد</th>
+                                    <th class="px-4 py-2 text-center">بودجه ماهانه تقریبی</th>
+                                </tr>
+                            </thead>
+                            <tbody id="purchasingMonthlyTableBody" class="divide-y divide-indigo-100"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // --- DATA & CONFIG ---
+        const RECIPES = [
+            {"id": "1", "name": "چلو کباب کوبیده", "cx": 1.2, "formula": [{"m": "گوشت چرخ کرده گوساله", "q": 90, "u": "گرم"}, {"m": "قلوگاه گوسفندی", "q": 45, "u": "گرم"}, {"m": "مرغ بدون استخوان", "q": 5, "u": "گرم"}, {"m": "پیاز", "q": 45, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 50, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "کره 10 گرمی", "q": 1, "u": "عدد"}, {"m": "زعفران", "q": 0.001, "u": "مثقال"}, {"m": "روغن مایع", "q": 10, "u": "گرم"}, {"m": "سماق", "q": 1, "u": "عدد"}, {"m": "سایر مواد (چلو کباب)", "q": 1, "u": "سرویس"}]},
+            {"id": "2", "name": "چلو کباب نگینی", "cx": 1.3, "formula": [{"m": "گوشت چرخ کرده گوساله", "q": 90, "u": "گرم"}, {"m": "قلوگاه گوسفندی", "q": 40, "u": "گرم"}, {"m": "سینه مرغ", "q": 30, "u": "گرم"}, {"m": "پیاز", "q": 50, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "کره 10 گرمی", "q": 1, "u": "عدد"}, {"m": "زعفران", "q": 0.001, "u": "مثقال"}, {"m": "روغن مایع", "q": 10, "u": "گرم"}, {"m": "سماق", "q": 1, "u": "عدد"}, {"m": "سایر مواد (نگینی)", "q": 1, "u": "سرویس"}]},
+            {"id": "3", "name": "چلوجوجه کباب", "cx": 1.1, "formula": [{"m": "جوجه بدون استخوان", "q": 180, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 50, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "زعفران", "q": 0.001, "u": "مثقال"}, {"m": "روغن مایع", "q": 10, "u": "گرم"}, {"m": "کره 10 گرمی", "q": 1, "u": "عدد"}, {"m": "ماست", "q": 7, "u": "گرم"}, {"m": "پیاز", "q": 20, "u": "گرم"}, {"m": "سایر مواد (جوجه)", "q": 1, "u": "سرویس"}]},
+            {"id": "4", "name": "چلو کباب بختیاری", "cx": 1.2, "formula": [{"m": "گوشت فیله و راسته گوساله", "q": 80, "u": "گرم"}, {"m": "مرغ بدون استخوان", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 50, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "روغن مایع", "q": 10, "u": "گرم"}, {"m": "کره 10 گرمی", "q": 1, "u": "عدد"}, {"m": "پیاز", "q": 50, "u": "گرم"}, {"m": "سایر مواد (بختیاری)", "q": 1, "u": "سرویس"}]},
+            {"id": "5", "name": "شوید پلو با گوشت", "cx": 1.1, "formula": [{"m": "گوشت خورشتی گوساله", "q": 150, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 140, "u": "گرم"}, {"m": "شوید پاک شده و خرد شده", "q": 50, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 30, "u": "گرم"}, {"m": "روغن مایع", "q": 20, "u": "گرم"}, {"m": "سایر مواد (شوید پلو)", "q": 1, "u": "سرویس"}]},
+            {"id": "6", "name": "زرشک پلو با مرغ", "cx": 1.0, "formula": [{"m": "مرغ بدون استخوان", "q": 300, "u": "گرم"}, {"m": "زرشک", "q": 10, "u": "گرم"}, {"m": "زعفران", "q": 0.001, "u": "مثقال"}, {"m": "رب گوجه فرنگی", "q": 20, "u": "گرم"}, {"m": "روغن مایع", "q": 50, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "سایر مواد (زرشک پلو)", "q": 1, "u": "سرویس"}]},
+            {"id": "7", "name": "سبزی پلو با ماهی قزل آلا", "cx": 1.1, "formula": [{"m": "ماهی قزال آلا پاک شده", "q": 250, "u": "گرم"}, {"m": "سبزی پلو", "q": 60, "u": "گرم"}, {"m": "روغن مایع", "q": 70, "u": "گرم"}, {"m": "naranj", "q": 100, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "سایر مواد (قزل آلا)", "q": 1, "u": "سرویس"}]},
+            {"id": "8", "name": "سبزی پلو با ماهی شیر", "cx": 1.1, "formula": [{"m": "ماهی شیر پاک شده", "q": 300, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "سبزی پلو", "q": 60, "u": "گرم"}, {"m": "روغن مایع", "q": 70, "u": "گرم"}, {"m": "زعفران", "q": 0.001, "u": "گرم"}, {"m": "آرد و تخم مرغ", "q": 1, "u": "سرویس"}, {"m": "آبلیمو", "q": 15, "u": "گرم"}, {"m": "نارنج", "q": 80, "u": "گرم"}, {"m": "پیاز،فلفل دلمه", "q": 1, "u": "سرویس"}, {"m": "سایر مواد (ماهی شیر)", "q": 1, "u": "سرویس"}]},
+            {"id": "9", "name": "خوراک تن ماهی", "cx": 0.8, "formula": [{"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "تن ماهی", "q": 180, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "آبلیمو", "q": 1, "u": "عدد"}]},
+            {"id": "10", "name": "خورشت قیمه بادمجان", "cx": 1.1, "formula": [{"m": "گوشت گوساله ران و سردست", "q": 80, "u": "گرم"}, {"m": "لپه", "q": 25, "u": "گرم"}, {"m": "بادمجان", "q": 120, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 10, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 30, "u": "گرم"}, {"m": "روغن مایع", "q": 50, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "سایر مواد (قیمه)", "q": 1, "u": "سرویس"}]},
+            {"id": "11", "name": "خورشت قورمه سبزی", "cx": 1.1, "formula": [{"m": "گوشت گوساله ران و سردست", "q": 80, "u": "گرم"}, {"m": "سبزی سرخ شده", "q": 40, "u": "گرم"}, {"m": "لیمو عمانی", "q": 3, "u": "گرم"}, {"m": "لوبیا قرمز", "q": 25, "u": "گرم"}, {"m": "روغن مایع", "q": 40, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "سایر مواد (qورمه)", "q": 1, "u": "سرویس"}]},
+            {"id": "12", "name": "خورشت فسنجان با مرغ", "cx": 1.2, "formula": [{"m": "ران بی خس", "q": 80, "u": "گرم"}, {"m": "مغز گردو", "q": 40, "u": "گرم"}, {"m": "رب انار", "q": 30, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "روغن مایع", "q": 30, "u": "گرم"}, {"m": "کدو حلوائی", "q": 30, "u": "گرم"}, {"m": "هویج", "q": 30, "u": "گرم"}, {"m": "پیاز", "q": 50, "u": "گرم"}, {"m": "سایر مواد (فسنجان)", "q": 1, "u": "سرویس"}]},
+            {"id": "13", "name": "خورشت کرفس", "cx": 1.1, "formula": [{"m": "گوشت گوساله ران و سردست", "q": 80, "u": "گرم"}, {"m": "کرفس سرخ شده", "q": 80, "u": "گرم"}, {"m": "نعنا", "q": 30, "u": "گرم"}, {"m": "لیمو عمانی", "q": 3, "u": "گرم"}, {"m": "روغن مایع", "q": 40, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "سایر مواد (کرفس)", "q": 1, "u": "سرویس"}]},
+            {"id": "14", "name": "لوبیا پلو با گوشت", "cx": 1.0, "formula": [{"m": "گوشت چرخ کرده گوساله", "q": 70, "u": "گرم"}, {"m": "لوبیا سبز خام", "q": 70, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 20, "u": "گرم"}, {"m": "روغن مایع", "q": 30, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "زعفران", "q": 0.001, "u": "مثقال"}, {"m": "سایر مواد (لوبیا پلو)", "q": 1, "u": "سرویس"}]},
+            {"id": "15", "name": "استامبولی پلو با گوشت", "cx": 1.0, "formula": [{"m": "گوشت چرخ کرده گوساله", "q": 70, "u": "گرم"}, {"m": "سیب زمینی", "q": 80, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 20, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 160, "u": "گرم"}, {"m": "زعفران", "q": 0.001, "u": "مثقال"}, {"m": "روغن مایع", "q": 40, "u": "گرم"}, {"m": "سایر مواد (استامبولی)", "q": 1, "u": "سرویس"}]},
+            {"id": "16", "name": "عدس پلو با گوشت", "cx": 1.0, "formula": [{"m": "گوشت چرخ کرده گوساله", "q": 70, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 20, "u": "گرم"}, {"m": "عدس", "q": 35, "u": "گرم"}, {"m": "کشمش پلوئی", "q": 15, "u": "گرم"}, {"m": "برنج درجه 1 ایرانی", "q": 150, "u": "گرم"}, {"m": "زعفران", "q": 0.001, "u": "مثقال"}, {"m": "روغن مایع", "q": 20, "u": "گرم"}, {"m": "سایر مواد (عدس پلو)", "q": 1, "u": "سرویس"}]},
+            {"id": "17", "name": "خوراک شنیسل مرغ", "cx": 1.1, "formula": [{"m": "سینه مرغ", "q": 300, "u": "گرم"}, {"m": "تخم مرغ", "q": 0.5, "u": "عدد"}, {"m": "روغن مایع", "q": 60, "u": "گرم"}, {"m": "زعفران", "q": 0.001, "u": "مثقال"}, {"m": "آرد سوخاری", "q": 40, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "سیب زمینی", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "سس کچاپ", "q": 1, "u": "عدد"}, {"m": "سایر مواد (شنیسل)", "q": 1, "u": "سرویس"}]},
+            {"id": "18", "name": "خوراک مرغ کنتاکی", "cx": 1.2, "formula": [{"m": "ران مرغ", "q": 400, "u": "گرم"}, {"m": "سیب زمینی", "q": 100, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "آرد سوخاری", "q": 40, "u": "گرم"}, {"m": "روغن مایع", "q": 50, "u": "گرم"}, {"m": "تخم مرغ", "q": 0.5, "u": "عدد"}, {"m": "سس کچاپ", "q": 1, "u": "عدد"}, {"m": "سایر مواد (کنتاکی)", "q": 1, "u": "سرویس"}]},
+            {"id": "19", "name": "خوراک مرغ", "cx": 1.0, "formula": [{"m": "مرغ بدون استخوان", "q": 350, "u": "گرم"}, {"m": "روغن مایع", "q": 40, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 20, "u": "گرم"}, {"m": "سیب زمینی", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "آبلیمو", "q": 10, "u": "گرم"}, {"m": "سایر مواد (خوراک مرغ)", "q": 1, "u": "سرویس"}]},
+            {"id": "20", "name": "آبگوشت", "cx": 1.0, "formula": [{"m": "نخود", "q": 50, "u": "گرم"}, {"m": "سیب زمینی", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 25, "u": "گرم"}, {"m": "روغن مایع", "q": 10, "u": "گرم"}, {"m": "نان سنگک", "q": 0.5, "u": "عدد"}, {"m": "سایر مواد (آبگوشت)", "q": 1, "u": "سرویس"}]},
+            {"id": "21", "name": "خوراک کتلت گوشت", "cx": 1.3, "formula": [{"m": "گوشت چرخ کرده گوساله", "q": 100, "u": "گرم"}, {"m": "جوجه بدون استخوان", "q": 20, "u": "گرم"}, {"m": "سیب زمینی", "q": 200, "u": "گرم"}, {"m": "تخم مرغ", "q": 0.5, "u": "عدد"}, {"m": "روغن مایع", "q": 80, "u": "گرم"}, {"m": "آرد سوخاری", "q": 50, "u": "گرم"}, {"m": "پیاز", "q": 30, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "سبزی جعفری", "q": 30, "u": "گرم"}, {"m": "سس کچاپ", "q": 1, "u": "عدد"}, {"m": "سایر مواد (کتلت)", "q": 1, "u": "سرویس"}]},
+            {"id": "22", "name": "خوراک کوکو سبزی", "cx": 1.2, "formula": [{"m": "تخم مرغ", "q": 2, "u": "عدد"}, {"m": "زرشک", "q": 5, "u": "گرم"}, {"m": "سبزی کوکو", "q": 250, "u": "گرم"}, {"m": "روغن مایع", "q": 80, "u": "گرم"}, {"m": "آرد گندم", "q": 10, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "سیب زمینی", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "سایر مواد (کوکو سبزی)", "q": 1, "u": "سرویس"}]},
+            {"id": "23", "name": "خوراک کوکو سیب زمینی", "cx": 1.2, "formula": [{"m": "سیب زمینی", "q": 200, "u": "گرم"}, {"m": "تخم مرغ", "q": 2, "u": "عدد"}, {"m": "روغن مایع", "q": 80, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "سایر مواد (کوکو سیب)", "q": 1, "u": "سرویس"}]},
+            {"id": "24", "name": "خوراک کوفته تبریزی", "cx": 1.4, "formula": [{"m": "برنج درجه 1 ایرانی", "q": 50, "u": "گرم"}, {"m": "لپه", "q": 25, "u": "گرم"}, {"m": "گوشت چرخ کرده گوساله", "q": 80, "u": "گرم"}, {"m": "آلو", "q": 20, "u": "گرم"}, {"m": "زرشک", "q": 5, "u": "گرم"}, {"m": "مرغ بدون استخوان", "q": 30, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 5, "u": "گرم"}, {"m": "تخم مرغ", "q": 0.5, "u": "عدد"}, {"m": "سبزی معطر", "q": 20, "u": "گرم"}, {"m": "روغن مایع", "q": 10, "u": "گرم"}, {"m": "سایر مواد (کوفته)", "q": 1, "u": "سرویس"}]},
+            {"id": "25", "name": "خوراک سالاد الویه", "cx": 1.2, "formula": [{"m": "مرغ بدون استخوان", "q": 120, "u": "گرم"}, {"m": "تخم مرغ", "q": 2, "u": "عدد"}, {"m": "سیب زمینی", "q": 100, "u": "گرم"}, {"m": "naranj", "q": 40, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "هویج", "q": 20, "u": "گرم"}, {"m": "سس مایونز", "q": 90, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "سایر مواد (الویه)", "q": 1, "u": "سرویس"}]},
+            {"id": "26", "name": "خوراک مرغ و قارچ", "cx": 1.1, "formula": [{"m": "مرغ بدون استخوان", "q": 220, "u": "گرم"}, {"m": "سیب زمینی", "q": 150, "u": "گرم"}, {"m": "قارچ", "q": 100, "u": "گرم"}, {"m": "نخود فرنگی", "q": 20, "u": "گرم"}, {"m": "هویج", "q": 30, "u": "گرم"}, {"m": "روغن مایع", "q": 70, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 25, "u": "گرم"}, {"m": "fلفل دلمه", "q": 20, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "سایر مواد (مرغ قارچ)", "q": 1, "u": "سرویس"}]},
+            {"id": "27", "name": "خوراک جوجه چینی", "cx": 1.2, "formula": [{"m": "سینه مرغ", "q": 250, "u": "گرم"}, {"m": "تخم مرغ", "q": 0.5, "u": "عدد"}, {"m": "سیب زمینی", "q": 100, "u": "گرم"}, {"m": "خیار شور", "q": 100, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 100, "u": "گرم"}, {"m": "روغن مایع", "q": 80, "u": "گرم"}, {"m": "سس کچاپ", "q": 1, "u": "عدد"}, {"m": "سایر مواد (جوجه چینی)", "q": 1, "u": "سرویس"}]},
+            {"id": "28", "name": "خوراک پوره سیب زمینی با مرغ", "cx": 1.0, "formula": [{"m": "سینه مرغ", "q": 150, "u": "گرم"}, {"m": "سیب زمینی", "q": 200, "u": "گرم"}, {"m": "کره", "q": 10, "u": "گرم"}, {"m": "سبزیجات", "q": 100, "u": "گرم"}, {"m": "سایر مواد (پوره)", "q": 1, "u": "سرویس"}]},
+            {"id": "29", "name": "سالاد بروکلی", "cx": 0.9, "formula": [{"m": "بروکلی", "q": 50, "u": "گرم"}, {"m": "سیب زمینی", "q": 100, "u": "گرم"}, {"m": "کرفس", "q": 30, "u": "گرم"}, {"m": "انگور", "q": 50, "u": "گرم"}, {"m": "ذرت", "q": 10, "u": "گرم"}, {"m": "هویج", "q": 10, "u": "گرم"}, {"m": "نخود فرنگی", "q": 10, "u": "گرم"}, {"m": "گردوی درجه 2", "q": 30, "u": "گرم"}, {"m": "سایر مواد (سالاد)", "q": 1, "u": "سرویس"}]},
+            {"id": "30", "name": "سوپ جو", "cx": 0.9, "formula": [{"m": "جو پوست کنده", "q": 25, "u": "گرم"}, {"m": "هویج", "q": 25, "u": "گرم"}, {"m": "سیب زمینی", "q": 25, "u": "گرم"}, {"m": "سبزی جعفری", "q": 15, "u": "گرم"}, {"m": "پیاز", "q": 20, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 15, "u": "گرم"}, {"m": "سایر مواد (سوپ جو)", "q": 1, "u": "سرویس"}]},
+            {"id": "31", "name": "سوپ ورمیشل", "cx": 0.9, "formula": [{"m": "هویج", "q": 40, "u": "گرم"}, {"m": "سیب زمینی", "q": 40, "u": "گرم"}, {"m": "پیاز", "q": 40, "u": "گرم"}, {"m": "سبزی جعفری", "q": 40, "u": "گرم"}, {"m": "رشته سوپ", "q": 25, "u": "گرم"}, {"m": "نخود فرنگی", "q": 10, "u": "گرم"}, {"m": "رب گوجه فرنگی", "q": 15, "u": "گرم"}, {"m": "سایر مواد (ورمیشل)", "q": 1, "u": "سرویس"}]},
+            {"id": "32", "name": "آش رشته", "cx": 1.1, "formula": [{"m": "سبزی آش", "q": 100, "u": "گرم"}, {"m": "رشته آش", "q": 65, "u": "گرم"}, {"m": "نخود و لوبیا و عدس", "q": 60, "u": "گرم"}, {"m": "کشک", "q": 60, "u": "گرم"}, {"m": "پیاز داغ", "q": 20, "u": "گرم"}, {"m": "روغن مایع", "q": 15, "u": "گرم"}, {"m": "سایر مواد (آش رشته)", "q": 1, "u": "سرویس"}]},
+            {"id": "33", "name": "آش جو", "cx": 1.1, "formula": [{"m": "سبزی آش", "q": 100, "u": "گرم"}, {"m": "جو پوست کنده", "q": 40, "u": "گرم"}, {"m": "نخود و لوبیا و عدس", "q": 40, "u": "گرم"}, {"m": "کشک", "q": 40, "u": "گرم"}, {"m": "پیاز داغ", "q": 20, "u": "گرم"}, {"m": "روغن مایع", "q": 15, "u": "گرم"}, {"m": "سایر مواد (آش جو)", "q": 1, "u": "سرویس"}]},
+            {"id": "34", "name": "فرنی", "cx": 0.8, "formula": [{"m": "آرد برنج", "q": 35, "u": "گرم"}, {"m": "شیر", "q": 120, "u": "گرم"}, {"m": "شکر", "q": 35, "u": "گرم"}, {"m": "سایر مواد (فرنی)", "q": 1, "u": "سرویس"}]},
+            {"id": "35", "name": "ماست و خیار", "cx": 0.5, "formula": [{"m": "ماست", "q": 150, "u": "گرم"}, {"m": "خیار", "q": 50, "u": "گرم"}, {"m": "سایر مواد (ماست خیار)", "q": 1, "u": "سرویس"}]},
+            {"id": "36", "name": "پنیر، گردو، خرما", "cx": 0.5, "formula": [{"m": "پنیر معمولی", "q": 60, "u": "گرم"}, {"m": "گردوی درجه 1", "q": 50, "u": "گرم"}, {"m": "خرما", "q": 80, "u": "گرم"}]},
+            {"id": "37", "name": "خیار، گوجه، پنیر و گردو", "cx": 0.5, "formula": [{"m": "پنیر معمولی", "q": 60, "u": "گرم"}, {"m": "خیار", "q": 200, "u": "گرم"}, {"m": "گوجه فرنگی", "q": 200, "u": "گرم"}, {"m": "گردو", "q": 40, "u": "گرم"}]},
+            {"id": "38", "name": "پک میوه", "cx": 0.5, "formula": [{"m": "میوه فصلی", "q": 600, "u": "گرم"}, {"m": "کارد میوه", "q": 1, "u": "عدد"}, {"m": "ظرف لانچ باکس", "q": 1, "u": "عدد"}]}
+        ];
+
+        const BASE_PRICES = {
+            "گوشت چرخ کرده گوساله": 7950000, "قلوگاه گوسفندی": 4600000, "مرغ بدون استخوان": 2500000, "پیاز": 250000, "گوجه فرنگی": 480000, "برنج درجه 1 ایرانی": 2300000, "کره": 7500000, "زعفران": 7750000, "روغن مایع": 950000, "سماق": 3960, "کره 10 گرمی": 75000, "سایر مواد (چلو کباب)": 35000, "سایر مواد (نگینی)": 35000, "سایر مواد (جوجه)": 35000, "سایر مواد (بختیاری)": 35000, "سایر مواد (شوید پلو)": 35000, "سایر مواد (زرشک پلو)": 35000, "سایر مواد (قزل آلا)": 35000, "سایر مواد (ماهی شیر)": 35000, "سایر مواد (قیمه)": 35000, "سایر مواد (قورمه)": 35000, "سایر مواد (فسنجان)": 35000, "سایر مواد (کرفس)": 35000, "سایر مواد (لوبیا پلو)": 35000, "سایر مواد (استامبولی)": 35000, "سایر مواد (عدس پلو)": 35000, "سایر مواد (شنیسل)": 35000, "سایر مواد (کنتاکی)": 35000, "سایر مواد (خوراک مرغ)": 35000, "سایر مواد (آبگوشت)": 131000, "سایر مواد (کتلت)": 35000, "سایر مواد (کوکو سبزی)": 35000, "سایر مواد (کوکو سیب)": 35000, "سایر مواد (کوفته)": 35000, "سایر مواد (الویه)": 35000, "سایر مواد (مرغ قارچ)": 35000, "سایر مواد (جوجه چینی)": 35000, "سایر مواد (پوره)": 35000, "سایر مواد (سالاد)": 70000, "سایر مواد (سوپ جو)": 39750, "سایر مواد (ورمیشل)": 35000, "سایر مواد (آش رشته)": 52400, "سایر مواد (آش جو)": 52400, "سایر مواد (فرنی)": 2020, "سایر مواد (ماست خیار)": 35000,
+            "سینه مرغ": 2500000, "جوجه بدون استخوان": 2500000, "ماست": 800000, "گوشت فیله و راسته گوساله": 7950000, "گوشت خورشتی گوساله": 9200000, "شوید پاک شده و خرد شده": 850000, "فلفل دلمه،هویج،کرفس،پیاز،سیر": 443000, "رب گوجه فرنگی": 1060000, "زرشک": 7700000, "ماهی قزال آلا پاک شده": 4000000, "سبزی پلو": 850000, "نارنج": 328000, "ماهی شیر پاک شده": 5000000, "آرد و تخم مرغ": 80500, "پیاز،فلفل دلمه": 6700, "تن ماهی": 6380000, "خیار شور": 1250000, "آبلیمو": 32800, "گوشت گوساله ران و سردست": 7950000, "لپه": 2100000, "بادمجان": 350000, "سبزی سرخ شده": 4000000, "لیمو عمانی": 5733000, "لوبیا قرمز": 2600000, "ران بی خس": 2400000, "مغز گردو": 7500000, "رب انار": 3500000, "کدو حلوائی": 395000, "هویج": 320000, "کرفس سرخ شده": 1650000, "نعنا": 450000, "لوبیا سبز خام": 950000, "سیب زمینی": 350000, "عدس": 1200000, "کشمش پلوئی": 3600000, "تخم مرغ": 116000, "آرد سوخاری": 1600000, "سس کچاپ": 18400, "ران مرغ": 1950000, "نخود": 2195000, "نان سنگک": 150000, "سبزی جعفری": 450000, "سبزی کوکو": 850000, "آرد گندم": 450000, "آلو": 1200000, "سبزی معطر": 850000, "نخود فرنگی": 1150000, "سس مایونز": 1500000, "قارچ": 1030000, "فلفل دلمه": 420000, "کرفس": 920000, "سبزیجات": 413000, "بروکلی": 580000, "انگور": 990000, "ذرت": 520000, "گردوی درجه 2": 7500000, "جو پوست کنده": 550000, "رشته سوپ": 550000, "سبزی آش": 850000, "رشته آش": 800000, "نخود و لوبیا و عدس": 1863000, "کشک": 2000000, "پیاز داغ": 2300000, "آرد برنج": 1700000, "شیر": 600000, "شکر": 650000, "خیار": 460000, "پنیر معمولی": 1500000, "گردوی درجه 1": 7500000, "خرما": 1000000, "گردو": 7500000, "میوه فصلی": 1000000, "کارد میوه": 5000, "ظرف لانچ باکس": 50000
+        };
+
+        let laborData = [
+            { role: "سرپرست", count: 0, salary: 450000000 },
+            { role: "کارشناس بهداشت", count: 0, salary: 350000000 },
+            { role: "سرآشپز", count: 1, salary: 300000000 },
+            { role: "آشپز", count: 4, salary: 300000000 },
+            { role: "سالن کار", count: 2, salary: 300000000 },
+            { role: "کمک آشپز", count: 3, salary: 300000000 },
+            { role: "کارگر ساده", count: 4, salary: 300000000 },
+            { role: "انباردار", count: 1, salary: 300000000 }
+        ];
+
+        let globalSettings = { 
+            totalAnnualMeals: 438000, 
+            baseLaborCost: 0,
+            annualDetergent: 2400000000,
+            annualUniform: 646000000,
+            annualConsumable: 66300000,
+            annualTransport: 10500000000,
+            
+            // Rent & Equipment (Deductions)
+            monthlyRent: 300000000,
+            equipmentValue: 7000000000,
+            depreciationYears: 3,
+
+            // Per Meal Calculated
+            detergentBase: 0,
+            operationalOverhead: 0, 
+            infrastructureDeductions: 0 
+        };
+        
+        let contractorPrices = {}; 
+
+        // --- CORE LOGIC ---
+        let globalPrices = JSON.parse(JSON.stringify(BASE_PRICES));
+        let recipesData = JSON.parse(JSON.stringify(RECIPES));
+        let selectedDishId = "1";
+        let costChartInstance = null, strategicChartInstance = null;
+
+        const normalize = (s) => s ? s.toString().trim().replace(/\s+/g, ' ').replace(/\u200C/g, ' ') : '';
+        const fmt = (n) => new Intl.NumberFormat('fa-IR').format(Math.round(n));
+        const parseNum = (s) => parseFloat(s.toString().replace(/[^\d.]/g, '')) || 0;
+
+        function getPrice(name) {
+            if(globalPrices[name] !== undefined) return globalPrices[name];
+            const norm = normalize(name);
+            for(let k in globalPrices) {
+                if(normalize(k) === norm || norm.includes(normalize(k))) return globalPrices[k];
+            }
+            return 0;
+        }
+
+        function calculateDishCosts(dish) {
+            let matCost = 0;
+            dish.formula.forEach(item => {
+                const p = getPrice(item.m);
+                if(item.u === 'مثقال' || item.u === 'عدد' || item.u === 'کیلوگرم' || item.u === 'سرویس') matCost += item.q * p;
+                else matCost += (item.q / 1000) * p;
+            });
+            const labor = globalSettings.baseLaborCost * (dish.cx || 1);
+            
+            const detergentCost = globalSettings.detergentBase * (dish.cx || 1);
+            const fixedOpOverhead = globalSettings.operationalOverhead; 
+            const totalOperationalOverhead = fixedOpOverhead + detergentCost;
+            const infrastructureCost = globalSettings.infrastructureDeductions;
+            
+            const primeCost = matCost + labor + totalOperationalOverhead + infrastructureCost;
+            const fullCost = primeCost; 
+            
+            const profPct = parseNum(document.getElementById('profitPct')?.value || 10) / 100;
+            const taxPct = parseNum(document.getElementById('taxPct')?.value || 2.5) / 100; 
+            const insPct = parseNum(document.getElementById('insurancePct')?.value || 7.78) / 100; 
+            
+            const profit = fullCost * profPct;
+            const tax = profit * taxPct;
+            const insurance = fullCost * insPct;
+            const finalPrice = fullCost + profit + tax + insurance;
+
+            return { matCost, labor, detergentCost, fixedOpOverhead, totalOperationalOverhead, infrastructureCost, fullCost, profit, tax, insurance, finalPrice };
+        }
+
+        function recalcAll() {
+            let totalAnnualSalary = 0;
+            laborData.forEach(l => totalAnnualSalary += (l.count * l.salary * 12));
+            const meals = parseNum(document.getElementById('totalMealsInput').value) || 1;
+            globalSettings.baseLaborCost = totalAnnualSalary / meals;
+
+            const annualDet = parseNum(document.getElementById('annualDetergent').value);
+            const annualUni = parseNum(document.getElementById('annualUniform').value);
+            const annualCon = parseNum(document.getElementById('annualConsumable').value);
+            const annualTrans = parseNum(document.getElementById('annualTransport').value);
+
+            const monthlyRent = parseNum(document.getElementById('monthlyRent').value);
+            const equipVal = parseNum(document.getElementById('equipmentValue').value);
+            const depYears = parseNum(document.getElementById('depreciationYears').value) || 3;
+
+            globalSettings.detergentBase = annualDet / meals;
+            globalSettings.operationalOverhead = (annualUni + annualCon + annualTrans) / meals; 
+            
+            const annualRent = monthlyRent * 12;
+            const annualDep = equipVal / depYears;
+            globalSettings.infrastructureDeductions = (annualRent + annualDep) / meals;
+
+            document.getElementById('operationalOverheadDisplay').innerText = fmt(globalSettings.operationalOverhead + globalSettings.detergentBase); 
+            document.getElementById('deductionsDisplay').innerText = fmt(globalSettings.infrastructureDeductions);
+            document.getElementById('totalOverheadDisplay').innerText = fmt(globalSettings.operationalOverhead + globalSettings.detergentBase + globalSettings.infrastructureDeductions);
+
+            refreshActiveTab();
+        }
+
+        function switchTab(tab) {
+            document.querySelectorAll('.tab-content').forEach(el => { el.classList.add('hidden'); el.classList.remove('flex'); });
+            const target = document.getElementById(`tab-${tab}`);
+            target.classList.remove('hidden'); target.classList.add('flex');
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(`btn-${tab}`).classList.add('active');
+            refreshActiveTab(tab);
+        }
+
+        function refreshActiveTab(forceTab = null) {
+            let activeTab = forceTab;
+            if(!activeTab) {
+                const activeBtn = document.querySelector('.tab-btn.active');
+                if(activeBtn) activeTab = activeBtn.id.replace('btn-', '');
+            }
+            if(activeTab === 'detail') renderDashboard();
+            if(activeTab === 'labor') renderLaborTab();
+            if(activeTab === 'financial') renderFinancialTab();
+            if(activeTab === 'contractor') renderContractorInput();
+            if(activeTab === 'comparison') renderComparison();
+            if(activeTab === 'reverse') renderReverseAnalysis();
+            if(activeTab === 'dashboard') renderStrategicDashboard();
+            if(activeTab === 'purchasing') renderPurchasingTab();
+        }
+
+        function renderDashboard() {
+            const dish = recipesData.find(r => r.id === selectedDishId);
+            if(!dish) return;
+            const costs = calculateDishCosts(dish);
+            
+            document.getElementById('dishTitle').innerText = dish.name;
+            document.getElementById('dishCxDisplay').innerText = `ضریب سختی: ${dish.cx}`;
+            document.getElementById('materialCostDisplay').innerText = fmt(costs.matCost);
+
+            const tbody = document.getElementById('bomTableBody');
+            tbody.innerHTML = '';
+            dish.formula.forEach((item, idx) => {
+                const p = getPrice(item.m);
+                let c = (item.u === 'مثقال' || item.u === 'عدد' || item.u === 'کیلوگرم' || item.u === 'سرویس') ? item.q * p : (item.q / 1000) * p;
+                tbody.innerHTML += `<tr>
+                    <td class="px-2 py-2 text-right font-bold bg-white">${item.m}</td>
+                    <td class="px-2 py-2 text-center bg-white"><input type="number" step="0.001" class="editable-input" value="${item.q}" onchange="updateQty(${idx}, this.value)"></td>
+                    <td class="px-2 py-2 text-center text-xs text-slate-500 bg-white">${item.u}</td>
+                    <td class="px-2 py-2 text-center bg-white"><input type="text" class="editable-input num-font" value="${fmt(p)}" onchange="updatePrice('${item.m}', this.value)"></td>
+                    <td class="px-2 py-2 text-left num-font text-blue-600 bg-white">${fmt(c)}</td>
+                </tr>`;
+            });
+
+            const canvas = document.getElementById('costChart');
+            if (canvas && canvas.offsetParent !== null) {
+                const ctx = canvas.getContext('2d');
+                if(costChartInstance) costChartInstance.destroy();
+                costChartInstance = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['مواد', 'دستمزد', 'سربار عملیاتی', 'کسورات زیرساختی'],
+                        datasets: [{ 
+                            data: [costs.matCost, costs.labor, costs.totalOperationalOverhead, costs.infrastructureCost], 
+                            backgroundColor: ['#3b82f6', '#4f46e5', '#f97316', '#64748b'],
+                            borderWidth: 0
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'left', labels: { font: { family: 'Vazirmatn' } } } } }
+                });
+            }
+        }
+
+        function renderLaborTab() {
+            document.getElementById('laborTableBody').innerHTML = laborData.map((l, i) => `
+                <tr class="hover:bg-slate-50">
+                    <td class="px-2 py-2 text-right font-bold">${l.role}</td>
+                    <td class="px-2 py-2 text-center"><input type="number" class="editable-input" value="${l.count}" onchange="updateLabor(${i}, 'count', this.value)"></td>
+                    <td class="px-2 py-2 text-center"><input type="text" class="editable-input" value="${fmt(l.salary)}" onchange="updateLabor(${i}, 'salary', this.value)"></td>
+                </tr>`).join('');
+            document.getElementById('avgLaborCost').innerText = fmt(globalSettings.baseLaborCost);
+        }
+
+        function renderFinancialTab() {
+            const tbody = document.getElementById('financialTableBody');
+            tbody.innerHTML = '';
+            recipesData.forEach(dish => {
+                const c = calculateDishCosts(dish);
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 border-b">
+                        <td class="px-2 py-2 text-right font-bold text-[11px]">${dish.name}</td>
+                        <td class="px-2 py-2 text-center text-[11px] num-font text-blue-700">${fmt(c.matCost)}</td>
+                        <td class="px-2 py-2 text-center text-[11px] num-font text-indigo-700">${fmt(c.labor)}</td>
+                        <td class="px-2 py-2 text-center text-[11px] num-font text-orange-700 font-bold bg-orange-50">${fmt(c.totalOperationalOverhead)}</td>
+                        <td class="px-4 py-2 text-center text-[11px] text-gray-700 bg-gray-100 font-bold">${fmt(c.infrastructureCost)}</td>
+                        <td class="px-4 py-2 text-center font-black bg-blue-50 text-[11px]">${fmt(c.fullCost)}</td>
+                        <td class="px-4 py-2 text-center text-[11px] text-gray-500">${fmt(c.insurance)}</td>
+                        <td class="px-4 py-2 text-center text-[11px] text-green-600 font-bold">${fmt(c.profit)}</td>
+                        <td class="px-4 py-2 text-center text-[11px] text-gray-500">${fmt(c.tax)}</td>
+                        <td class="px-4 py-2 text-left font-black bg-slate-800 text-white dir-ltr text-[11px]">${fmt(c.finalPrice)}</td>
+                    </tr>`;
+            });
+        }
+
+        function renderContractorInput() {
+            const tbody = document.getElementById('contractorInputBody');
+            tbody.innerHTML = '';
+            recipesData.forEach(dish => {
+                const c = calculateDishCosts(dish);
+                const currentBid = contractorPrices[dish.id] || 0;
+                tbody.innerHTML += `
+                    <tr>
+                        <td class="px-6 py-3 text-right font-bold">${dish.name}</td>
+                        <td class="px-6 py-3 text-center text-slate-500 num-font">${fmt(c.finalPrice)}</td>
+                        <td class="px-6 py-3 text-center">
+                            <input type="text" class="editable-input font-bold text-lg text-blue-800 border-2 border-blue-100 focus:border-blue-500" 
+                                value="${currentBid > 0 ? fmt(currentBid) : ''}" 
+                                placeholder="وارد کنید..."
+                                onchange="updateContractorPrice('${dish.id}', this.value)">
+                        </td>
+                        <td class="px-6 py-3 text-left">
+                            ${currentBid > 0 ? '<span class="text-green-600 font-bold text-xs bg-green-50 px-2 py-1 rounded border border-green-200">ثبت شد</span>' : '<span class="text-red-400 text-xs bg-red-50 px-2 py-1 rounded border border-red-200">منتظر ورود</span>'}
+                        </td>
+                    </tr>`;
+            });
+        }
+
+        function renderComparison() {
+            const tbody = document.getElementById('comparisonTableBody');
+            tbody.innerHTML = '';
+            
+            let totalWeightedPriceInternal = 0;
+            let totalWeightedPriceContractor = 0;
+            const totalMeals = parseNum(document.getElementById('totalMealsInput').value);
+            const mealsPerDish = totalMeals / recipesData.length;
+
+            recipesData.forEach(dish => {
+                const c = calculateDishCosts(dish);
+                const bid = contractorPrices[dish.id] || 0;
+                
+                totalWeightedPriceInternal += c.finalPrice * mealsPerDish;
+                if(bid > 0) totalWeightedPriceContractor += bid * mealsPerDish;
+                else totalWeightedPriceContractor += c.finalPrice * mealsPerDish;
+
+                if(bid === 0) return;
+                const diff = bid - c.finalPrice;
+                const pct = (diff / c.finalPrice) * 100;
+                let statusClass = pct > 5 ? 'var-high-pos' : (pct < -10 ? 'var-low-neg' : 'var-ok');
+                let statusText = pct > 5 ? 'پیمانکار گران‌تر' : (pct < -10 ? 'پیمانکار ارزان‌تر (ریسک)' : 'منطقی');
+                tbody.innerHTML += `
+                    <tr class="border-b">
+                        <td class="px-4 py-3 text-right font-bold">${dish.name}</td>
+                        <td class="px-4 py-3 text-center num-font font-bold text-blue-700 bg-blue-50">${fmt(c.finalPrice)}</td>
+                        <td class="px-4 py-3 text-center num-font">${fmt(bid)}</td>
+                        <td class="px-4 py-3 text-center num-font dir-ltr ${diff > 0 ? 'text-red-600' : 'text-green-600'}">${fmt(diff)}</td>
+                        <td class="px-4 py-3 text-center num-font dir-ltr font-bold ${diff > 0 ? 'text-red-600' : 'text-green-600'}">${pct.toFixed(1)}%</td>
+                        <td class="px-4 py-3 text-left"><span class="text-xs px-2 py-1 rounded border ${statusClass}">${statusText}</span></td>
+                    </tr>`;
+            });
+
+            document.getElementById('avgPriceInternal').innerText = fmt(totalWeightedPriceInternal / totalMeals);
+            document.getElementById('avgPriceContractor').innerText = fmt(totalWeightedPriceContractor / totalMeals);
+        }
+
+        // FULL REVERSE ANALYSIS WITH COMMODITIES
+        function renderReverseAnalysis() {
+            const tbody = document.getElementById('reverseTableBody');
+            const commBody = document.getElementById('reverseCommoditiesBody');
+            if(!tbody) return;
+            tbody.innerHTML = '';
+            commBody.innerHTML = '';
+
+            const simProfitPct = parseNum(document.getElementById('reverseProfit').value) / 100;
+            const simTaxPct = parseNum(document.getElementById('reverseTax').value) / 100;
+            
+            document.getElementById('lblSimProfit').innerText = (simProfitPct * 100).toFixed(0) + "%";
+
+            let totalStandardMat = 0;
+            let totalImpliedMat = 0;
+
+            recipesData.forEach(dish => {
+                const bid = contractorPrices[dish.id] || 0;
+                if(bid === 0) return;
+
+                const c = calculateDishCosts(dish);
+                
+                // Contractor Logic: Price = Cost + (Price * Tax) + (Cost * Profit) -> Simplified: Price = Cost * (1+Profit) / (1-Tax) ...
+                // Let's use simpler model: NetRevenue = Price * (1 - Tax).  Cost = NetRevenue / (1 + Profit).
+                const netRevenue = bid * (1 - simTaxPct);
+                const impliedTotalCost = netRevenue / (1 + simProfitPct);
+                
+                const fixedCosts = c.totalOperationalOverhead + c.infrastructureCost;
+                const laborCost = c.labor; 
+                
+                const impliedMaterialBudget = impliedTotalCost - fixedCosts - laborCost;
+                const standardMaterialCost = c.matCost;
+                
+                // Accumulate for commodity analysis
+                totalStandardMat += standardMaterialCost;
+                totalImpliedMat += impliedMaterialBudget;
+
+                const diff = impliedMaterialBudget - standardMaterialCost;
+                const diffPct = (diff / standardMaterialCost) * 100;
+
+                let qualityStatus = "";
+                let qualityClass = "";
+                if(diffPct < -15) { qualityStatus = "افت شدید کیفیت"; qualityClass = "text-red-700 font-black"; }
+                else if(diffPct < -5) { qualityStatus = "کاهش وزن/کیفیت"; qualityClass = "text-orange-600 font-bold"; }
+                else { qualityStatus = "استاندارد"; qualityClass = "text-green-600"; }
+
+                tbody.innerHTML += `
+                    <tr class="hover:bg-slate-50 border-b">
+                        <td class="px-4 py-2 text-right font-bold text-[11px]">${dish.name}</td>
+                        <td class="px-4 py-2 text-center num-font bg-slate-800 text-white font-bold">${fmt(bid)}</td>
+                        <td class="px-2 py-2 text-center num-font text-slate-400 text-[10px]">${fmt(bid - netRevenue + (netRevenue - impliedTotalCost))}</td>
+                        <td class="px-2 py-2 text-center num-font text-red-800 text-[11px]">${fmt(fixedCosts + laborCost)}</td>
+                        <td class="px-4 py-2 text-center num-font font-black bg-emerald-50 text-emerald-800 text-sm border-x border-emerald-200">${fmt(impliedMaterialBudget)}</td>
+                        <td class="px-4 py-2 text-center num-font text-slate-500 text-[11px]">${fmt(standardMaterialCost)}</td>
+                        <td class="px-4 py-2 text-left text-xs ${qualityClass}">${qualityStatus} (${diffPct.toFixed(0)}%)</td>
+                    </tr>`;
+            });
+
+            // Commodity Analysis
+            const overallRatio = totalImpliedMat / totalStandardMat;
+            const keyCommodities = [
+                "گوشت چرخ کرده گوساله", "مرغ بدون استخوان", "برنج درجه 1 ایرانی", "روغن مایع", 
+                "گوشت گوساله ران و سردست", "قلوگاه گوسفندی", "ماهی شیر پاک شده", "ماهی قزال آلا پاک شده", "تن ماهی", "سینه مرغ"
+            ];
+
+            keyCommodities.forEach(comm => {
+                const stdPrice = getPrice(comm);
+                const impliedPrice = stdPrice * overallRatio;
+                const priceDiffPct = ((impliedPrice - stdPrice) / stdPrice) * 100;
+                
+                let analysis = "قیمت منطقی";
+                if(priceDiffPct < -20) analysis = "غیرممکن (مواد جایگزین/ضایعات)";
+                else if(priceDiffPct < -10) analysis = "مشکوک (درجه ۲)";
+                
+                commBody.innerHTML += `
+                    <tr>
+                        <td class="px-4 py-2 text-right font-bold text-red-900">${comm}</td>
+                        <td class="px-4 py-2 text-center num-font text-slate-600">${fmt(stdPrice)}</td>
+                        <td class="px-4 py-2 text-center num-font font-black text-red-600 bg-red-100">${fmt(impliedPrice)}</td>
+                        <td class="px-4 py-2 text-left text-xs font-bold text-red-800">${analysis}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderPurchasingTab() {
+            const tbody = document.getElementById('purchasingTableBody');
+            const tbodyMonthly = document.getElementById('purchasingMonthlyTableBody');
+            tbody.innerHTML = '';
+            tbodyMonthly.innerHTML = '';
+            
+            const totalMeals = parseNum(document.getElementById('totalMealsInput').value);
+            const mealsPerDish = totalMeals / recipesData.length;
+            
+            let materialTotals = {};
+            let totalBudgetInternal = 0;
+            let totalBudgetContractor = 0;
+
+            recipesData.forEach(dish => {
+                const c = calculateDishCosts(dish);
+                const bid = contractorPrices[dish.id] || c.finalPrice; 
+                
+                totalBudgetInternal += c.finalPrice * mealsPerDish;
+                totalBudgetContractor += bid * mealsPerDish;
+
+                dish.formula.forEach(item => {
+                    const key = item.m + "|" + item.u;
+                    if(!materialTotals[key]) materialTotals[key] = { name: item.m, unit: item.u, qty: 0, price: getPrice(item.m) };
+                    
+                    let qtyToAdd = item.q * mealsPerDish;
+                    materialTotals[key].qty += qtyToAdd;
+                });
+            });
+
+            // Annual
+            document.getElementById('totalBudgetInternal').innerText = fmt(totalBudgetInternal);
+            document.getElementById('totalBudgetContractor').innerText = fmt(totalBudgetContractor);
+            const diff = totalBudgetContractor - totalBudgetInternal;
+            const diffEl = document.getElementById('totalBudgetDiff');
+            diffEl.innerText = fmt(diff);
+            diffEl.className = `text-2xl font-black num-font ${diff > 0 ? 'text-red-600' : 'text-green-600'}`;
+
+            // Monthly Summary
+            document.getElementById('monthlyBudgetInternal').innerText = fmt(totalBudgetInternal / 12);
+            document.getElementById('monthlyBudgetContractor').innerText = fmt(totalBudgetContractor / 12);
+            const mDiff = diff / 12;
+            const mDiffEl = document.getElementById('monthlyBudgetDiff');
+            mDiffEl.innerText = fmt(mDiff);
+            mDiffEl.className = `text-xl font-black num-font ${mDiff > 0 ? 'text-red-600' : 'text-green-600'}`;
+
+            // Render Material List
+            const sortedMaterials = Object.values(materialTotals).sort((a,b) => (b.qty * b.price) - (a.qty * a.price));
+            
+            sortedMaterials.forEach(m => {
+                let displayQty = m.qty;
+                let displayUnit = m.unit;
+                if(m.unit === 'گرم' && m.qty > 1000) {
+                    displayQty = m.qty / 1000;
+                    displayUnit = 'کیلوگرم';
+                }
+                
+                let totalVal = (m.unit === 'گرم' ? m.qty/1000 : m.qty) * m.price;
+                if(m.unit === 'عدد' || m.unit === 'مثقال' || m.unit === 'سرویس') totalVal = m.qty * m.price;
+
+                tbody.innerHTML += `
+                    <tr class="border-b hover:bg-slate-50">
+                        <td class="px-4 py-2 text-right font-bold text-xs">${m.name}</td>
+                        <td class="px-4 py-2 text-center num-font font-bold text-blue-700">${fmt(displayQty)}</td>
+                        <td class="px-4 py-2 text-center text-xs text-slate-500">${displayUnit}</td>
+                        <td class="px-4 py-2 text-center num-font text-slate-700">${fmt(totalVal)}</td>
+                    </tr>
+                `;
+
+                tbodyMonthly.innerHTML += `
+                    <tr class="border-b hover:bg-indigo-50/30">
+                        <td class="px-4 py-2 text-right font-bold text-xs text-indigo-900">${m.name}</td>
+                        <td class="px-4 py-2 text-center num-font font-bold text-indigo-600">${fmt(displayQty / 12)}</td>
+                        <td class="px-4 py-2 text-center text-xs text-slate-500">${displayUnit}</td>
+                        <td class="px-4 py-2 text-center num-font text-slate-700">${fmt(totalVal / 12)}</td>
+                    </tr>
+                `;
+            });
+        }
+
+        function renderStrategicDashboard() {
+            let totalDiff = 0, count = 0, high = 0, low = 0;
+            let potentialSavings = 0;
+            const totalMeals = parseNum(document.getElementById('totalMealsInput').value);
+            const mealsPerDish = totalMeals / recipesData.length;
+
+            recipesData.forEach(dish => {
+                const bid = contractorPrices[dish.id] || 0;
+                if(bid > 0) {
+                    const c = calculateDishCosts(dish);
+                    const pct = ((bid - c.finalPrice) / c.finalPrice) * 100;
+                    totalDiff += pct;
+                    count++;
+                    if(pct > 5) high++;
+                    if(pct < -5) low++; 
+                    if(bid < c.finalPrice) potentialSavings += (c.finalPrice - bid) * mealsPerDish;
+                }
+            });
+
+            document.getElementById('dashAvgDiff').innerText = count > 0 ? (totalDiff / count).toFixed(1) + "%" : "0%";
+            document.getElementById('dashHighRisk').innerText = high;
+            document.getElementById('dashLowRisk').innerText = low;
+            document.getElementById('dashSavings').innerText = fmt(potentialSavings);
+
+            const canvas = document.getElementById('strategicChart');
+            if(canvas && canvas.offsetParent !== null) {
+                const ctx = canvas.getContext('2d');
+                if(strategicChartInstance) strategicChartInstance.destroy();
+                const labels = [], internalData = [], contractorData = [];
+                recipesData.slice(0, 10).forEach(d => { 
+                    if(contractorPrices[d.id]) {
+                        labels.push(d.name);
+                        internalData.push(calculateDishCosts(d).finalPrice);
+                        contractorData.push(contractorPrices[d.id]);
+                    }
+                });
+                strategicChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [
+                            { label: 'برآورد کارفرما', data: internalData, backgroundColor: '#3b82f6', borderRadius: 4 },
+                            { label: 'پیمانکار', data: contractorData, backgroundColor: '#ef4444', borderRadius: 4 }
+                        ]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: false, grid: { color: '#f3f4f6' } }, x: { grid: { display: false } } }, plugins: { legend: { labels: { font: { family: 'Vazirmatn' } } } } }
+                });
+            }
+
+            const recBox = document.getElementById('finalRecommendation');
+            if(count === 0) {
+                recBox.innerHTML = "<div class='text-center text-slate-400 py-10'>هنوز قیمت‌های پیمانکار وارد نشده است.</div>";
+            } else {
+                let text = `<ul class="list-disc pr-4 space-y-2">`;
+                if(low > high) text += `<li class="text-orange-600 font-bold">هشدار کیفیت: پیمانکار در ${low} قلم غذا قیمتی بسیار پایین‌تر از برآورد داده. آنالیز معکوس نشان می‌دهد احتمالاً از وزن مواد کم خواهد شد.</li>`;
+                if(high > low) text += `<li class="text-red-600 font-bold">ریسک مالی: پیشنهاد پیمانکار گران است (${high} مورد بالاتر از خط مبنا). اختلاف بودجه کل را در تب تدارکات بررسی کنید.</li>`;
+                if(Math.abs(totalDiff/count) < 3) text += `<li class="text-green-600 font-bold">وضعیت مطلوب: میانگین قیمت‌ها منطقی است. روی اقلام با مصرف بالا (خرید حجیم) تمرکز کنید.</li>`;
+                text += `</ul>`;
+                recBox.innerHTML = text;
+            }
+        }
+
+        // --- Helpers ---
+        window.updateQty = (idx, val) => { recipesData.find(r => r.id === selectedDishId).formula[idx].q = parseFloat(val) || 0; renderDashboard(); };
+        window.updatePrice = (matName, valStr) => { 
+            const val = parseNum(valStr);
+            let keyToUpdate = matName;
+            if(globalPrices[matName] === undefined) {
+                const n = normalize(matName);
+                for(let k in globalPrices) if(normalize(k) === n || n.includes(normalize(k))) { keyToUpdate = k; break; }
+            }
+            globalPrices[keyToUpdate] = val;
+            renderDashboard();
+        };
+        window.updateLabor = (idx, f, v) => { laborData[idx][f] = parseNum(v); recalcAll(); };
+        window.updateContractorPrice = (id, val) => { contractorPrices[id] = parseNum(val); };
+        window.copyInternalToContractor = () => {
+            recipesData.forEach(d => contractorPrices[d.id] = calculateDishCosts(d).finalPrice);
+            renderContractorInput();
+        };
+
+        function selectDish(id) { selectedDishId = id; renderMenuList(); renderDashboard(); }
+        function renderMenuList() {
+            const list = document.getElementById('menuList');
+            const term = document.getElementById('searchDish') ? document.getElementById('searchDish').value.toLowerCase() : '';
+            if (!list) return;
+            list.innerHTML = '';
+            recipesData.filter(r => r.name.toLowerCase().includes(term)).forEach(r => {
+                const isActive = selectedDishId === r.id;
+                const div = document.createElement('div');
+                div.className = `p-2 rounded-lg cursor-pointer transition flex justify-between items-center mb-1 border ${isActive ? 'bg-slate-800 text-white font-bold shadow-lg transform scale-105' : 'bg-white border-transparent hover:bg-slate-100 text-slate-600'}`;
+                div.onclick = () => selectDish(r.id);
+                div.innerHTML = `<span class="text-xs truncate">${r.name}</span>`;
+                list.appendChild(div);
+            });
+        }
+
+        document.getElementById('searchDish').addEventListener('keyup', renderMenuList);
+        document.getElementById('priceInput').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            Papa.parse(file, { header: true, complete: function(results) {
+                let count = 0;
+                results.data.forEach(row => {
+                    const keys = Object.keys(row);
+                    const nameKey = keys.find(k => k.includes("شرح") || k.includes("نام"));
+                    const priceKey = keys.find(k => k.includes("نرخ") || k.includes("قیمت") || k.includes("ریال"));
+                    if(nameKey && priceKey && row[priceKey]) {
+                        const name = normalize(row[nameKey].toString().replace(/\n/g, '').replace(/\(.*\)/g, ''));
+                        const price = parseNum(row[priceKey]);
+                        if(name && price > 0) {
+                            let found = false;
+                            for(let k in globalPrices) { if(normalize(k) === name || name.includes(normalize(k))) { globalPrices[k] = price; found = true; break; } }
+                            if(!found) globalPrices[name] = price;
+                            count++;
+                        }
+                    }
+                });
+                alert(`${count} نرخ بروزرسانی شد.`);
+                recalcAll();
+            }});
+        });
+
+        document.getElementById('contractorUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if(!file) return;
+            Papa.parse(file, { header: true, complete: function(results) {
+                let count = 0;
+                results.data.forEach(row => {
+                    const keys = Object.keys(row);
+                    const nameKey = keys.find(k => k.includes("شرح") || k.includes("نام") || k.includes("غذا"));
+                    const priceKey = keys.find(k => k.includes("قیمت") || k.includes("نرخ") || k.includes("پیشنهادی"));
+                    if(nameKey && priceKey && row[nameKey] && row[priceKey]) {
+                        const name = normalize(row[nameKey].toString());
+                        const price = parseNum(row[priceKey]);
+                        if(name && price > 0) {
+                            const recipe = recipesData.find(r => { const rName = normalize(r.name); return rName === name || rName.includes(name) || name.includes(rName); });
+                            if(recipe) { contractorPrices[recipe.id] = price; count++; }
+                        }
+                    }
+                });
+                alert(`${count} نرخ پیمانکار وارد شد.`);
+                renderContractorInput();
+                if(count > 0) switchTab('comparison');
+            }});
+        });
+
+        window.onload = function() { recalcAll(); renderMenuList(); if(recipesData.length) selectDish(recipesData[0].id); switchTab('detail'); };
+    </script>
+</body>
+</html>
