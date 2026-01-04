@@ -1,0 +1,837 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد مدیریتی پروژه ایربگ اطلس</title>
+    
+    <!-- Fonts: Vazirmatn -->
+    <link href="https://cdn.jsdelivr.net/gh/rastikerdar/vazirmatn@v33.003/Vazirmatn-font-face.css" rel="stylesheet" type="text/css" />
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f0f4f8;
+            color: #334e68;
+            overflow: hidden;
+        }
+
+        /* Sidebar Styling */
+        .sidebar-link {
+            transition: all 0.3s ease;
+            border-right: 4px solid transparent;
+            cursor: pointer;
+        }
+        .sidebar-link:hover {
+            background-color: #e3f2fd;
+            color: #0f766e;
+        }
+        .sidebar-link.active {
+            background-color: #ccfbf1;
+            color: #0f766e;
+            border-right-color: #0f766e;
+            font-weight: bold;
+        }
+
+        /* Card Styling */
+        .glass-card {
+            background: white;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            transition: transform 0.2s;
+        }
+        .glass-card:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Accordion Styling */
+        details > summary {
+            list-style: none;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        details > summary::-webkit-details-marker {
+            display: none;
+        }
+        details[open] > summary .icon-expand {
+            transform: rotate(180deg);
+        }
+        details[open] > summary {
+            background-color: #f0fdfa;
+            color: #0f766e;
+            border-bottom: 1px solid #ccfbf1;
+        }
+
+        /* Content Area Transition */
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s ease-in-out;
+            height: 100vh;
+            overflow-y: auto;
+            padding-bottom: 120px;
+        }
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
+        }
+    </style>
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        teal: {
+                            50: '#f0fdfa',
+                            100: '#ccfbf1',
+                            500: '#14b8a6',
+                            600: '#0d9488',
+                            700: '#0f766e',
+                            800: '#115e59',
+                            900: '#134e4a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="flex h-screen">
+
+    <!-- Sidebar -->
+    <aside class="w-64 bg-white shadow-xl z-20 hidden md:flex flex-col">
+        <div class="p-6 flex items-center justify-center border-b border-gray-100">
+            <div class="text-center">
+                <i class="fa-solid fa-shield-halved text-4xl text-teal-600 mb-2"></i>
+                <h1 class="text-lg font-bold text-gray-800">پروژه ایربگ اطلس</h1>
+                <p class="text-xs text-gray-500">داشبورد مدیریتی جامع</p>
+            </div>
+        </div>
+        
+        <nav class="flex-1 overflow-y-auto py-4">
+            <ul class="space-y-1">
+                <li class="sidebar-link active px-6 py-3 flex items-center gap-3" onclick="switchTab('dashboard', this)">
+                    <i class="fa-solid fa-chart-line w-5"></i>
+                    <span>نمای کلی (KPI)</span>
+                </li>
+                <li class="sidebar-link px-6 py-3 flex items-center gap-3" onclick="switchTab('ch1', this)">
+                    <i class="fa-solid fa-car-side w-5"></i>
+                    <span>۱. شناخت سیستم</span>
+                </li>
+                <li class="sidebar-link px-6 py-3 flex items-center gap-3" onclick="switchTab('ch2', this)">
+                    <i class="fa-solid fa-chess-knight w-5"></i>
+                    <span>۲. استراتژی ساخت</span>
+                </li>
+                <li class="sidebar-link px-6 py-3 flex items-center gap-3" onclick="switchTab('ch3', this)">
+                    <i class="fa-solid fa-microscope w-5"></i>
+                    <span>۳. مهندسی و فرآیند</span>
+                </li>
+                <li class="sidebar-link px-6 py-3 flex items-center gap-3" onclick="switchTab('ch4', this)">
+                    <i class="fa-solid fa-coins w-5"></i>
+                    <span>۴. آنالیز مالی (کامل)</span>
+                </li>
+                <li class="sidebar-link px-6 py-3 flex items-center gap-3" onclick="switchTab('ch5', this)">
+                    <i class="fa-solid fa-calendar-days w-5"></i>
+                    <span>۵. زمان‌بندی و CashFlow</span>
+                </li>
+                <li class="sidebar-link px-6 py-3 flex items-center gap-3" onclick="switchTab('ch6', this)">
+                    <i class="fa-solid fa-bolt w-5 text-amber-500"></i>
+                    <span class="text-teal-800 font-medium">۶. پیشنهاد ویژه (چابک)</span>
+                </li>
+            </ul>
+        </nav>
+        
+        <div class="p-4 border-t border-gray-100">
+            <div class="bg-teal-50 rounded-lg p-3 text-center">
+                <p class="text-xs text-teal-800 font-bold">تاریخ گزارش:</p>
+                <p class="text-xs text-gray-600">۱۱ دی ۱۴۰۴</p>
+            </div>
+        </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="flex-1 relative overflow-hidden bg-slate-50">
+        
+        <!-- Header Mobile -->
+        <header class="md:hidden bg-white shadow p-4 flex justify-between items-center">
+            <span class="font-bold text-teal-700">پروژه اطلس</span>
+            <button class="text-gray-600"><i class="fa-solid fa-bars"></i></button>
+        </header>
+
+        <!-- DASHBOARD TAB (KPIs) -->
+        <div id="dashboard" class="tab-content active p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">داشبورد عملکردی کلان</h2>
+            
+            <!-- Top KPI Cards -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+                <!-- Revenue -->
+                <div class="glass-card p-6 flex items-center justify-between border-l-4 border-teal-500">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">درآمد سالیانه</p>
+                        <h3 class="text-2xl font-bold text-gray-800">۲،۲۳۱ <span class="text-sm font-normal">میلیارد ریال</span></h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-teal-100 flex items-center justify-center text-teal-600">
+                        <i class="fa-solid fa-sack-dollar text-xl"></i>
+                    </div>
+                </div>
+                
+                <!-- Net Profit -->
+                <div class="glass-card p-6 flex items-center justify-between border-l-4 border-emerald-500">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">سود خالص سالیانه</p>
+                        <h3 class="text-2xl font-bold text-gray-800">۲۳۳ <span class="text-sm font-normal">میلیارد ریال</span></h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600">
+                        <i class="fa-solid fa-arrow-trend-up text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- IRR -->
+                <div class="glass-card p-6 flex items-center justify-between border-l-4 border-blue-500">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">نرخ بازده (سناریو پایه)</p>
+                        <h3 class="text-2xl font-bold text-gray-800">۲۰.۴۱ ٪</h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center text-blue-600">
+                        <i class="fa-solid fa-percent text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- ROI/Payback -->
+                <div class="glass-card p-6 flex items-center justify-between border-l-4 border-amber-500">
+                    <div>
+                        <p class="text-sm text-gray-500 mb-1">بازگشت سرمایه</p>
+                        <h3 class="text-2xl font-bold text-gray-800">۴.۹ <span class="text-sm font-normal">سال</span></h3>
+                    </div>
+                    <div class="w-12 h-12 rounded-full bg-amber-100 flex items-center justify-center text-amber-600">
+                        <i class="fa-solid fa-hourglass-half text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Charts Section -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 h-96">
+                <!-- Main Comparison Chart -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4">مقایسه بازدهی (IRR) سناریوها</h3>
+                    <div class="h-64">
+                        <canvas id="kpiChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Investment Breakdown Summary -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4">خلاصه هزینه تمام شده (BOM)</h3>
+                    <div class="h-64 flex justify-center">
+                        <canvas id="bomSummaryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quick Summary Box -->
+            <div class="mt-8 glass-card p-6 bg-gradient-to-l from-teal-50 to-white">
+                <h3 class="font-bold text-teal-800 mb-2">نتیجه‌گیری مدیریتی:</h3>
+                <p class="text-gray-600 leading-relaxed">
+                    با اجرای <strong>سناریوی چابک (پیشنهاد فصل ۶)</strong>، نرخ بازده داخلی (IRR) از ۲۰٪ به حدود <strong>۴۶٪</strong> اصلاح خواهد شد و نیاز ارزی ۸۰٪ کاهش می‌یابد. این پروژه فراتر از سودآوری، ضامن تداوم تولید خودروی اطلس است.
+                </p>
+            </div>
+        </div>
+
+        <!-- CHAPTER 1: System Overview -->
+        <div id="ch1" class="tab-content p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">فصل اول: شناخت سیستم جامع ایمنی</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                <div class="glass-card p-6">
+                    <div class="h-40 bg-slate-100 rounded-lg mb-4 flex items-center justify-center text-4xl text-slate-300">
+                        <i class="fa-solid fa-user-shield"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-teal-700 mb-2">ماژول راننده (DAB)</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                        <li>نصب در غربیلک فرمان</li>
+                        <li>زمان عملکرد: ۳۰-۴۵ میلی‌ثانیه</li>
+                        <li>تکنولوژی تاشدن ستاره‌ای (Star Fold)</li>
+                        <li>استاندارد ASIL-D</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6">
+                    <div class="h-40 bg-slate-100 rounded-lg mb-4 flex items-center justify-center text-4xl text-slate-300">
+                        <i class="fa-solid fa-person-seat"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-teal-700 mb-2">ماژول سرنشین (PAB)</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                        <li>نصب در داشبورد (۱۲۰ لیتر)</li>
+                        <li>چالش خط پارگی نامرئی</li>
+                        <li>مجهز به کانال پرتاب (Chute)</li>
+                        <li>جلوگیری از پرتاب قطعات (No Fragmentation)</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6">
+                    <div class="h-40 bg-slate-100 rounded-lg mb-4 flex items-center justify-center text-4xl text-slate-300">
+                        <i class="fa-solid fa-microchip"></i>
+                    </div>
+                    <h3 class="text-lg font-bold text-teal-700 mb-2">واحد کنترل (ACU)</h3>
+                    <ul class="text-sm text-gray-600 space-y-2 list-disc list-inside">
+                        <li>مغز متفکر سیستم</li>
+                        <li>ذخیره انرژی تا ۱۵۰ms</li>
+                        <li>الگوریتم‌های تشخیص (Discrimination)</li>
+                        <li>ارتباط با سنسورهای اقماری</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHAPTER 2: Strategy -->
+        <div id="ch2" class="tab-content p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">فصل دوم: استراتژی ساخت (Make or Buy)</h2>
+            <div class="glass-card p-8">
+                <p class="mb-6 text-gray-600">تمرکز استراتژیک بر <strong>"زنجیره ارزش مکانیکال و پلیمری"</strong> با توجه به زیرساخت‌های سایپا آذین.</p>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right">
+                        <thead>
+                            <tr class="bg-teal-50 text-teal-800">
+                                <th class="p-4 rounded-r-lg">قطعه</th>
+                                <th class="p-4">تصمیم</th>
+                                <th class="p-4">دلیل استراتژیک</th>
+                                <th class="p-4 rounded-l-lg">وضعیت زیرساخت</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-600">
+                            <tr class="border-b border-gray-100">
+                                <td class="p-4 font-bold">اینفلیتور (Inflator)</td>
+                                <td class="p-4"><span class="bg-red-100 text-red-700 px-3 py-1 rounded-full text-xs font-bold">خرید (BUY)</span></td>
+                                <td class="p-4">ریسک بالای مواد منفجره، انحصار تکنولوژی</td>
+                                <td class="p-4 text-red-500"><i class="fa-solid fa-xmark"></i> عدم مجوز</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="p-4 font-bold">کیسه هوا (Bag)</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">ساخت (MAKE)</span></td>
+                                <td class="p-4">ارزش افزوده ۳۰٪، کاهش هزینه سربار</td>
+                                <td class="p-4 text-green-500"><i class="fa-solid fa-check"></i> سالن دوخت مجهز</td>
+                            </tr>
+                            <tr class="border-b border-gray-100">
+                                <td class="p-4 font-bold">کاور (Cover)</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">ساخت (MAKE)</span></td>
+                                <td class="p-4">تخصص اصلی شرکت در تریم و پلیمر</td>
+                                <td class="p-4 text-green-500"><i class="fa-solid fa-check"></i> تزریق پلاستیک</td>
+                            </tr>
+                            <tr>
+                                <td class="p-4 font-bold">محفظه (Housing)</td>
+                                <td class="p-4"><span class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-xs font-bold">ساخت (MAKE)</span></td>
+                                <td class="p-4">تکنولوژی پرس در دسترس</td>
+                                <td class="p-4 text-green-500"><i class="fa-solid fa-check"></i> پرس شاپ</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHAPTER 3: Engineering -->
+        <div id="ch3" class="tab-content p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">فصل سوم: مهندسی و فرآیند</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold text-teal-700 mb-4 border-b pb-2">۱. مهندسی معکوس و تست</h3>
+                    <ul class="space-y-4">
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-vial text-teal-500 mt-1"></i>
+                            <div>
+                                <span class="font-bold text-gray-700 block">آنالیز مواد (FTIR/DSC)</span>
+                                <span class="text-xs text-gray-500">تضمین عملکرد پلیمر کاور در منفی ۴۰ درجه</span>
+                            </div>
+                        </li>
+                        <li class="flex items-start gap-3">
+                            <i class="fa-solid fa-cube text-teal-500 mt-1"></i>
+                            <div>
+                                <span class="font-bold text-gray-700 block">اسکن سه بعدی</span>
+                                <span class="text-xs text-gray-500">ابر نقاط با دقت ۱۰ میکرون برای انطباق سطوح</span>
+                            </div>
+                        </li>
+                    </ul>
+                </div>
+                
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold text-teal-700 mb-4 border-b pb-2">۲. کانسپت خط تولید (تولید ناب)</h3>
+                    <div class="space-y-4 relative pl-4">
+                        <!-- Connecting Line -->
+                        <div class="absolute right-[11px] top-2 bottom-4 w-0.5 bg-gray-200"></div>
+                        <div class="relative flex items-center gap-4">
+                            <div class="w-6 h-6 rounded-full bg-teal-500 text-white flex items-center justify-center text-xs z-10">۱</div>
+                            <span class="text-gray-700">برش لیزری هوشمند (سیل کردن لبه‌ها)</span>
+                        </div>
+                        <div class="relative flex items-center gap-4">
+                            <div class="w-6 h-6 rounded-full bg-teal-500 text-white flex items-center justify-center text-xs z-10">۲</div>
+                            <span class="text-gray-700">دوخت ایمنی (چرخ‌های قابل برنامه‌ریزی)</span>
+                        </div>
+                        <div class="relative flex items-center gap-4">
+                            <div class="w-6 h-6 rounded-full bg-amber-500 text-white flex items-center justify-center text-xs z-10">۳</div>
+                            <span class="text-gray-800 font-bold">فولدینگ اتوماتیک (گلوگاه تکنولوژیک)</span>
+                        </div>
+                        <div class="relative flex items-center gap-4">
+                            <div class="w-6 h-6 rounded-full bg-teal-500 text-white flex items-center justify-center text-xs z-10">۴</div>
+                            <span class="text-gray-700">مونتاژ نهایی و کنترل گشتاور</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHAPTER 4: Financials (EXPANDABLE) -->
+        <div id="ch4" class="tab-content p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">فصل چهارم: آنالیز مالی و اقتصادی (کامل)</h2>
+            
+            <div class="space-y-6">
+                
+                <!-- 1. COGS & Profit (The Critical Table) -->
+                <details class="glass-card group" open>
+                    <summary class="p-6 flex items-center justify-between font-bold text-gray-800 cursor-pointer">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-money-bill-wave text-teal-600"></i>
+                            محاسبه بهای تمام شده و سود (تفاضل ۵۷۰۰ و ۵۱۰۰)
+                        </span>
+                        <i class="fa-solid fa-chevron-down icon-expand text-gray-400 transition-transform"></i>
+                    </summary>
+                    <div class="p-6 border-t border-gray-100 bg-white">
+                        <div class="overflow-x-auto">
+                            <table class="w-full text-right">
+                                <thead class="bg-gray-50 text-gray-700 text-sm">
+                                    <tr>
+                                        <th class="p-3">شرح هزینه / درآمد</th>
+                                        <th class="p-3 text-center">مبلغ (ریال)</th>
+                                        <th class="p-3 text-center">درصد از کل</th>
+                                        <th class="p-3">توضیحات</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100 text-gray-600">
+                                    <tr>
+                                        <td class="p-3">مواد مستقیم (Material)</td>
+                                        <td class="p-3 text-center font-mono">۳۹,۷۰۴,۰۴۰</td>
+                                        <td class="p-3 text-center text-xs">۶۹.۶٪</td>
+                                        <td class="p-3 text-xs text-gray-500">وابسته به اینفلیتور</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3">دستمزد و سربار ساخت</td>
+                                        <td class="p-3 text-center font-mono">۷,۲۷۸,۰۰۰</td>
+                                        <td class="p-3 text-center text-xs">۱۲.۷٪</td>
+                                        <td class="p-3 text-xs text-gray-500">نیروی انسانی و استهلاک</td>
+                                    </tr>
+                                    <tr>
+                                        <td class="p-3">هزینه‌های اداری و فروش (SG&A)</td>
+                                        <td class="p-3 text-center font-mono">۴,۰۷۷,۹۶۰</td>
+                                        <td class="p-3 text-center text-xs">۷.۲٪</td>
+                                        <td class="p-3 text-xs text-gray-500">لجستیک و اداری</td>
+                                    </tr>
+                                    <tr class="bg-red-50 text-red-800 font-bold border-t-2 border-red-200">
+                                        <td class="p-3">بهای تمام شده نهایی (Cost)</td>
+                                        <td class="p-3 text-center font-mono text-lg">۵۱,۰۶۰,۰۰۰</td>
+                                        <td class="p-3 text-center">۸۹.۶٪</td>
+                                        <td class="p-3 text-xs">مجموع هزینه‌ها</td>
+                                    </tr>
+                                    <tr class="bg-blue-50 text-blue-800 font-bold border-t-2 border-blue-200">
+                                        <td class="p-3">قیمت فروش (Sales Price)</td>
+                                        <td class="p-3 text-center font-mono text-lg">۵۷,۰۰۰,۰۰۰</td>
+                                        <td class="p-3 text-center">۱۰۰٪</td>
+                                        <td class="p-3 text-xs">مبنای درآمد (عدد ۵۷۰۰ شما)</td>
+                                    </tr>
+                                    <tr class="bg-emerald-100 text-emerald-900 font-bold border-t-2 border-emerald-400">
+                                        <td class="p-3">سود خالص هر ست (Net Profit)</td>
+                                        <td class="p-3 text-center font-mono text-xl">۵,۹۴۰,۰۰۰</td>
+                                        <td class="p-3 text-center">۱۰.۴٪</td>
+                                        <td class="p-3 text-xs">حاشیه سود خالص</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 2. CAPEX Table & Chart -->
+                <details class="glass-card group">
+                    <summary class="p-6 flex items-center justify-between font-bold text-gray-800 cursor-pointer">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-industry text-teal-600"></i>
+                            آنالیز سرمایه‌گذاری ثابت (CAPEX)
+                        </span>
+                        <i class="fa-solid fa-chevron-down icon-expand text-gray-400 transition-transform"></i>
+                    </summary>
+                    <div class="p-6 border-t border-gray-100 bg-white grid grid-cols-1 md:grid-cols-2 gap-6">
+                        <div class="overflow-x-auto">
+                             <table class="w-full text-right text-sm text-gray-600">
+                                <thead class="bg-gray-50">
+                                    <tr><th class="p-2">اقلام</th><th class="p-2 text-center">دلار ($)</th><th class="p-2 text-center text-teal-700">ریال (میلیارد)</th></tr>
+                                </thead>
+                                <tbody class="divide-y">
+                                    <tr><td class="p-2">R&D و دانش فنی</td><td class="p-2 text-center">۲۰۰,۰۰۰</td><td class="p-2 text-center text-teal-600 font-mono">۳۱۰.۰</td></tr>
+                                    <tr><td class="p-2">قالب‌های پلیمری</td><td class="p-2 text-center">۹۰,۰۰۰</td><td class="p-2 text-center text-teal-600 font-mono">۱۳۹.۵</td></tr>
+                                    <tr><td class="p-2">قالب‌های فلزی</td><td class="p-2 text-center">۶۷,۰۰۰</td><td class="p-2 text-center text-teal-600 font-mono">۱۰۳.۸</td></tr>
+                                    <tr><td class="p-2">برش لیزر</td><td class="p-2 text-center">۴۰,۰۰۰</td><td class="p-2 text-center text-teal-600 font-mono">۶۲.۰</td></tr>
+                                    <tr><td class="p-2">فولدینگ (گلوگاه)</td><td class="p-2 text-center">۳۰,۰۰۰</td><td class="p-2 text-center text-teal-600 font-mono">۴۶.۵</td></tr>
+                                    <tr><td class="p-2">پرینتر و بارکد</td><td class="p-2 text-center">۱۳,۰۰۰</td><td class="p-2 text-center text-teal-600 font-mono">۲۰.۲</td></tr>
+                                    <tr class="font-bold bg-gray-100 border-t-2"><td class="p-2">جمع کل</td><td class="p-2 text-center">۴۴۰,۰۰۰</td><td class="p-2 text-center font-mono">۶۸۲.۰</td></tr>
+                                </tbody>
+                             </table>
+                        </div>
+                        <div class="h-64 flex justify-center">
+                            <canvas id="capexChart"></canvas>
+                        </div>
+                    </div>
+                </details>
+
+                <!-- 3. OPEX Table -->
+                <details class="glass-card group">
+                    <summary class="p-6 flex items-center justify-between font-bold text-gray-800 cursor-pointer">
+                        <span class="flex items-center gap-2">
+                            <i class="fa-solid fa-chart-pie text-teal-600"></i>
+                            هزینه‌های عملیاتی سالیانه (OPEX)
+                        </span>
+                        <i class="fa-solid fa-chevron-down icon-expand text-gray-400 transition-transform"></i>
+                    </summary>
+                    <div class="p-6 border-t border-gray-100 bg-white">
+                        <table class="w-full text-right text-sm">
+                            <thead class="bg-gray-50">
+                                <tr><th>سرفصل</th><th class="text-center">درصد</th><th class="text-center">مبلغ (میلیارد ریال)</th></tr>
+                            </thead>
+                            <tbody class="divide-y text-gray-600">
+                                <tr><td>مواد و قطعات</td><td class="text-center">۷۷٪</td><td class="text-center font-bold">۱,۵۵۴</td></tr>
+                                <tr><td>سربار (استهلاک)</td><td class="text-center">۱۰٪</td><td class="text-center">۲۱۰</td></tr>
+                                <tr><td>نیروی انسانی</td><td class="text-center">۴٪</td><td class="text-center">۷۵</td></tr>
+                                <tr><td>سایر</td><td class="text-center">۹٪</td><td class="text-center">۱۶۰</td></tr>
+                                <tr class="bg-gray-100 font-bold"><td>جمع کل</td><td>۱۰۰٪</td><td class="text-center">۱,۹۹۹</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </details>
+
+            </div>
+        </div>
+
+        <!-- CHAPTER 5: Roadmap & Cash Flow -->
+        <div id="ch5" class="tab-content p-8">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6">فصل پنجم: زمان‌بندی و جریان نقدینگی</h2>
+            
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <!-- Timeline Info -->
+                <div class="space-y-6">
+                    <div class="glass-card p-4 border-r-4 border-teal-500">
+                        <h4 class="font-bold text-teal-800">فاز ۱: مهندسی (ماه ۱-۲)</h4>
+                        <p class="text-sm text-gray-600">شروع پروژه و پیش‌پرداخت (۲۶۱- م.ر)</p>
+                    </div>
+                    <div class="glass-card p-4 border-r-4 border-amber-500">
+                        <h4 class="font-bold text-gray-800">فاز ۲: ساخت (ماه ۳-۶)</h4>
+                        <p class="text-sm text-gray-600">ساخت قالب و دستگاه‌ها (۲۳۰- م.ر)</p>
+                    </div>
+                    <div class="glass-card p-4 border-r-4 border-teal-500">
+                        <h4 class="font-bold text-teal-800">فاز ۳: نمونه‌سازی (ماه ۷-۹)</h4>
+                        <p class="text-sm text-gray-600">تست و حمل دریایی (۷۵- م.ر)</p>
+                    </div>
+                    <div class="glass-card p-4 border-r-4 border-green-500">
+                        <h4 class="font-bold text-green-700">فاز ۴: تولید (ماه ۱۰-۱۱)</h4>
+                        <p class="text-sm text-gray-600">شروع درآمدزایی و تسویه (۱۵۵- م.ر)</p>
+                    </div>
+                </div>
+
+                <!-- Cash Flow Chart -->
+                <div class="glass-card p-6">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4 text-center">نمودار جریان نقدینگی (میلیارد ریال)</h3>
+                    <div class="h-64">
+                        <canvas id="cashFlowChart"></canvas>
+                    </div>
+                    <p class="text-xs text-center text-gray-400 mt-2">مقایسه هزینه دوره‌ای و سرمایه‌گذاری تجمعی</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- CHAPTER 6: Special Proposal -->
+        <div id="ch6" class="tab-content p-8">
+            <h2 class="text-2xl font-bold text-amber-600 mb-6">فصل ششم: پیشنهاد ویژه (ورود چابک)</h2>
+            
+            <div class="glass-card bg-gradient-to-br from-slate-800 to-slate-900 text-white p-8 mb-8">
+                <div class="flex flex-col md:flex-row justify-between items-center gap-6">
+                    <div>
+                        <h3 class="text-xl font-bold mb-2">استراتژی Agile Entry</h3>
+                        <p class="text-slate-300 opacity-90 max-w-xl">
+                            حذف سرمایه‌گذاری قالب‌ها (Hard Tooling) در فاز اول و استفاده از ظرفیت شریک تجاری.
+                        </p>
+                    </div>
+                    <div class="flex gap-4">
+                        <div class="text-center bg-white/10 p-4 rounded-lg">
+                            <span class="block text-3xl font-bold text-emerald-400">۸۰٪</span>
+                            <span class="text-xs text-slate-400">کاهش سرمایه ارزی</span>
+                        </div>
+                        <div class="text-center bg-white/10 p-4 rounded-lg">
+                            <span class="block text-3xl font-bold text-amber-400">۵ ماه</span>
+                            <span class="text-xs text-slate-400">کاهش زمان پروژه</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Comparison Details Table (NEW REQUEST) -->
+            <details class="glass-card group mb-8" open>
+                <summary class="p-6 flex items-center justify-between font-bold text-gray-800 cursor-pointer">
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-scale-balanced text-amber-600"></i>
+                        مقایسه ریز اقلام سرمایه‌گذاری (پایه vs پیشنهادی)
+                    </span>
+                    <i class="fa-solid fa-chevron-down icon-expand text-gray-400 transition-transform"></i>
+                </summary>
+                <div class="p-6 border-t border-gray-100 bg-white">
+                    <table class="w-full text-right text-sm">
+                        <thead class="bg-gray-100 text-gray-600">
+                            <tr>
+                                <th class="p-3">ردیف سرمایه‌گذاری</th>
+                                <th class="p-3 text-center">سناریوی پایه ($)</th>
+                                <th class="p-3 text-center text-emerald-700">سناریوی چابک ($)</th>
+                                <th class="p-3 text-center">تغییرات</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-gray-100">
+                            <tr>
+                                <td class="p-3">هزینه توسعه (R&D)</td>
+                                <td class="p-3 text-center">۲۰۰,۰۰۰</td>
+                                <td class="p-3 text-center font-bold text-emerald-600">۰</td>
+                                <td class="p-3 text-center text-xs text-gray-500">انتقال به فاز ۲</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">قالب‌های پلیمری و فلزی</td>
+                                <td class="p-3 text-center">۱۵۷,۰۰۰</td>
+                                <td class="p-3 text-center font-bold text-emerald-600">۰</td>
+                                <td class="p-3 text-center text-xs text-gray-500">استفاده از پارتنر</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">دستگاه برش لیزر</td>
+                                <td class="p-3 text-center">۴۰,۰۰۰</td>
+                                <td class="p-3 text-center text-gray-800">۴۰,۰۰۰</td>
+                                <td class="p-3 text-center text-xs text-gray-400">-</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">دستگاه فولدینگ</td>
+                                <td class="p-3 text-center">۳۰,۰۰۰</td>
+                                <td class="p-3 text-center text-gray-800">۳۰,۰۰۰</td>
+                                <td class="p-3 text-center text-xs text-gray-400">-</td>
+                            </tr>
+                            <tr>
+                                <td class="p-3">پرینتر و تجهیزات</td>
+                                <td class="p-3 text-center">۱۳,۰۰۰</td>
+                                <td class="p-3 text-center text-gray-800">۱۳,۰۰۰</td>
+                                <td class="p-3 text-center text-xs text-gray-400">-</td>
+                            </tr>
+                            <tr class="bg-gray-50 font-bold border-t-2">
+                                <td class="p-3">جمع کل سرمایه</td>
+                                <td class="p-3 text-center">
+                                    <div class="text-red-600">۴۴۰,۰۰۰ $</div>
+                                    <div class="text-xs text-gray-500 mt-1">۶۸۲ میلیارد ریال</div>
+                                </td>
+                                <td class="p-3 text-center">
+                                    <div class="text-emerald-600">۸۳,۰۰۰ $</div>
+                                    <div class="text-xs text-emerald-700 mt-1">۱۲۹ میلیارد ریال</div>
+                                </td>
+                                <td class="p-3 text-center text-emerald-600">۸۱٪ کاهش</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </details>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
+                <div class="glass-card p-6 border-t-4 border-slate-400">
+                    <h3 class="text-lg font-bold text-gray-700 mb-4">سناریوی پایه (سنتی)</h3>
+                    <ul class="space-y-3 text-gray-600">
+                        <li class="flex justify-between"><span>سرمایه ثابت:</span> <strong>۴۴۰,۰۰۰ دلار</strong></li>
+                        <li class="flex justify-between"><span>زمان اجرا:</span> <strong>۱۱ ماه</strong></li>
+                        <li class="flex justify-between"><span>IRR:</span> <strong>۲۰٪</strong></li>
+                        <li class="mt-4 pt-4 border-t text-sm text-red-500">ریسک خواب سرمایه بالا</li>
+                    </ul>
+                </div>
+                <div class="glass-card p-6 border-t-4 border-emerald-500 bg-emerald-50/50">
+                    <h3 class="text-lg font-bold text-emerald-800 mb-4">سناریوی پیشنهادی (چابک)</h3>
+                    <ul class="space-y-3 text-gray-700">
+                        <li class="flex justify-between"><span>سرمایه ثابت:</span> <strong class="text-emerald-600">۸۳,۰۰۰ دلار</strong></li>
+                        <li class="flex justify-between"><span>زمان اجرا:</span> <strong class="text-emerald-600">۵ ماه</strong></li>
+                        <li class="flex justify-between"><span>IRR:</span> <strong class="text-emerald-600">۴۶٪</strong></li>
+                        <li class="mt-4 pt-4 border-t text-sm text-emerald-600">تمرکز بر کیفیت مونتاژ و ورود سریع به بازار</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="glass-card p-6 overflow-x-auto">
+                <h3 class="text-lg font-bold text-gray-700 mb-4">ماتریس مقایسه‌ای جامع</h3>
+                <table class="w-full text-right text-sm">
+                    <thead>
+                        <tr class="bg-gray-100 text-gray-700">
+                            <th class="p-3 rounded-r">شاخص مقایسه</th>
+                            <th class="p-3">سناریوی پایه (سنتی)</th>
+                            <th class="p-3 rounded-l text-emerald-700">سناریوی پیشنهادی (چابک)</th>
+                        </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-100">
+                        <tr>
+                            <td class="p-3 font-bold text-gray-600">سرمایه‌گذاری ثابت (CAPEX)</td>
+                            <td class="p-3">۴۴۰,۰۰۰ دلار</td>
+                            <td class="p-3 font-bold text-emerald-600">۸۳,۰۰۰ دلار</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-gray-600">زمان راه‌اندازی</td>
+                            <td class="p-3">۱۱ ماه</td>
+                            <td class="p-3 font-bold text-emerald-600">۵ ماه</td>
+                        </tr>
+                        <tr>
+                            <td class="p-3 font-bold text-gray-600">نرخ بازده داخلی (IRR)</td>
+                            <td class="p-3">۲۰.۴٪</td>
+                            <td class="p-3 font-bold text-emerald-600">۴۶٪</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+    </main>
+
+    <script>
+        function switchTab(tabId, element) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.remove('active');
+            });
+            document.getElementById(tabId).classList.add('active');
+
+            document.querySelectorAll('.sidebar-link').forEach(link => {
+                link.classList.remove('active');
+            });
+            element.classList.add('active');
+        }
+
+        Chart.defaults.font.family = 'Vazirmatn';
+        Chart.defaults.font.size = 12;
+
+        // 1. KPI Chart
+        new Chart(document.getElementById('kpiChart').getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: ['سناریو پایه', 'سناریو چابک'],
+                datasets: [{
+                    label: 'نرخ بازده داخلی (IRR)',
+                    data: [20.4, 46],
+                    backgroundColor: ['#94a3b8', '#10b981'],
+                    borderRadius: 8,
+                    barThickness: 50
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { display: false } },
+                scales: { y: { beginAtZero: true, title: { display: true, text: 'درصد %' } } }
+            }
+        });
+
+        // 2. BOM Summary
+        new Chart(document.getElementById('bomSummaryChart').getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['اینفلیتور (خرید خارجی)', 'سایر قطعات (ساخت داخل)'],
+                datasets: [{
+                    data: [70, 30],
+                    backgroundColor: ['#f87171', '#2dd4bf'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                cutout: '70%',
+                plugins: { legend: { position: 'bottom' } }
+            }
+        });
+
+        // 3. CAPEX Chart
+        new Chart(document.getElementById('capexChart').getContext('2d'), {
+            type: 'pie',
+            data: {
+                labels: ['R&D', 'قالب‌ها', 'برش لیزر', 'فولدینگ', 'سایر'],
+                datasets: [{
+                    data: [200, 157, 40, 30, 13],
+                    backgroundColor: ['#0f766e', '#14b8a6', '#5eead4', '#fbbf24', '#94a3b8'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'right' } }
+            }
+        });
+
+        // 4. Cash Flow Chart (UPDATED: Line + Cumulative)
+        new Chart(document.getElementById('cashFlowChart').getContext('2d'), {
+            type: 'line',
+            data: {
+                labels: ['آغاز (ماه‌های ۱-۲)', 'ساخت (ماه‌های ۳-۶)', 'نمونه‌سازی (ماه‌های ۷-۹)', 'تولید (ماه‌های ۱۰-۱۱)'],
+                datasets: [
+                    {
+                        label: 'هزینه دوره‌ای',
+                        data: [-261, -230, -75, -155],
+                        borderColor: '#f59e0b', // Amber
+                        backgroundColor: '#f59e0b',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        borderDash: [5, 5],
+                        pointRadius: 4
+                    },
+                    {
+                        label: 'سرمایه‌گذاری تجمعی (Cumulative)',
+                        data: [-261, -491, -566, -721], // Cumulative calculation
+                        borderColor: '#0f766e', // Teal
+                        backgroundColor: '#0f766e',
+                        borderWidth: 3,
+                        tension: 0.3,
+                        pointRadius: 6,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 2,
+                        fill: {
+                            target: 'origin',
+                            above: 'rgba(15, 118, 110, 0.1)',   // Area will be red above the origin
+                            below: 'rgba(15, 118, 110, 0.1)'    // And blue below the origin
+                        }
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: { legend: { position: 'top' } },
+                scales: {
+                    y: { 
+                        title: { display: true, text: 'میلیارد ریال' },
+                        grid: { color: '#e5e7eb' }
+                    },
+                    x: { grid: { display: false } }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
