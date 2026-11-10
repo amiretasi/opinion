@@ -31,106 +31,97 @@
 <body class="min-h-screen pb-12">
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-        <i class="fa-solid fa-circle-check text-xl"></i>
-        <span id="toast-msg" class="text-sm font-bold">نکته کلیدی کپی شد!</span>
+    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-xl flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-sm"></i>
+        <span id="toast-msg" class="text-xs font-bold">نکته کلیدی کپی شد!</span>
     </div>
 
-    <!-- Header -->
+    <!-- Ultra-Compact Header (Search Removed, Micro Tabs) -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 text-xl font-black">
-                    ۲
-                </div>
-                <div>
-                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">برگه تقلب مصاحبه - Canvas 2 (اصلاح‌شده بر محور تجارت)</span>
-                    <h1 class="text-base md:text-lg font-extrabold text-slate-900 mt-0.5">کالبدشکافی بخش خصوصی داخلی در تجارت: «شرکت‌های بازرگانی» در برابر «صنایع مجبور به تجارت» و نقش دولت</h1>
-                </div>
+        <div class="max-w-7xl mx-auto px-3 py-1.5 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-md bg-emerald-600 text-white flex items-center justify-center text-xs font-black">۲</span>
+                <h1 class="text-xs md:text-sm font-extrabold text-slate-900">داشبورد ۲: بخش خصوصی در تجارت (شرکت‌های بازرگانی vs صنایع مجبور به تجارت) و دولت</h1>
             </div>
 
-            <!-- Instant Search -->
-            <div class="flex items-center gap-2 w-full lg:w-96">
-                <div class="relative w-full">
-                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-slate-400"></i>
-                    <input type="text" id="globalSearch" oninput="filterContent(this.value)" placeholder="جستجوی سریع (مثلاً: بازرگانی، دارویی، غذایی، NTSW، کد فیدار، کوتاژ...)" 
-                        class="w-full bg-slate-100 text-sm text-slate-900 placeholder-slate-500 pr-10 pl-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:bg-white transition">
-                </div>
-                <button onclick="resetSearch()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-xl border border-slate-300 transition">
-                    <i class="fa-solid fa-rotate-right"></i>
+            <!-- Micro Tabs -->
+            <div class="flex flex-wrap items-center gap-1">
+                <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-layer-group text-[10px]"></i> همه
+                </button>
+                <button onclick="switchTab('group1-trading')" id="tab-group1-trading" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-briefcase text-blue-600 text-[10px]"></i> ۱. شرکت‌های بازرگانی
+                </button>
+                <button onclick="switchTab('group2-forced')" id="tab-group2-forced" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-industry text-emerald-600 text-[10px]"></i> ۲. صنایع مجبور به تجارت
+                </button>
+                <button onclick="switchTab('sectors')" id="tab-sectors" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-pills text-amber-600 text-[10px]"></i> ۴ صنعت (غذا/دارو/قطعه/ساختمان)
+                </button>
+                <button onclick="switchTab('state-role')" id="tab-state-role" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-landmark text-rose-600 text-[10px]"></i> نقش و خطاهای دولت
                 </button>
             </div>
         </div>
-
-        <!-- Tabs -->
-        <div class="max-w-7xl mx-auto px-4 pb-2.5 flex flex-wrap gap-2">
-            <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-layer-group"></i> نمای کامل (همه بخش‌ها)
-            </button>
-            <button onclick="switchTab('group1-trading')" id="tab-group1-trading" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-briefcase text-blue-600"></i> گروه اول: شرکت‌های تجاری و بازرگانی
-            </button>
-            <button onclick="switchTab('group2-forced')" id="tab-group2-forced" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-industry text-emerald-600"></i> گروه دوم: صنایع، ساختمان، غذا و داروی «مجبور به تجارت»
-            </button>
-            <button onclick="switchTab('sectors')" id="tab-sectors" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-pills text-amber-600"></i> تفکیک ۴ بخش (صنعتی، غذایی، دارویی، ساختمانی)
-            </button>
-            <button onclick="switchTab('state-role')" id="tab-state-role" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-landmark text-rose-600"></i> نقش دولت در قبال این دو گروه و تبعات آن
-            </button>
-        </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
+    <main class="max-w-7xl mx-auto px-3 mt-3 space-y-5">
 
-        <!-- CORE INTERVIEW THESIS BANNER -->
-        <section class="glass-card p-5 rounded-2xl border-r-4 border-r-emerald-600 bg-emerald-50/40 searchable-block cursor-pointer" onclick="copyText(this.innerText)">
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-xs font-extrabold text-emerald-800 uppercase"><i class="fa-solid fa-microphone-lines ml-1"></i> تز کلیدی مصاحبه برای شروع سرفصل دوم (کلیک = کپی)</span>
-                <span class="text-xs text-slate-500"><i class="fa-regular fa-copy ml-1"></i>کپی استدلال</span>
-            </div>
-            <p class="text-sm md:text-base font-medium text-slate-800 leading-7">
-                «وقتی از بخش خصوصی داخلی ایران در حوزه تجارت حرف می‌زنیم، با دو گروه کاملاً متفاوت روبه‌رو هستیم: <b class="text-blue-700">گروه اول، شرکت‌های تجاری و بازرگانی حرفه‌ای</b> هستند که ذات کارشان تجارت است؛ و <b class="text-emerald-800">گروه دوم، شرکت‌های صنعتی، ساختمانی، غذایی و دارویی</b> هستند که تاجر نیستند، اما چون ۸۵٪ واردات ایران مواد اولیه و قطعات تولید است و قوانین سهمیه تولیدی وزارت صمت و عدم تخصیص ارز بانک مرکزی دستشان را بسته، <b class="text-rose-700">برای نخوابیدن خط تولید و کارگاه مجبور به تجارت (واردات مستقیم نهاده و حتی صادرات اجباری برای تأمین ارز خود) شده‌اند!</b>»
+        <!-- COMPACT CORE INTERVIEW THESIS BANNER -->
+        <section class="glass-card px-3.5 py-2.5 rounded-xl border-r-4 border-r-emerald-600 bg-emerald-50/40 cursor-pointer" onclick="copyText(this.innerText)">
+            <p class="text-xs md:text-sm font-medium text-slate-800 leading-6">
+                <b class="text-emerald-800"><i class="fa-solid fa-microphone-lines ml-1"></i>تز اصلی مصاحبه:</b> بخش خصوصی داخلی در تجارت دو گروه است: <b class="text-blue-700">۱) شرکت‌های تجاری و بازرگانی حرفه‌ای</b> (که ذات کارشان تجارت است) و <b class="text-emerald-800">۲) شرکت‌های صنعتی، ساختمانی، غذایی و دارویی</b> که تاجر نیستند، اما چون <b>۸۵٪ واردات کشور نهاده تولید است</b> و قوانین سهمیه تولیدی وزارت صمت و عدم تخصیص ارز بانک مرکزی دستشان را بسته، <b class="text-rose-700">برای نخوابیدن خط تولید مجبور به واردات مستقیم و حتی صادرات اجباری شده‌اند!</b>
             </p>
         </section>
 
-        <!-- TOP 6 KPIs OF TRADE & PRODUCTION -->
-        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 searchable-block">
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-blue-600 cursor-pointer" onclick="copyText('۸۵ درصد کل واردات ایران شامل مواد اولیه، کالاهای واسطه‌ای، دارو، نهاده‌های دامی و ماشین‌آلات خطوط تولید است؛ به همین دلیل صنعت و تولید در ایران مستقیماً به تجارت گره خورده است.')">
-                <span class="text-xs font-bold text-blue-700 block">سهم تولید از کل واردات کشور</span>
-                <div class="text-xl font-black text-slate-900 mt-1">۸۵٪ کل واردات</div>
-                <span class="text-[11px] text-slate-600">مواد اولیه، دارو، نهاده و ماشین‌آلات</span>
+        <!-- ULTRA-COMPACT TOP 6 KPIs OF TRADE & PRODUCTION -->
+        <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-blue-600 cursor-pointer hover:bg-slate-50" onclick="copyText('۸۵ درصد کل واردات ایران شامل مواد اولیه، کالاهای واسطه‌ای، دارو، نهاده‌های دامی و ماشین‌آلات خطوط تولید است؛ به همین دلیل صنعت و تولید در ایران مستقیماً به تجارت گره خورده است.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">سهم تولید از واردات</span>
+                    <span class="text-xs font-black text-blue-700">۸۵٪ کل واردات</span>
+                </div>
+                <div class="text-[10px] text-slate-600">مواد اولیه، دارو و ماشین‌آلات</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-emerald-600 cursor-pointer" onclick="copyText('در پی اختلالات اینترنت و سامانه جامع تجارت (NTSW)، زمان ثبت سفارش از ۲-۳ روز به ۲۰ تا ۲۵ روز رسید که با از دست رفتن اسلات کشتی‌ها (Vessel Closing Time) به ۳۱ تا ۴۵ روز تأخیر مرکب ورود کالا منجر شد.')">
-                <span class="text-xs font-bold text-emerald-700 block">قفل سامانه جامع تجارت (NTSW)</span>
-                <div class="text-xl font-black text-slate-900 mt-1">۲۰ تا ۲۵ روز</div>
-                <span class="text-[11px] text-slate-600">تأخیر مرکب کشتی: <b>31 تا 45 روز</b></span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-emerald-600 cursor-pointer hover:bg-slate-50" onclick="copyText('در پی اختلالات اینترنت و سامانه جامع تجارت (NTSW)، زمان ثبت سفارش از ۲-۳ روز به ۲۰ تا ۲۵ روز رسید که با از دست رفتن اسلات کشتی‌ها (Vessel Closing Time) به ۳۱ تا ۴۵ روز تأخیر مرکب ورود کالا منجر شد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">قفل ثبت سفارش NTSW</span>
+                    <span class="text-xs font-black text-emerald-700">۲۰ تا ۲۵ روز</span>
+                </div>
+                <div class="text-[10px] text-slate-600">تأخیر مرکب کشتی: <b>31-45 روز</b></div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer" onclick="copyText('با مصرف شدن موجودی اطمینان ۳۰ روزه انبارها (Safety Stock) در جنگ، شاخص موجودی مواد اولیه صنعت در شهریور ۱۴۰۵ به ۳۶.۷ سقوط کرد (فرآورده‌های نفتی ۱۸.۲، ماشین‌سازی ۲۹.۲، غذایی ۳۱.۳).')">
-                <span class="text-xs font-bold text-amber-700 block">تخلیه Safety Stock صنایع</span>
-                <div class="text-xl font-black text-rose-600 mt-1">شامخ ۳۶.۷</div>
-                <span class="text-[11px] text-slate-600">نفت: 18.2 | ماشین: 29.2 | غذا: 31.3</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-amber-500 cursor-pointer hover:bg-slate-50" onclick="copyText('با مصرف شدن موجودی اطمینان ۳۰ روزه انبارها (Safety Stock) در جنگ، شاخص موجودی مواد اولیه صنعت در شهریور ۱۴۰۵ به ۳۶.۷ سقوط کرد (فرآورده‌های نفتی ۱۸.۲، ماشین‌سازی ۲۹.۲، غذایی ۳۱.۳).')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">تخلیه Safety Stock</span>
+                    <span class="text-xs font-black text-rose-600">شامخ ۳۶.۷</span>
+                </div>
+                <div class="text-[10px] text-slate-600">نفت: 18.2 | ماشین: 29.2</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer" onclick="copyText('در حالی که قیمت خرید مواد اولیه صنایع غذایی در شهریور ۱۴۰۵ به ۹۴.۲ رسید، به دلیل قیمت‌گذاری دستوری و کاهش ۱۱ درصدی واردات کالای اساسی، شامخ صنایع غذایی به ۳۸.۶ (بدترین صنعت کشور) سقوط کرد.')">
-                <span class="text-xs font-bold text-rose-700 block">بحران صنایع غذایی در ۱۴۰۵</span>
-                <div class="text-xl font-black text-rose-600 mt-1">شامخ ۳۸.۶ (قعر جدول)</div>
-                <span class="text-[11px] text-slate-600">تولید: 35.8 | صادرات: 27.6 | نهاده: 94.2</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-rose-600 cursor-pointer hover:bg-slate-50" onclick="copyText('در حالی که قیمت خرید مواد اولیه صنایع غذایی در شهریور ۱۴۰۵ به ۹۴.۲ رسید، به دلیل قیمت‌گذاری دستوری و کاهش ۱۱ درصدی واردات کالای اساسی، شامخ صنایع غذایی به ۳۸.۶ (بدترین صنعت کشور) سقوط کرد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">سقوط صنایع غذایی</span>
+                    <span class="text-xs font-black text-rose-600">شامخ ۳۸.۶</span>
+                </div>
+                <div class="text-[10px] text-slate-600">تولید: 35.8 | نهاده: 94.2</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-purple-600 cursor-pointer" onclick="copyText('تغییرات خلق‌الساعه کد تعرفه‌ها در وزارت صمت و عدم تأمین ارز بانک مرکزی، ۴.۰۷ میلیارد یورو بدهی و مطالبات ارزی بلاتکلیف برای شرکت‌های بازرگانی و تولیدی واردکننده ایجاد کرد.')">
-                <span class="text-xs font-bold text-purple-700 block">بدهی ارزی بلاتکلیف واردکنندگان</span>
-                <div class="text-xl font-black text-purple-700 mt-1" dir="ltr">4.07 B€</div>
-                <span class="text-[11px] text-slate-600">خطر ورشکستگی با تسعیر نرخ جدید</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-purple-600 cursor-pointer hover:bg-slate-50" onclick="copyText('تغییرات خلق‌الساعه کد تعرفه‌ها در وزارت صمت و عدم تأمین ارز بانک مرکزی، ۴.۰۷ میلیارد یورو بدهی و مطالبات ارزی بلاتکلیف برای شرکت‌های بازرگانی و تولیدی واردکننده ایجاد کرد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">بدهی ارزی واردکنندگان</span>
+                    <span class="text-xs font-black text-purple-700" dir="ltr">4.07 B€</span>
+                </div>
+                <div class="text-[10px] text-slate-600">بلاتکلیف در بانک مرکزی</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-red-600 cursor-pointer" onclick="copyText('در ۵ ماهه اول ۱۴۰۵، تخصیص ارز دولت به گونه‌ای بود که واردات کالای اساسی و دارو ۱۱ درصد (۳۰۰ میلیون دلار) کاهش یافت اما واردات خودروی سواری ۶۶ درصد رشد کرد!')">
-                <span class="text-xs font-bold text-red-700 block">انحراف تخصیص ارز (۵ ماهه ۱۴۰۵)</span>
-                <div class="text-xl font-black text-red-600 mt-1" dir="ltr">-11% vs +66%</div>
-                <span class="text-[11px] text-slate-600">افت ۱۱٪ کالای اساسی / رشد ۶۶٪ خودرو</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-red-600 cursor-pointer hover:bg-slate-50" onclick="copyText('در ۵ ماهه اول ۱۴۰۵، تخصیص ارز دولت به گونه‌ای بود که واردات کالای اساسی و دارو ۱۱ درصد (۳۰۰ میلیون دلار) کاهش یافت اما واردات خودروی سواری ۶۶ درصد رشد کرد!')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">انحراف ارز (۵ ماهه)</span>
+                    <span class="text-xs font-black text-red-600" dir="ltr">-11% vs +66%</span>
+                </div>
+                <div class="text-[10px] text-slate-600">کالای اساسی -11% / خودرو +66%</div>
             </div>
         </section>
 
