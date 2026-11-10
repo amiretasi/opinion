@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد ۱: آمار اقتصاد کلان، شامخ، تجارت خارجی و تورم (۱۴۰۳ تا ۱۴۰۵)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vazirmatn Persian Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #94a3b8;
+            border-radius: 3px;
+        }
+        @media print {
+            body { background: white; color: black; }
+            .no-print { display: none !important; }
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12 custom-scrollbar">
+
+    <!-- Toast Notification for Copy -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <span id="toast-msg" class="text-sm font-bold">فکت آماری کپی شد!</span>
+    </div>
+
+    <!-- Top Sticky Header & Interview Search Bar -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 w-full lg:w-auto justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 text-xl font-black">
+                        ۱
+                    </div>
+                    <div>
+                        <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">برگه تقلب مصاحبه - Canvas 1</span>
+                        <h1 class="text-base md:text-lg font-extrabold text-slate-900 mt-0.5">داشبورد داده‌محور: اقتصاد کلان، شامخ، تجارت خارجی و تورم (۱۴۰۳ تا آبان ۱۴۰۵)</h1>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Instant Search Filter for Live Interview -->
+            <div class="flex items-center gap-2 w-full lg:w-96">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-slate-400"></i>
+                    <input type="text" id="globalSearch" oninput="filterContent(this.value)" placeholder="جستجوی سریع در حین مصاحبه (مثلاً: ترکیه، شامخ، تورم، خودرو...)" 
+                        class="w-full bg-slate-100 text-sm text-slate-900 placeholder-slate-500 pr-10 pl-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-blue-600 focus:bg-white transition">
+                </div>
+                <button onclick="resetSearch()" title="پاک کردن جستجو" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-xl border border-slate-300 transition">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Navigation Tabs -->
+        <div class="max-w-7xl mx-auto px-4 pb-2.5 flex flex-wrap gap-2">
+            <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-grip"></i> نمایش یکپارچه (همه بخش‌ها)
+            </button>
+            <button onclick="switchTab('soundbites')" id="tab-soundbites" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-microphone-lines text-amber-600"></i> فکت‌های طلایی مصاحبه
+            </button>
+            <button onclick="switchTab('macro')" id="tab-macro" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-chart-pie text-rose-600"></i> رشد کلان و سرمایه‌گذاری
+            </button>
+            <button onclick="switchTab('pmi')" id="tab-pmi" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-industry text-blue-600"></i> مقایسه شامخ (۱۴۰۴ و ۱۴۰۵)
+            </button>
+            <button onclick="switchTab('trade')" id="tab-trade" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-ship text-emerald-600"></i> آمار صادرات و واردات ۱۴۰۵
+            </button>
+            <button onclick="switchTab('inflation')" id="tab-inflation" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-fire-flame-curved text-orange-600"></i> تورم و ارز (مهر و آبان ۱۴۰۵)
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
+
+        <!-- TOP 6 CRITICAL KPIs (Always Visible at Top for Instant Reference) -->
+        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 searchable-block">
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer hover:border-rose-400 transition" onclick="copyText('رشد اقتصادی سال ۱۴۰۴ به منفی ۰.۷ درصد و در بهار ۱۴۰۵ (اوج جنگ ۴۰ روزه) به منفی ۱۰ تا ۱۱ درصد (و صنعت به منفی ۱۴ درصد) سقوط کرد.')">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-medium text-slate-500">رشد کل ۱۴۰۴ / بهار ۱۴۰۵</span>
+                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+                </div>
+                <div class="text-xl font-black text-rose-600 mt-1" dir="ltr">-0.7% / -11%</div>
+                <div class="text-[11px] text-slate-600 mt-1">رشد ارزش افزوده صنعت: <b class="text-rose-700">-14%</b></div>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer hover:border-amber-400 transition" onclick="copyText('تشکیل سرمایه ثابت ناخالص در بخش ماشین‌آلات در سال ۱۴۰۴ معادل منفی ۱۲.۳ درصد سقوط کرده که به معنای سرمایه‌زدایی خالص صنعتی است.')">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-medium text-slate-500">سرمایه‌گذاری ماشین‌آلات</span>
+                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+                </div>
+                <div class="text-xl font-black text-amber-600 mt-1" dir="ltr">-12.3%</div>
+                <div class="text-[11px] text-slate-600 mt-1">عدم‌النفع ۶ ماهه صنعت: <b class="text-amber-700">322 همت</b></div>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-blue-600 cursor-pointer hover:border-blue-400 transition" onclick="copyText('در شهریور ۱۴۰۵ شامخ کل اقتصاد برای ۱۸ ماه متوالی زیر ۵۰ ماند (۴۶.۲) و موجودی مواد اولیه صنعت به ۳۶.۷ و قیمت خرید مواد اولیه به رکورد ۷ ساله ۹۳.۳ رسید.')">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-medium text-slate-500">شامخ کل / صنعت (شهریور ۱۴۰۵)</span>
+                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+                </div>
+                <div class="text-xl font-black text-blue-700 mt-1">۴۶.۲ / ۴۸.۵</div>
+                <div class="text-[11px] text-slate-600 mt-1">موجودی مواد اولیه صنعت: <b class="text-rose-600">36.7</b></div>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-emerald-600 cursor-pointer hover:border-emerald-400 transition" onclick="copyText('در نیمه نخست سال ۱۴۰۵ حجم (وزن) صادرات غیرنفتی کشور ۳۴ درصد و ارزش دلاری آن ۲۰ تا ۲۵ درصد نسبت به نیمه نخست ۱۴۰۴ سقوط کرد.')">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-medium text-slate-500">صادرات ۶ ماهه نخست ۱۴۰۵</span>
+                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+                </div>
+                <div class="text-xl font-black text-emerald-700 mt-1" dir="ltr">-34% وزنی</div>
+                <div class="text-[11px] text-slate-600 mt-1">افت ارزش دلاری: <b class="text-emerald-700">20% تا 25%-</b></div>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-purple-600 cursor-pointer hover:border-purple-400 transition" onclick="copyText('واردات کشور در ۵ ماهه نخست ۱۴۰۵ معادل ۲۶.۱ درصد نسبت به ۱۴۰۴ و ۳۸ درصد نسبت به ۱۴۰۳ کاهش یافت و در ۶ ماهه با افت ۲۰ درصدی حجم مواجه شد.')">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-medium text-slate-500">واردات ۵ و ۶ ماهه ۱۴۰۵</span>
+                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+                </div>
+                <div class="text-xl font-black text-purple-700 mt-1" dir="ltr">-26.1% ارزشی</div>
+                <div class="text-[11px] text-slate-600 mt-1">افت نسبت به ۱۴۰۳: <b class="text-purple-700">-38%</b></div>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-red-600 cursor-pointer hover:border-red-400 transition" onclick="copyText('تورم نقطه‌به‌نقطه مهر ۱۴۰۵ طبق مرکز آمار ایران به ۸۸.۷ درصد و تورم سالانه به ۷۶.۸ درصد رسید (تورم سالانه شهری بانک مرکزی: ۷۱.۴ درصد).')">
+                <div class="flex justify-between items-start">
+                    <span class="text-xs font-medium text-slate-500">تورم نقطه‌ای مهر ۱۴۰۵</span>
+                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+                </div>
+                <div class="text-xl font-black text-red-600 mt-1" dir="ltr">88.7%</div>
+                <div class="text-[11px] text-slate-600 mt-1">سالانه مرکز آمار: <b class="text-red-700">76.8%</b> | ب.م: <b>71.4%</b></div>
+            </div>
+        </section>
+
+        <!-- SECTION 1: GOLDEN INTERVIEW SOUNDBITES -->
+        <section id="sec-soundbites" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-microphone-lines text-amber-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">جملات کلیدی و فکت‌های آماده قرائت در مصاحبه (با یک کلیک کپی کنید)</h2>
+                </div>
+                <span class="text-xs text-slate-500 font-medium">مناسب پاسخ‌های ۳۰ ثانیه‌ای مستند</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div class="glass-card p-4 rounded-2xl border border-amber-300 hover:border-amber-500 transition cursor-pointer" onclick="copyText(this.querySelector('p').innerText)">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-lg">۱. فکت ورود به جنگ با اقتصاد فرسوده</span>
+                        <span class="text-xs text-slate-500"><i class="fa-regular fa-copy ml-1"></i>کپی جمله</span>
+                    </div>
+                    <p class="text-sm leading-7 text-slate-700">
+                        «اقتصاد ایران پیش از شلیک اولین موشک در خرداد ۱۴۰۴ نیز از درون دچار سرمایه‌زدایی شده بود؛ طبق آمار رسمی بانک مرکزی و اتاق تهران، در سال ۱۴۰۴ رشد اقتصادی به <b class="text-slate-900">منفی ۰.۷ درصد</b> و تشکیل سرمایه در ماشین‌آلات به <b class="text-slate-900">منفی ۱۲.۳ درصد</b> سقوط کرد و در بهار ۱۴۰۵ (جنگ ۴۰ روزه) رشد فصلی صنعت به <b class="text-rose-700">منفی ۱۴ درصد</b> رسید.»
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border border-blue-300 hover:border-blue-500 transition cursor-pointer" onclick="copyText(this.querySelector('p').innerText)">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2.5 py-1 rounded-lg">۲. فکت شامخ و تخلیه انبارهای کشور</span>
+                        <span class="text-xs text-slate-500"><i class="fa-regular fa-copy ml-1"></i>کپی جمله</span>
+                    </div>
+                    <p class="text-sm leading-7 text-slate-700">
+                        «مقایسه شامخ اردیبهشت ۱۴۰۴ با شهریور ۱۴۰۵ نشان می‌دهد که ما وارد <b class="text-slate-900">۱۸ ماه رکود متوالی</b> شده‌ایم؛ خطرناک‌ترین نماگر در شهریور ۱۴۰۵، سقوط موجودی مواد اولیه صنعت به <b class="text-rose-700">۳۶.۷</b> (و در فرآورده‌های نفتی به <b class="text-rose-700">۱۸.۲</b>) همزمان با رسیدن شاخص قیمت خرید مواد اولیه به رکورد ۷ ساله <b class="text-slate-900">۹۳.۳</b> است.»
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border border-emerald-300 hover:border-emerald-500 transition cursor-pointer" onclick="copyText(this.querySelector('p').innerText)">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-2.5 py-1 rounded-lg">۳. فکت آمار تجارت خارجی ۱۴۰۵ و شیفت زمینی</span>
+                        <span class="text-xs text-slate-500"><i class="fa-regular fa-copy ml-1"></i>کپی جمله</span>
+                    </div>
+                    <p class="text-sm leading-7 text-slate-700">
+                        «در نیمه اول ۱۴۰۵ به دلیل انسداد دریایی جنوب، وزن صادرات ما <b class="text-rose-700">۳۴ درصد</b> و ارزش آن <b class="text-rose-700">۲۰ تا ۲۵ درصد</b> ریخت و واردات ۵ ماهه نیز <b class="text-rose-700">۲۶.۱ درصد</b> افت کرد؛ اما بخش خصوصی با چرخش به مرزهای زمینی، صادرات ۶ ماهه به ترکیه را <b class="text-emerald-700">۵۶.۱ درصد</b> (به <b class="text-slate-900">۴.۲۸ میلیارد دلار</b>)، به عراق را به <b class="text-slate-900">۱.۴ میلیارد دلار</b> و به پاکستان را به <b class="text-slate-900">۱.۳۹ میلیارد دلار</b> رساند.»
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border border-rose-300 hover:border-rose-500 transition cursor-pointer" onclick="copyText(this.querySelector('p').innerText)">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-lg">۴. فکت سونامی تورم مهر ۱۴۰۵</span>
+                        <span class="text-xs text-slate-500"><i class="fa-regular fa-copy ml-1"></i>کپی جمله</span>
+                    </div>
+                    <p class="text-sm leading-7 text-slate-700">
+                        «دقیقاً با وقفه ۶ ماهه پس از جنگ ۴۰ روزه فروردین، شوک هزینه لجستیک و خلق پول در مهر ۱۴۰۵ به شاخص مصرف‌کننده اصابت کرد و تورم نقطه‌به‌نقطه مرکز آمار به <b class="text-red-700">۸۸.۷ درصد</b> و تورم سالانه به <b class="text-red-700">۷۶.۸ درصد</b> (و در آمار شهری بانک مرکزی به <b class="text-slate-900">۷۱.۴ درصد</b> با شاخص <b class="text-slate-900">۸۳۶.۸</b>) جهش یافت.»
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: MACRO & INVESTMENT TIMELINE -->
+        <section id="sec-macro" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-chart-pie text-rose-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">بخش اول: سیر قهقرایی اقتصاد کلان و تشکیل سرمایه (۱۴۰۳ تا آبان ۱۴۰۵)</h2>
+                </div>
+                <span class="text-xs bg-slate-100 text-slate-700 border border-slate-200 px-3 py-1 rounded-lg font-medium">منبع: جداول اتاق تهران (TCCIM) و بانک مرکزی</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+                <!-- Timeline Phase 1 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-slate-500">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold bg-slate-100 text-slate-800 px-2.5 py-1 rounded-md">فاز اول: پیش از جنگ</span>
+                        <span class="text-xs text-slate-500 font-bold">سال ۱۴۰۳ تا اردیبهشت ۱۴۰۴</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">فرسایش موتور رشد پیش از برخورد نظامی</h3>
+                    <ul class="space-y-2.5 text-xs md:text-sm text-slate-700 leading-6">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-left text-slate-500 mt-1"></i><span><b>رشد اقتصادی ۱۴۰۳:</b> حدود <b class="text-slate-900">3.0% تا 3.1%</b> (بدون نفت حدود <b class="text-slate-900">2.5%</b>) با محدودیت شدید ناشی از قطعی برق تابستان و زمستان.</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-left text-slate-500 mt-1"></i><span><b>موجودی مواد اولیه صنعت:</b> ثبت <b>۱۵ ماه کاهش متوالی</b> از اسفند ۱۴۰۲ تا اردیبهشت ۱۴۰۴.</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-left text-slate-500 mt-1"></i><span><b>سفارشات جدید مشتریان:</b> ثبت <b>۶ ماه روند کاهشی پیاپی</b> پیش از شروع جنگ ۱۲ روزه.</span></li>
+                    </ul>
+                </div>
+
+                <!-- Timeline Phase 2 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-amber-500">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md">فاز دوم: تکانه‌های نظامی</span>
+                        <span class="text-xs text-amber-700 font-bold">خرداد ۱۴۰۴ تا فروردین ۱۴۰۵</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">جنگ ۱۲ روزه، اسنپ‌بک و جنگ ۴۰ روزه رمضان</h3>
+                    <ul class="space-y-2.5 text-xs md:text-sm text-slate-700 leading-6">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-left text-amber-600 mt-1"></i><span><b>رشد کل سال ۱۴۰۴:</b> سقوط به <b class="text-rose-600">-0.7%</b> طبق برآورد رسمی بانک مرکزی.</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-left text-amber-600 mt-1"></i><span><b>سقوط تشکیل سرمایه ماشین‌آلات:</b> ثبت نرخ <b class="text-rose-600">-12.3%</b> در سال ۱۴۰۴ (پدیده سرمایه‌زدایی صنعتی).</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-left text-amber-600 mt-1"></i><span><b>سقوط آزاد بهار ۱۴۰۵:</b> رشد GDP فصلی <b class="text-rose-600">-10% تا -11%</b> و رشد ارزش افزوده صنعت <b class="text-rose-600">-14%</b> (سقوط شامخ کل به کانال <b>27</b>).</span></li>
+                    </ul>
+                </div>
+
+                <!-- Timeline Phase 3 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-rose-600">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-md">فاز سوم: وضعیت «نه جنگ، نه صلح»</span>
+                        <span class="text-xs text-rose-700 font-bold">اردیبهشت تا آبان ۱۴۰۵</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-3">آثار مرتبه دوم و سوم جنگ در نیمه دوم ۱۴۰۵</h3>
+                    <ul class="space-y-2.5 text-xs md:text-sm text-slate-700 leading-6">
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-left text-rose-600 mt-1"></i><span><b>عدم‌النفع ۶ ماهه صنعت و معدن:</b> بالغ بر <b class="text-rose-600">322 همت</b> در نیمه اول ۱۴۰۵ (<b class="text-amber-700">122 همت</b> ناترازی انرژی + <b class="text-amber-700">200 همت</b> گسست زنجیره تأمین و رکود).</span></li>
+                        <li class="flex items-start gap-2"><i class="fa-solid fa-caret-left text-rose-600 mt-1"></i><span><b>قفل نهضت ملی مسکن:</b> از <b class="text-slate-900">512,835</b> واحد معرفی‌شده و <b class="text-slate-900">388,000</b> قرارداد، فقط <b class="text-rose-600">100,000 واحد</b> به فروش اقساطی رسید (انحراف <b>66.6%</b> از برنامه هفتم).</span></li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: PMI COMPARISON (ORDIBEHESHT 1404 vs SHAHRIVAR 1405) -->
+        <section id="sec-pmi" class="tab-section space-y-5 searchable-block">
+            <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-industry text-blue-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">بخش دوم: کالبدشکافی تطبیقی شامخ (اردیبهشت ۱۴۰۴ در برابر شهریور ۱۴۰۵)</h2>
+                </div>
+                <span class="text-xs bg-blue-50 text-blue-800 px-3 py-1 rounded-lg border border-blue-200 font-medium">خط مرزی رونق و رکود: عدد ۵۰ (تعدیل فصلی شده)</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Comparison Table -->
+                <div class="lg:col-span-7 glass-card rounded-2xl overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+                        <h3 class="text-sm font-bold text-slate-900">جدول مقایسه خط‌به‌خط مؤلفه‌های شامخ کل اقتصاد و بخش صنعت</h3>
+                        <span class="text-[11px] text-slate-500">کلیک روی هر سطر = کپی آمار</span>
+                    </div>
+                    <div class="overflow-x-auto custom-scrollbar">
+                        <table class="w-full text-right text-xs md:text-sm">
+                            <thead class="bg-slate-100 text-slate-700 text-xs uppercase border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3">عنوان مؤلفه</th>
+                                    <th class="py-3 px-2 text-center">فروردین ۱۴۰۴</th>
+                                    <th class="py-3 px-2 text-center text-blue-700">اردیبهشت ۱۴۰۴<br><span class="text-[10px]">(قبل از جنگ)</span></th>
+                                    <th class="py-3 px-2 text-center">مرداد ۱۴۰۵</th>
+                                    <th class="py-3 px-2 text-center text-rose-700">شهریور ۱۴۰۵<br><span class="text-[10px]">(پساجنگ)</span></th>
+                                    <th class="py-3 px-3">پیامد تحلیلی برای مصاحبه</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 text-slate-800">
+                                <tr class="hover:bg-blue-50/50 cursor-pointer" onclick="copyText('شامخ کل اقتصاد از ۵۰.۳ در اردیبهشت ۱۴۰۴ به ۴۶.۲ در شهریور ۱۴۰۵ سقوط کرد (۱۸ ماه رکود متوالی).')">
+                                    <td class="py-2.5 px-3 font-bold text-slate-900">شامخ کل اقتصاد</td>
+                                    <td class="py-2.5 px-2 text-center">48.7</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-blue-700">50.3</td>
+                                    <td class="py-2.5 px-2 text-center">46.7</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-rose-600">46.2</td>
+                                    <td class="py-2.5 px-3 text-xs text-slate-600">۱۸ ماه رکود متوالی (سقوط تا ۲۷ در اسفند ۱۴۰۴)</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 cursor-pointer" onclick="copyText('شاخص موجودی مواد اولیه کل اقتصاد از ۴۹.۱ در اردیبهشت ۱۴۰۴ با سقوط ۱۰.۸ واحدی به ۳۸.۳ در شهریور ۱۴۰۵ رسید.')">
+                                    <td class="py-2.5 px-3 font-semibold">موجودی مواد اولیه (کل)</td>
+                                    <td class="py-2.5 px-2 text-center">50.1</td>
+                                    <td class="py-2.5 px-2 text-center text-blue-700">49.1</td>
+                                    <td class="py-2.5 px-2 text-center">39.1</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-rose-600">38.3</td>
+                                    <td class="py-2.5 px-3 text-xs text-rose-700 font-medium">سقوط ۱۰.۸ واحدی؛ تخلیه انبارهای کشور</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 cursor-pointer" onclick="copyText('شاخص استخدام نیروی انسانی کل اقتصاد از ۵۶.۱ در اردیبهشت ۱۴۰۴ با سقوط ۱۲.۱ واحدی به ۴۴.۰ در شهریور ۱۴۰۵ رسید.')">
+                                    <td class="py-2.5 px-3 font-semibold">استخدام نیروی انسانی (کل)</td>
+                                    <td class="py-2.5 px-2 text-center">45.7</td>
+                                    <td class="py-2.5 px-2 text-center text-emerald-700 font-bold">56.1</td>
+                                    <td class="py-2.5 px-2 text-center">47.2</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-rose-600">44.0</td>
+                                    <td class="py-2.5 px-3 text-xs text-slate-600">سقوط ۱۲.۱ واحدی؛ ۱۶ ماه انقباض اشتغال</td>
+                                </tr>
+                                <tr class="hover:bg-blue-50/50 cursor-pointer" onclick="copyText('شاخص صادرات کل اقتصاد در شهریور ۱۴۰۵ به ۳۷.۴ سقوط کرد (۲۳ ماه انقباض متوالی).')">
+                                    <td class="py-2.5 px-3 font-semibold">صادرات کالا و خدمات (کل)</td>
+                                    <td class="py-2.5 px-2 text-center">44.1</td>
+                                    <td class="py-2.5 px-2 text-center text-blue-700">42.0</td>
+                                    <td class="py-2.5 px-2 text-center">43.2</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-rose-600">37.4</td>
+                                    <td class="py-2.5 px-3 text-xs text-rose-700 font-medium">۲۳ ماه انقباض متوالی صادرات</td>
+                                </tr>
+                                <tr class="bg-slate-50 hover:bg-blue-50/60 cursor-pointer" onclick="copyText('شامخ بخش صنعت در شهریور ۱۴۰۵ عدد ۴۸.۵ را ثبت کرد (۱۱ ماه رکود متوالی صنعتی).')">
+                                    <td class="py-2.5 px-3 font-bold text-blue-800">شامخ کل بخش صنعت</td>
+                                    <td class="py-2.5 px-2 text-center">50.6</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-blue-700">46.3</td>
+                                    <td class="py-2.5 px-2 text-center">49.8</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-amber-600">48.5</td>
+                                    <td class="py-2.5 px-3 text-xs text-slate-600">۱۱ ماه رکود متوالی (سقوط تا ۲۸ در جنگ ۴۰ روزه)</td>
+                                </tr>
+                                <tr class="bg-slate-50 hover:bg-blue-50/60 cursor-pointer" onclick="copyText('موجودی مواد اولیه خریداری‌شده بخش صنعت در شهریور ۱۴۰۵ به عدد بحرانی ۳۶.۷ سقوط کرد (۱۷ ماه کاهش متوالی).')">
+                                    <td class="py-2.5 px-3 font-bold text-rose-700">موجودی مواد اولیه (صنعت)</td>
+                                    <td class="py-2.5 px-2 text-center">49.3</td>
+                                    <td class="py-2.5 px-2 text-center text-blue-700">46.9</td>
+                                    <td class="py-2.5 px-2 text-center">41.5</td>
+                                    <td class="py-2.5 px-2 text-center font-black text-rose-600">36.7</td>
+                                    <td class="py-2.5 px-3 text-xs text-rose-700 font-bold">بحرانی‌ترین نماگر؛ ۱۷ ماه کاهش پیاپی</td>
+                                </tr>
+                                <tr class="bg-slate-50 hover:bg-blue-50/60 cursor-pointer" onclick="copyText('شاخص قیمت خرید مواد اولیه صنعت در شهریور ۱۴۰۵ به ۹۳.۳ رسید که بالاترین رکورد ۷ سال گذشته است.')">
+                                    <td class="py-2.5 px-3 font-bold text-amber-800">قیمت خرید مواد اولیه (صنعت)</td>
+                                    <td class="py-2.5 px-2 text-center">75.2</td>
+                                    <td class="py-2.5 px-2 text-center text-blue-700">77.3</td>
+                                    <td class="py-2.5 px-2 text-center">88.2</td>
+                                    <td class="py-2.5 px-2 text-center font-black text-red-600">93.3</td>
+                                    <td class="py-2.5 px-3 text-xs text-amber-800 font-bold">بالاترین رکورد تورم نهاده در ۷ سال گذشته</td>
+                                </tr>
+                                <tr class="bg-slate-50 hover:bg-blue-50/60 cursor-pointer" onclick="copyText('در شهریور ۱۴۰۵ قیمت خرید مواد اولیه صنعت ۹۳.۳ اما قیمت فروش محصولات ۷۴.۵ بود؛ یعنی ۱۸.۸ واحد شکاف که حاشیه سود تولید را له کرد.')">
+                                    <td class="py-2.5 px-3 font-semibold text-blue-900">قیمت فروش محصولات (صنعت)</td>
+                                    <td class="py-2.5 px-2 text-center">64.4</td>
+                                    <td class="py-2.5 px-2 text-center text-blue-700">59.3</td>
+                                    <td class="py-2.5 px-2 text-center">64.7</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-orange-600">74.5</td>
+                                    <td class="py-2.5 px-3 text-xs text-slate-700">شکاف <b>18.8 واحدی</b> با قیمت خرید؛ له شدن سود</td>
+                                </tr>
+                                <tr class="bg-slate-50 hover:bg-blue-50/60 cursor-pointer" onclick="copyText('موجودی محصول نهایی در انبار کارخانه‌ها از ۵۳.۷ در اردیبهشت ۱۴۰۴ به ۴۴.۳ در شهریور ۱۴۰۵ کاهش یافت.')">
+                                    <td class="py-2.5 px-3 font-semibold text-blue-900">موجودی انبار محصول (صنعت)</td>
+                                    <td class="py-2.5 px-2 text-center">55.8</td>
+                                    <td class="py-2.5 px-2 text-center text-blue-700">53.7</td>
+                                    <td class="py-2.5 px-2 text-center">49.6</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-rose-600">44.3</td>
+                                    <td class="py-2.5 px-3 text-xs text-slate-600">تزریق ذخایر کارخانه‌ها برای جلوگیری از قحطی</td>
+                                </tr>
+                                <tr class="bg-slate-50 hover:bg-blue-50/60 cursor-pointer" onclick="copyText('انتظارات تولید صنعتی ماه آینده از ۵۲.۷ در اردیبهشت ۱۴۰۴ به ۴۵.۶ در شهریور ۱۴۰۵ سقوط کرد.')">
+                                    <td class="py-2.5 px-3 font-semibold text-blue-900">انتظارات تولید ماه آینده (صنعت)</td>
+                                    <td class="py-2.5 px-2 text-center">61.1</td>
+                                    <td class="py-2.5 px-2 text-center text-blue-700">52.7</td>
+                                    <td class="py-2.5 px-2 text-center">48.9</td>
+                                    <td class="py-2.5 px-2 text-center font-bold text-rose-600">45.6</td>
+                                    <td class="py-2.5 px-3 text-xs text-slate-600">پاییز ناامیدکننده؛ کمترین سطح ۵ ماهه پساجنگ</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Chart & Sub-sector Highlights -->
+                <div class="lg:col-span-5 flex flex-col gap-4">
+                    <div class="glass-card p-4 rounded-2xl">
+                        <h3 class="text-sm font-bold text-slate-900 mb-3">نمودار مقایسه شامخ صنعت (اردیبهشت ۱۴۰۴ در برابر شهریور ۱۴۰۵)</h3>
+                        <div class="h-60">
+                            <canvas id="pmiChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Critical Sub-sectors Card -->
+                    <div class="glass-card p-4 rounded-2xl border border-rose-200">
+                        <h3 class="text-sm font-bold text-rose-700 mb-2.5 flex items-center gap-2">
+                            <i class="fa-solid fa-triangle-exclamation"></i> آمارهای خیره‌کننده زیربخش‌های صنعت در شهریور ۱۴۰۵
+                        </h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs">
+                            <div class="bg-rose-50/60 p-2.5 rounded-xl border border-rose-200">
+                                <span class="text-slate-600 block">بدترین صنعت در شهریور ۱۴۰۵:</span>
+                                <strong class="text-rose-700 text-sm">صنایع غذایی: ۳۸.۶</strong>
+                                <span class="text-[11px] text-slate-600 block mt-0.5">تولید: 35.8 | صادرات: 27.6 | استخدام: 35.8</span>
+                            </div>
+                            <div class="bg-rose-50/60 p-2.5 rounded-xl border border-rose-200">
+                                <span class="text-slate-600 block">قحطی مواد اولیه در زیربخش‌ها:</span>
+                                <strong class="text-rose-700 text-sm">فرآورده‌های نفتی: ۱۸.۲</strong>
+                                <span class="text-[11px] text-slate-600 block mt-0.5">ماشین‌سازی: 29.2 | نساجی: 30.0 | غذایی: 31.3</span>
+                            </div>
+                            <div class="bg-amber-50/70 p-2.5 rounded-xl border border-amber-200">
+                                <span class="text-slate-600 block">انفجار شاخص قیمت خرید نهاده:</span>
+                                <strong class="text-red-700 text-sm">فرآورده‌های نفتی: ۱۰۰.۰!</strong>
+                                <span class="text-[11px] text-slate-600 block mt-0.5">ماشین‌سازی: 97.6 | پوشاک: 96.1 | غذایی: 94.2</span>
+                            </div>
+                            <div class="bg-emerald-50/70 p-2.5 rounded-xl border border-emerald-200">
+                                <span class="text-slate-600 block">صنایع بالای مرز ۵۰ در شهریور:</span>
+                                <strong class="text-emerald-700 text-sm">لاستیک و پلاستیک: ۶۱.۵</strong>
+                                <span class="text-[11px] text-slate-600 block mt-0.5">کانی غیرفلزی: 52.7 | نساجی و چوب: 51.9</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: FOREIGN TRADE 1403, 1404, 1405 -->
+        <section id="sec-trade" class="tab-section space-y-5 searchable-block">
+            <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-ship text-emerald-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">بخش سوم: کارنامه جامع تجارت خارجی ایران (صادرات و واردات ۱۴۰۳، ۱۴۰۴ و ۱۴۰۵)</h2>
+                </div>
+                <span class="text-xs bg-emerald-50 text-emerald-800 px-3 py-1 rounded-lg border border-emerald-200 font-medium">منبع: آمار رسمی گمرک ایران (IRICA) و سازمان توسعه تجارت</span>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                <!-- Trade Table -->
+                <div class="lg:col-span-7 glass-card rounded-2xl overflow-hidden">
+                    <div class="p-4 bg-slate-50 border-b border-slate-200">
+                        <h3 class="text-sm font-bold text-slate-900">جدول تطبیقی صادرات و واردات از اوج ۱۴۰۳ تا سقوط نیمه نخست ۱۴۰۵</h3>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-right text-xs md:text-sm">
+                            <thead class="bg-slate-100 text-slate-700 text-xs border-b border-slate-200">
+                                <tr>
+                                    <th class="py-3 px-3">شاخص تجاری</th>
+                                    <th class="py-3 px-2.5 text-center">سال ۱۴۰۳<br><span class="text-[10px]">(پیش از جنگ)</span></th>
+                                    <th class="py-3 px-2.5 text-center">سال ۱۴۰۴<br><span class="text-[10px]">(جنگ ۱۲ روزه و اسفند)</span></th>
+                                    <th class="py-3 px-2.5 text-center text-amber-800">۵ ماهه نخست ۱۴۰۵</th>
+                                    <th class="py-3 px-2.5 text-center text-emerald-800">نیمه نخست (۶ ماهه) ۱۴۰۵</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-200 text-slate-800">
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-3 px-3 font-bold text-slate-900">ارزش صادرات غیرنفتی</td>
+                                    <td class="py-3 px-2.5 text-center">57.84 میلیارد $</td>
+                                    <td class="py-3 px-2.5 text-center">51.70 میلیارد $ <span class="text-rose-600 font-bold text-xs">(-11%)</span></td>
+                                    <td class="py-3 px-2.5 text-center font-bold text-amber-700">~15.0 میلیارد $ <span class="text-rose-600 text-xs">(-28.2%)</span></td>
+                                    <td class="py-3 px-2.5 text-center font-bold text-emerald-700">~20.8 میلیارد $ <span class="text-rose-600 text-xs">(-20% تا -25%)</span></td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-3 px-3 font-bold text-slate-900">وزن (حجم) صادرات</td>
+                                    <td class="py-3 px-2.5 text-center">~152.0 میلیون تن</td>
+                                    <td class="py-3 px-2.5 text-center">~136.0 میلیون تن</td>
+                                    <td class="py-3 px-2.5 text-center text-slate-600">سقوط تناژ دریایی جنوب</td>
+                                    <td class="py-3 px-2.5 text-center font-black text-rose-600">سقوط -34.0% وزنی</td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-3 px-3 font-bold text-slate-900">ارزش واردات کشور</td>
+                                    <td class="py-3 px-2.5 text-center">72.37 میلیارد $</td>
+                                    <td class="py-3 px-2.5 text-center">58.01 میلیارد $ <span class="text-rose-600 font-bold text-xs">(-21%)</span></td>
+                                    <td class="py-3 px-2.5 text-center font-bold text-amber-700">~17.0 میلیارد $ <span class="text-rose-600 text-xs">(-26.1%)</span></td>
+                                    <td class="py-3 px-2.5 text-center font-bold text-emerald-700">~23.8 میلیارد $ <span class="text-rose-600 text-xs">(-38% به ۱۴۰۳)</span></td>
+                                </tr>
+                                <tr class="hover:bg-slate-50">
+                                    <td class="py-3 px-3 font-bold text-slate-900">وزن (حجم) واردات</td>
+                                    <td class="py-3 px-2.5 text-center">39.20 میلیون تن</td>
+                                    <td class="py-3 px-2.5 text-center">41.08 میلیون تن</td>
+                                    <td class="py-3 px-2.5 text-center text-slate-600">کاهش ورودی بنادر جنوب</td>
+                                    <td class="py-3 px-2.5 text-center font-black text-rose-600">سقوط -20.0% وزنی</td>
+                                </tr>
+                                <tr class="bg-rose-50/50">
+                                    <td class="py-3 px-3 font-bold text-rose-800">تراز تجاری غیرنفتی</td>
+                                    <td class="py-3 px-2.5 text-center font-bold text-rose-600" dir="ltr">-14.53 B$</td>
+                                    <td class="py-3 px-2.5 text-center font-bold text-rose-600" dir="ltr">-6.31 B$</td>
+                                    <td class="py-3 px-2.5 text-center font-bold text-rose-600" dir="ltr">-2.0 B$</td>
+                                    <td class="py-3 px-2.5 text-center font-bold text-rose-600" dir="ltr">~ -3.0 B$</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 4 Analytical Points on Trade 1405 -->
+                    <div class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3 bg-slate-50 border-t border-slate-200 text-xs text-slate-700">
+                        <div class="p-3 rounded-xl bg-white border border-slate-200">
+                            <strong class="text-amber-700 block mb-1">۱. چرا وزن صادرات ۳۴٪ ریخت اما ارزش ۲۰٪؟</strong>
+                            به دلیل ۵ برابر شدن کرایه دریایی و بیمه جنگ در هرمز، کالاهای حجیم و کم‌ارزش (سنگ‌آهن، سیمان، کلینکر و مواد معدنی فله) که از بنادر جنوب صادر می‌شدند کاملاً غیراقتصادی و از سبد حذف شدند.
+                        </div>
+                        <div class="p-3 rounded-xl bg-white border border-slate-200">
+                            <strong class="text-rose-700 block mb-1">۲. چرا سقوط ۲۶٪ واردات خطرناک‌تر است؟</strong>
+                            چون <b>85% واردات ایران</b> مواد اولیه و کالاهای واسطه‌ای و سرمایه‌ای تولید است! در ۵ ماهه ۱۴۰۵ واردات کالای اساسی <b>11% (300 میلیون دلار)</b> کم شد اما واردات خودروی سواری <b>66%</b> رشد کرد!
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Route Shift Cards (Turkey, Iraq, Pakistan, Air Freight) -->
+                <div class="lg:col-span-5 flex flex-col justify-between gap-4">
+                    <div class="glass-card p-4 rounded-2xl border-r-4 border-r-emerald-600">
+                        <h3 class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+                            <i class="fa-solid fa-route text-emerald-600"></i> تغییر جغرافیای تجارت ۱۴۰۵ (چرخش از ۷۵٪ دریا به مرزهای زمینی)
+                        </h3>
+                        <div class="space-y-3 text-xs md:text-sm">
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+                                <div>
+                                    <span class="font-bold text-emerald-700 block">۱. ترکیه (شریان اصلی زمینی ۶ ماهه ۱۴۰۵)</span>
+                                    <span class="text-xs text-slate-600">حجم: <b>7.172 میلیون تن</b> (+41.8% رشد وزنی)</span>
+                                </div>
+                                <div class="text-left">
+                                    <span class="text-base font-black text-slate-900 block" dir="ltr">4.284 B$</span>
+                                    <span class="text-xs text-emerald-700 font-bold" dir="ltr">+56.1% رشد ارزش</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+                                <div>
+                                    <span class="font-bold text-blue-700 block">۲. عراق (مرزهای زمینی غرب و کرمانشاه)</span>
+                                    <span class="text-xs text-slate-600">عبور مستمر کامیون‌ها از پرویزخان و خسروی</span>
+                                </div>
+                                <div class="text-left">
+                                    <span class="text-base font-black text-slate-900 block" dir="ltr">+1.40 B$</span>
+                                    <span class="text-xs text-blue-700 font-bold">در ۶ ماهه نخست</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-slate-50 p-3 rounded-xl border border-slate-200 flex justify-between items-center">
+                                <div>
+                                    <span class="font-bold text-amber-700 block">۳. پاکستان (رکوردشکنی پس از جنگ ۴۰ روزه)</span>
+                                    <span class="text-xs text-slate-600">جهش <b>+47%</b> در خرداد/ژوئن ۲۰۲۶ (119M$ در یک ماه)</span>
+                                </div>
+                                <div class="text-left">
+                                    <span class="text-base font-black text-slate-900 block" dir="ltr">1.395 B$</span>
+                                    <span class="text-xs text-amber-700 font-bold" dir="ltr">+12% رشد سالانه</span>
+                                </div>
+                            </div>
+
+                            <div class="bg-rose-50/70 p-3 rounded-xl border border-rose-200 flex justify-between items-center">
+                                <div>
+                                    <span class="font-bold text-rose-700 block">۴. سقوط صادرات هوایی (زعفران و اقلام پرارزش)</span>
+                                    <span class="text-xs text-slate-600">لغو پروازها و جهش ۴ تا ۵ برابری کرایه بار هوایی</span>
+                                </div>
+                                <div class="text-left">
+                                    <span class="text-base font-black text-rose-600 block" dir="ltr">-40.0%</span>
+                                    <span class="text-xs text-rose-700 font-bold">افت صادرات زعفران</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 5: INFLATION & MONETARY SHOCK (MEHR & ABAN 1405) -->
+        <section id="sec-inflation" class="tab-section space-y-4 searchable-block">
+            <div class="flex flex-col md:flex-row md:items-center justify-between border-b border-slate-200 pb-3 gap-2">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-fire-flame-curved text-orange-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">بخش چهارم: کالبدشکافی سونامی تورم مهر ۱۴۰۵ و نرخ‌های بازار آزاد آبان ۱۴۰۵</h2>
+                </div>
+                <span class="text-xs bg-orange-50 text-orange-800 px-3 py-1 rounded-lg border border-orange-200 font-medium">مقایسه آمار مرکز آمار ایران و بانک مرکزی (مهر ۱۴۰۵)</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- Statistical Center Card -->
+                <div class="glass-card p-5 rounded-2xl border border-red-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold bg-red-100 text-red-800 px-2.5 py-1 rounded-md">مرجع اول: مرکز آمار ایران</span>
+                        <span class="text-xs text-slate-500 font-medium">مهر ۱۴۰۵</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <span class="text-sm text-slate-700">تورم نقطه‌به‌نقطه مهر ۱۴۰۵:</span>
+                            <span class="text-2xl font-black text-red-600" dir="ltr">88.7%</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <span class="text-sm text-slate-700">تورم سالانه مهر ۱۴۰۵:</span>
+                            <span class="text-xl font-bold text-orange-600" dir="ltr">76.8%</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <span class="text-sm text-slate-700">شتاب نسبت به شهریور (73.6%):</span>
+                            <span class="text-sm font-bold text-rose-600" dir="ltr">+3.2 واحد درصد در ۱ ماه</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-slate-700">تورم ماهانه مهر ۱۴۰۵:</span>
+                            <span class="text-lg font-bold text-slate-900" dir="ltr">4.4%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Central Bank Card -->
+                <div class="glass-card p-5 rounded-2xl border border-amber-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md">مرجع دوم: بانک مرکزی (مناطق شهری)</span>
+                        <span class="text-xs text-slate-500 font-medium">مهر ۱۴۰۵</span>
+                    </div>
+                    <div class="space-y-3">
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <span class="text-sm text-slate-700">عدد شاخص بهای مصرف‌کننده شهری:</span>
+                            <span class="text-2xl font-black text-amber-600" dir="ltr">836.8</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <span class="text-sm text-slate-700">تورم سالانه مناطق شهری:</span>
+                            <span class="text-xl font-bold text-orange-600" dir="ltr">71.4%</span>
+                        </div>
+                        <div class="flex justify-between items-center border-b border-slate-200 pb-2">
+                            <span class="text-sm text-slate-700">تورم ماهانه شهری مهر ۱۴۰۵:</span>
+                            <span class="text-lg font-bold text-rose-600" dir="ltr">4.6%</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-sm text-slate-700">واکنش حسابداری دولت در بودجه:</span>
+                            <span class="text-xs font-bold text-slate-800">لایحه حذف ۴ صفر از پول ملی</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Market Rates & Drivers (Aban 1405) -->
+                <div class="glass-card p-5 rounded-2xl border border-purple-200">
+                    <div class="flex justify-between items-center mb-3">
+                        <span class="text-xs font-bold bg-purple-100 text-purple-800 px-2.5 py-1 rounded-md">نرخ‌های بازار و پیشران‌های تورم</span>
+                        <span class="text-xs text-slate-500 font-medium">آبان ۱۴۰۵</span>
+                    </div>
+                    <div class="space-y-2.5 text-xs md:text-sm">
+                        <div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-2 rounded-lg">
+                            <span class="text-slate-700">نرخ دلار آزاد / یورو آزاد:</span>
+                            <span class="font-bold text-purple-700">272,500 / 306,670 تومان</span>
+                        </div>
+                        <div class="flex justify-between items-center bg-slate-50 border border-slate-200 p-2 rounded-lg">
+                            <span class="text-slate-700">سکه امامی / اونس جهانی طلا:</span>
+                            <span class="font-bold text-amber-700">261 میلیون تومان / 3,927$</span>
+                        </div>
+                        <div class="p-2.5 rounded-lg bg-slate-50 border border-slate-200 text-xs leading-5 text-slate-700">
+                            <strong class="text-slate-900 block mb-0.5">دو موتور تورم ۸۸.۷ درصدی:</strong>
+                            ۱. <b>تورم فشار هزینه (Cost-Push):</b> جهش ۵ برابری حمل دریایی، رشد ۱۵۰٪ مواد ناریه و شامخ قیمت خرید ۹۳.۳.<br>
+                            ۲. <b>تورم پولی:</b> سقوط درآمد نفت و ۸۰۰ همت اضافه برداشت بانک‌ها.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        // Copy to clipboard using execCommand for iframe compatibility
+        function copyText(text) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text.trim();
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = 'کپی شد: ' + (text.length > 45 ? text.substring(0, 45) + '...' : text);
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2800);
+        }
+
+        // Tab Switching Logic
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+
+            const sections = document.querySelectorAll('.tab-section');
+            if (tabId === 'all') {
+                sections.forEach(sec => sec.classList.remove('hidden'));
+            } else {
+                sections.forEach(sec => {
+                    if (sec.id === 'sec-' + tabId) {
+                        sec.classList.remove('hidden');
+                    } else {
+                        sec.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        // Live Search Filter
+        function filterContent(query) {
+            const q = query.trim().toLowerCase();
+            const blocks = document.querySelectorAll('.searchable-block');
+            if (!q) {
+                blocks.forEach(b => b.classList.remove('hidden'));
+                return;
+            }
+            blocks.forEach(block => {
+                if (block.innerText.toLowerCase().includes(q)) {
+                    block.classList.remove('hidden');
+                } else {
+                    block.classList.add('hidden');
+                }
+            });
+        }
+
+        function resetSearch() {
+            const input = document.getElementById('globalSearch');
+            input.value = '';
+            filterContent('');
+            switchTab('all');
+        }
+
+        // Initialize Chart.js on Window Load
+        window.onload = function () {
+            const ctx = document.getElementById('pmiChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: ['شامخ صنعت', 'مقدار تولید', 'موجودی مواد اولیه', 'قیمت خرید نهاده', 'قیمت فروش محصول', 'موجودی انبار', 'انتظارات آینده'],
+                    datasets: [
+                        {
+                            label: 'اردیبهشت ۱۴۰۴ (پیش از جنگ)',
+                            data: [46.3, 44.3, 46.9, 77.3, 59.3, 53.7, 52.7],
+                            backgroundColor: 'rgba(37, 99, 235, 0.8)',
+                            borderColor: '#1d4ed8',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        },
+                        {
+                            label: 'شهریور ۱۴۰۵ (پساجنگ ۴۰ روزه)',
+                            data: [48.5, 49.0, 36.7, 93.3, 74.5, 44.3, 45.6],
+                            backgroundColor: 'rgba(225, 29, 72, 0.85)',
+                            borderColor: '#be123c',
+                            borderWidth: 1,
+                            borderRadius: 6
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#1e293b', font: { family: 'Vazirmatn', size: 11, weight: 'bold' } }
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: false,
+                            min: 20,
+                            max: 100,
+                            grid: { color: 'rgba(148, 163, 184, 0.25)' },
+                            ticks: { color: '#334155', font: { family: 'Vazirmatn' } }
+                        },
+                        x: {
+                            grid: { display: false },
+                            ticks: { color: '#1e293b', font: { family: 'Vazirmatn', size: 10, weight: '600' } }
+                        }
+                    }
+                }
+            });
+        };
+    </script>
+</body>
+</html>
