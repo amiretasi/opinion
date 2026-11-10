@@ -31,103 +31,94 @@
 <body class="min-h-screen pb-12">
 
     <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
-        <i class="fa-solid fa-circle-check text-xl"></i>
-        <span id="toast-msg" class="text-sm font-bold">مطلب کپی شد!</span>
+    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-xl flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-sm"></i>
+        <span id="toast-msg" class="text-xs font-bold">مطلب کپی شد!</span>
     </div>
 
-    <!-- Header -->
+    <!-- Ultra-Compact Header (Search Removed, Micro Tabs) -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 text-xl font-black">
-                    ۳
-                </div>
-                <div>
-                    <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">برگه تقلب مصاحبه - Canvas 3</span>
-                    <h1 class="text-base md:text-lg font-extrabold text-slate-900 mt-0.5">داشبورد تفکیک بحران: «موانع ناگزیر ناشی از جنگ» در برابر «خطاهای تصمیم‌گیری دولت»</h1>
-                </div>
+        <div class="max-w-7xl mx-auto px-3 py-1.5 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-md bg-rose-600 text-white flex items-center justify-center text-xs font-black">۳</span>
+                <h1 class="text-xs md:text-sm font-extrabold text-slate-900">داشبورد ۳: تفکیک «موانع ناگزیر ناشی از جنگ» از «خطاهای تصمیم‌گیری دولت»</h1>
             </div>
 
-            <!-- Instant Search -->
-            <div class="flex items-center gap-2 w-full lg:w-96">
-                <div class="relative w-full">
-                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-slate-400"></i>
-                    <input type="text" id="globalSearch" oninput="filterContent(this.value)" placeholder="جستجوی سریع (مثلاً: بیمه جنگ، کد رهگیری، ناریه، فورس‌ماژور...)" 
-                        class="w-full bg-slate-100 text-sm text-slate-900 placeholder-slate-500 pr-10 pl-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-rose-600 focus:bg-white transition">
-                </div>
-                <button onclick="resetSearch()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-xl border border-slate-300 transition">
-                    <i class="fa-solid fa-rotate-right"></i>
+            <!-- Micro Tabs -->
+            <div class="flex flex-wrap items-center gap-1">
+                <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-table-columns text-[10px]"></i> همه
+                </button>
+                <button onclick="switchTab('inevitable')" id="tab-inevitable" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-explosion text-amber-600 text-[10px]"></i> ۵ مانع ناگزیر جنگ
+                </button>
+                <button onclick="switchTab('policy-errors')" id="tab-policy-errors" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-gavel text-rose-600 text-[10px]"></i> ۶ خطای تصمیم‌گیری دولت
+                </button>
+                <button onclick="switchTab('solutions')" id="tab-solutions" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-lightbulb text-emerald-600 text-[10px]"></i> ماتریس و ۵ راهکار فوری
                 </button>
             </div>
         </div>
-
-        <!-- Tabs -->
-        <div class="max-w-7xl mx-auto px-4 pb-2.5 flex flex-wrap gap-2">
-            <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-table-columns"></i> نمایش کامل و ماتریس تفکیک
-            </button>
-            <button onclick="switchTab('inevitable')" id="tab-inevitable" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-explosion text-amber-600"></i> بخش اول: ۵ مانع ناگزیر ناشی از ذات جنگ
-            </button>
-            <button onclick="switchTab('policy-errors')" id="tab-policy-errors" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-gavel text-rose-600"></i> بخش دوم: ۶ خطای تصمیم‌گیری دولت (خودتحریمی)
-            </button>
-            <button onclick="switchTab('solutions')" id="tab-solutions" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-lightbulb text-emerald-600"></i> بسته ۵ بندی راهکارهای فوری مصاحبه
-            </button>
-        </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
+    <main class="max-w-7xl mx-auto px-3 mt-3 space-y-5">
 
-        <!-- TOP 6 KPIs OF OBSTACLES -->
-        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 searchable-block">
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer" onclick="copyText('حق بیمه ریسک جنگ برای کشتی‌ها در تنگه هرمز ۱۰۰۰ درصد جهش یافت (از ۰.۲۵ درصد به ۳ تا ۱۰ درصد ارزش بدنه شناور) و ۳۰۰۰ دلار اضافه کرایه جنگی به هر کانتینر تحمیل شد.')">
-                <span class="text-xs text-amber-700 font-bold block">مانع جنگی: بیمه هرمز</span>
-                <div class="text-lg font-black text-slate-900 mt-1">جهش ۱,۰۰۰٪ بیمه</div>
-                <span class="text-[11px] text-slate-600">۳٪ تا ۱۰٪ بدنه | +3,000$ کانتینر</span>
+        <!-- ULTRA-COMPACT TOP 6 KPIs OF OBSTACLES -->
+        <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-amber-500 cursor-pointer hover:bg-slate-50" onclick="copyText('حق بیمه ریسک جنگ برای کشتی‌ها در تنگه هرمز ۱۰۰۰ درصد جهش یافت (از ۰.۲۵ درصد به ۳ تا ۱۰ درصد ارزش بدنه شناور) و ۳۰۰۰ دلار اضافه کرایه جنگی به هر کانتینر تحمیل شد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-amber-700 font-bold">مانع جنگ: بیمه هرمز</span>
+                    <span class="text-xs font-black text-slate-900">+۱,۰۰۰٪</span>
+                </div>
+                <div class="text-[10px] text-slate-600">۳ تا ۱۰٪ بدنه | +3000$</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer" onclick="copyText('طبق قوانین فیزیک ترانزیت، یک کشتی کانتینربر بزرگ ۲۰,۰۰۰ کانتینر حمل می‌کند اما یک قطار باری فقط ۱۰۰ کانتینر؛ یعنی جایگزینی یک کشتی نیازمند ۲۰۰ رام قطار است!')">
-                <span class="text-xs text-amber-700 font-bold block">مانع جنگی: فیزیک ترانزیت</span>
-                <div class="text-lg font-black text-slate-900 mt-1">۱ کشتی = ۲۰۰ قطار!</div>
-                <span class="text-[11px] text-slate-600">جهش ۴ تا ۵ برابری کرایه هوایی</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-amber-500 cursor-pointer hover:bg-slate-50" onclick="copyText('طبق قوانین فیزیک ترانزیت، یک کشتی کانتینربر بزرگ ۲۰,۰۰۰ کانتینر حمل می‌کند اما یک قطار باری فقط ۱۰۰ کانتینر؛ یعنی جایگزینی یک کشتی نیازمند ۲۰۰ رام قطار است!')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-amber-700 font-bold">مانع جنگ: فیزیک ریل</span>
+                    <span class="text-xs font-black text-slate-900">۱ کشتی=۲۰۰ قطار</span>
+                </div>
+                <div class="text-[10px] text-slate-600">بار هوایی: ۴ تا ۵ برابر</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer" onclick="copyText('در بخش معدن، محدودیت امنیتی نیترات آمونیوم قیمت مواد ناریه را ۱۵۰ درصد و قطع واردات قیمت قطعات و لاستیک را ۱۰۰ درصد بالا برد و ۳۴ درصد به هزینه عملیاتی استخراج افزود.')">
-                <span class="text-xs text-amber-700 font-bold block">مانع جنگی: شوک فنی معادن</span>
-                <div class="text-lg font-black text-slate-900 mt-1">+۱۵۰٪ مواد ناریه</div>
-                <span class="text-[11px] text-slate-600">+۱۰۰٪ قطعات | +۳۴٪ OPEX</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-amber-500 cursor-pointer hover:bg-slate-50" onclick="copyText('در بخش معدن، محدودیت امنیتی نیترات آمونیوم قیمت مواد ناریه را ۱۵۰ درصد و قطع واردات قیمت قطعات و لاستیک را ۱۰۰ درصد بالا برد و ۳۴ درصد به هزینه عملیاتی استخراج افزود.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-amber-700 font-bold">مانع جنگ: معادن</span>
+                    <span class="text-xs font-black text-slate-900">+۱۵۰٪ ناریه</span>
+                </div>
+                <div class="text-[10px] text-slate-600">+۱۰۰٪ قطعه | +۳۴٪ OPEX</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer" onclick="copyText('بزرگ‌ترین خطای تصمیم‌گیری دولت در جنگ، منوط کردن خروج کالای ارزیابی‌شده از گمرک به صدور کد رهگیری ارز بانک مرکزی بود که میلیون‌ها تن ماده اولیه را در بنادر رسوب داد.')">
-                <span class="text-xs text-rose-700 font-bold block">خطای دولت: قفل گمرک</span>
-                <div class="text-lg font-black text-rose-600 mt-1">تله «کد رهگیری»</div>
-                <span class="text-[11px] text-slate-600">خنثی شدن ترخیص ۷۳ ساعته</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-rose-600 cursor-pointer hover:bg-slate-50" onclick="copyText('بزرگ‌ترین خطای تصمیم‌گیری دولت در جنگ، منوط کردن خروج کالای ارزیابی‌شده از گمرک به صدور کد رهگیری ارز بانک مرکزی بود که میلیون‌ها تن ماده اولیه را در بنادر رسوب داد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-rose-700 font-bold">خطای دولت: گمرک</span>
+                    <span class="text-xs font-black text-rose-600">قفل کد رهگیری</span>
+                </div>
+                <div class="text-[10px] text-slate-600">خنثی شدن ترخیص ۷۳ ساعته</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer" onclick="copyText('تغییرات خلق‌الساعه کدهای تعرفه ثبت سفارش در وزارت صمت و ناهماهنگی با بانک مرکزی، ۴.۰۷ میلیارد یورو بدهی و مطالبات ارزی بلاتکلیف برای واردکنندگان ایجاد کرد.')">
-                <span class="text-xs text-rose-700 font-bold block">خطای دولت: بدهی ارزی</span>
-                <div class="text-lg font-black text-rose-600 mt-1" dir="ltr">4.07 میلیارد یورو</div>
-                <span class="text-[11px] text-slate-600">مطالبات بلاتکلیف واردکنندگان</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-rose-600 cursor-pointer hover:bg-slate-50" onclick="copyText('تغییرات خلق‌الساعه کدهای تعرفه ثبت سفارش در وزارت صمت و ناهماهنگی با بانک مرکزی، ۴.۰۷ میلیارد یورو بدهی و مطالبات ارزی بلاتکلیف برای واردکنندگان ایجاد کرد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-rose-700 font-bold">خطای دولت: بدهی ارز</span>
+                    <span class="text-xs font-black text-rose-600" dir="ltr">4.07 B€</span>
+                </div>
+                <div class="text-[10px] text-slate-600">بلاتکلیف برای واردکنندگان</div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer" onclick="copyText('بانک مرکزی در حالی که با ۸۰۰ همت اضافه برداشت بانک‌های ناتراز مماشات کرد (که تورم را به ۸۸.۷ درصد رساند)، سرمایه در گردش تولید را با نرخ بهره بالای ۳۰ درصد و انحراف ۹۰ درصدی اوراق گام خشکاند.')">
-                <span class="text-xs text-rose-700 font-bold block">خطای دولت: سیاست پولی</span>
-                <div class="text-lg font-black text-rose-600 mt-1">۸۰۰ همت اضافه برداشت</div>
-                <span class="text-[11px] text-slate-600">در برابر قحطی اعتبار برای تولید</span>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-rose-600 cursor-pointer hover:bg-slate-50" onclick="copyText('بانک مرکزی در حالی که با ۸۰۰ همت اضافه برداشت بانک‌های ناتراز مماشات کرد (که تورم را به ۸۸.۷ درصد رساند)، سرمایه در گردش تولید را با نرخ بهره بالای ۳۰ درصد و انحراف ۹۰ درصدی اوراق گام خشکاند.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-rose-700 font-bold">خطای دولت: بانک‌ها</span>
+                    <span class="text-xs font-black text-rose-600">۸۰۰ همت ناتراز</span>
+                </div>
+                <div class="text-[10px] text-slate-600">قحطی اعتبار برای تولید</div>
             </div>
         </section>
 
-        <!-- CORE INTERVIEW ARGUMENT BANNER -->
-        <section class="glass-card p-5 rounded-2xl border-r-4 border-r-blue-600 bg-blue-50/40 searchable-block cursor-pointer" onclick="copyText(this.innerText)">
-            <div class="flex justify-between items-center mb-1">
-                <span class="text-xs font-extrabold text-blue-700 uppercase"><i class="fa-solid fa-bullhorn ml-1"></i> تز اصلی مصاحبه در بخش سوم (تفاوت شوک برون‌زا و خطای درون‌زا)</span>
-                <span class="text-xs text-slate-500"><i class="fa-regular fa-copy ml-1"></i>کپی استدلال</span>
-            </div>
-            <p class="text-sm md:text-base font-medium text-slate-800 leading-7">
-                «مغالطه بزرگ دستگاه‌های دولتی این است که تمام رکود و تورم ۸۸.۷ درصدی سال ۱۴۰۵ را به گردن جنگ ۱۲ و ۴۰ روزه می‌اندازند؛ در حالی که بخش خصوصی با مهندسی تغییر مسیر و بانکداری سایه توان عبور از <b class="text-slate-900">موانع ناگزیر جنگی</b> را داشت، اما آنچه پای تولیدکننده را در داخل مرزها به زنجیر کشید، <b class="text-rose-700">خطاهای تصمیم‌گیری دولت</b> نظیر قفل کد رهگیری در گمرکات، سرکوب نرخ ارز صادراتی، قیمت‌گذاری دستوری و نکول مطالبات پیمانکاران بود.»
+        <!-- COMPACT CORE INTERVIEW ARGUMENT BANNER -->
+        <section class="glass-card px-3.5 py-2.5 rounded-xl border-r-4 border-r-blue-600 bg-blue-50/40 cursor-pointer" onclick="copyText(this.innerText)">
+            <p class="text-xs md:text-sm font-medium text-slate-800 leading-6">
+                <b class="text-blue-700"><i class="fa-solid fa-bullhorn ml-1"></i>تز اصلی مصاحبه:</b> مغالطه بزرگ دولتی‌ها این است که تمام رکود و تورم ۸۸.۷٪ سال ۱۴۰۵ را تقصیر جنگ می‌اندازند؛ در حالی که بخش خصوصی توان عبور از <b class="text-slate-900">موانع ناگزیر جنگی</b> را داشت، اما آنچه تولید و تجارت را در داخل مرزها قفل کرد، <b class="text-rose-700">خطاهای تصمیم‌گیری دولت</b> (قفل کد رهگیری در گمرک، سرکوب ارز صادراتی، قیمت‌گذاری دستوری و نکول مطالبات) بود.
             </p>
         </section>
 
