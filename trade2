@@ -1,0 +1,437 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد ۲: بخش خصوصی داخلی در تجارت (شرکت‌های بازرگانی vs صنایع مجبور به تجارت) و نقش دولت</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vazirmatn Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #059669, #047857);
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <span id="toast-msg" class="text-sm font-bold">نکته کلیدی کپی شد!</span>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-emerald-50 border border-emerald-200 flex items-center justify-center text-emerald-700 text-xl font-black">
+                    ۲
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-emerald-700 bg-emerald-50 px-2.5 py-0.5 rounded-full border border-emerald-200">برگه تقلب مصاحبه - Canvas 2 (اصلاح‌شده بر محور تجارت)</span>
+                    <h1 class="text-base md:text-lg font-extrabold text-slate-900 mt-0.5">کالبدشکافی بخش خصوصی داخلی در تجارت: «شرکت‌های بازرگانی» در برابر «صنایع مجبور به تجارت» و نقش دولت</h1>
+                </div>
+            </div>
+
+            <!-- Instant Search -->
+            <div class="flex items-center gap-2 w-full lg:w-96">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-slate-400"></i>
+                    <input type="text" id="globalSearch" oninput="filterContent(this.value)" placeholder="جستجوی سریع (مثلاً: بازرگانی، دارویی، غذایی، NTSW، کد فیدار، کوتاژ...)" 
+                        class="w-full bg-slate-100 text-sm text-slate-900 placeholder-slate-500 pr-10 pl-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-emerald-600 focus:bg-white transition">
+                </div>
+                <button onclick="resetSearch()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-xl border border-slate-300 transition">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="max-w-7xl mx-auto px-4 pb-2.5 flex flex-wrap gap-2">
+            <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-layer-group"></i> نمای کامل (همه بخش‌ها)
+            </button>
+            <button onclick="switchTab('group1-trading')" id="tab-group1-trading" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-briefcase text-blue-600"></i> گروه اول: شرکت‌های تجاری و بازرگانی
+            </button>
+            <button onclick="switchTab('group2-forced')" id="tab-group2-forced" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-industry text-emerald-600"></i> گروه دوم: صنایع، ساختمان، غذا و داروی «مجبور به تجارت»
+            </button>
+            <button onclick="switchTab('sectors')" id="tab-sectors" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-pills text-amber-600"></i> تفکیک ۴ بخش (صنعتی، غذایی، دارویی، ساختمانی)
+            </button>
+            <button onclick="switchTab('state-role')" id="tab-state-role" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-landmark text-rose-600"></i> نقش دولت در قبال این دو گروه و تبعات آن
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
+
+        <!-- CORE INTERVIEW THESIS BANNER -->
+        <section class="glass-card p-5 rounded-2xl border-r-4 border-r-emerald-600 bg-emerald-50/40 searchable-block cursor-pointer" onclick="copyText(this.innerText)">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-extrabold text-emerald-800 uppercase"><i class="fa-solid fa-microphone-lines ml-1"></i> تز کلیدی مصاحبه برای شروع سرفصل دوم (کلیک = کپی)</span>
+                <span class="text-xs text-slate-500"><i class="fa-regular fa-copy ml-1"></i>کپی استدلال</span>
+            </div>
+            <p class="text-sm md:text-base font-medium text-slate-800 leading-7">
+                «وقتی از بخش خصوصی داخلی ایران در حوزه تجارت حرف می‌زنیم، با دو گروه کاملاً متفاوت روبه‌رو هستیم: <b class="text-blue-700">گروه اول، شرکت‌های تجاری و بازرگانی حرفه‌ای</b> هستند که ذات کارشان تجارت است؛ و <b class="text-emerald-800">گروه دوم، شرکت‌های صنعتی، ساختمانی، غذایی و دارویی</b> هستند که تاجر نیستند، اما چون ۸۵٪ واردات ایران مواد اولیه و قطعات تولید است و قوانین سهمیه تولیدی وزارت صمت و عدم تخصیص ارز بانک مرکزی دستشان را بسته، <b class="text-rose-700">برای نخوابیدن خط تولید و کارگاه مجبور به تجارت (واردات مستقیم نهاده و حتی صادرات اجباری برای تأمین ارز خود) شده‌اند!</b>»
+            </p>
+        </section>
+
+        <!-- TOP 6 KPIs OF TRADE & PRODUCTION -->
+        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 searchable-block">
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-blue-600 cursor-pointer" onclick="copyText('۸۵ درصد کل واردات ایران شامل مواد اولیه، کالاهای واسطه‌ای، دارو، نهاده‌های دامی و ماشین‌آلات خطوط تولید است؛ به همین دلیل صنعت و تولید در ایران مستقیماً به تجارت گره خورده است.')">
+                <span class="text-xs font-bold text-blue-700 block">سهم تولید از کل واردات کشور</span>
+                <div class="text-xl font-black text-slate-900 mt-1">۸۵٪ کل واردات</div>
+                <span class="text-[11px] text-slate-600">مواد اولیه، دارو، نهاده و ماشین‌آلات</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-emerald-600 cursor-pointer" onclick="copyText('در پی اختلالات اینترنت و سامانه جامع تجارت (NTSW)، زمان ثبت سفارش از ۲-۳ روز به ۲۰ تا ۲۵ روز رسید که با از دست رفتن اسلات کشتی‌ها (Vessel Closing Time) به ۳۱ تا ۴۵ روز تأخیر مرکب ورود کالا منجر شد.')">
+                <span class="text-xs font-bold text-emerald-700 block">قفل سامانه جامع تجارت (NTSW)</span>
+                <div class="text-xl font-black text-slate-900 mt-1">۲۰ تا ۲۵ روز</div>
+                <span class="text-[11px] text-slate-600">تأخیر مرکب کشتی: <b>31 تا 45 روز</b></span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer" onclick="copyText('با مصرف شدن موجودی اطمینان ۳۰ روزه انبارها (Safety Stock) در جنگ، شاخص موجودی مواد اولیه صنعت در شهریور ۱۴۰۵ به ۳۶.۷ سقوط کرد (فرآورده‌های نفتی ۱۸.۲، ماشین‌سازی ۲۹.۲، غذایی ۳۱.۳).')">
+                <span class="text-xs font-bold text-amber-700 block">تخلیه Safety Stock صنایع</span>
+                <div class="text-xl font-black text-rose-600 mt-1">شامخ ۳۶.۷</div>
+                <span class="text-[11px] text-slate-600">نفت: 18.2 | ماشین: 29.2 | غذا: 31.3</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer" onclick="copyText('در حالی که قیمت خرید مواد اولیه صنایع غذایی در شهریور ۱۴۰۵ به ۹۴.۲ رسید، به دلیل قیمت‌گذاری دستوری و کاهش ۱۱ درصدی واردات کالای اساسی، شامخ صنایع غذایی به ۳۸.۶ (بدترین صنعت کشور) سقوط کرد.')">
+                <span class="text-xs font-bold text-rose-700 block">بحران صنایع غذایی در ۱۴۰۵</span>
+                <div class="text-xl font-black text-rose-600 mt-1">شامخ ۳۸.۶ (قعر جدول)</div>
+                <span class="text-[11px] text-slate-600">تولید: 35.8 | صادرات: 27.6 | نهاده: 94.2</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-purple-600 cursor-pointer" onclick="copyText('تغییرات خلق‌الساعه کد تعرفه‌ها در وزارت صمت و عدم تأمین ارز بانک مرکزی، ۴.۰۷ میلیارد یورو بدهی و مطالبات ارزی بلاتکلیف برای شرکت‌های بازرگانی و تولیدی واردکننده ایجاد کرد.')">
+                <span class="text-xs font-bold text-purple-700 block">بدهی ارزی بلاتکلیف واردکنندگان</span>
+                <div class="text-xl font-black text-purple-700 mt-1" dir="ltr">4.07 B€</div>
+                <span class="text-[11px] text-slate-600">خطر ورشکستگی با تسعیر نرخ جدید</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-red-600 cursor-pointer" onclick="copyText('در ۵ ماهه اول ۱۴۰۵، تخصیص ارز دولت به گونه‌ای بود که واردات کالای اساسی و دارو ۱۱ درصد (۳۰۰ میلیون دلار) کاهش یافت اما واردات خودروی سواری ۶۶ درصد رشد کرد!')">
+                <span class="text-xs font-bold text-red-700 block">انحراف تخصیص ارز (۵ ماهه ۱۴۰۵)</span>
+                <div class="text-xl font-black text-red-600 mt-1" dir="ltr">-11% vs +66%</div>
+                <span class="text-[11px] text-slate-600">افت ۱۱٪ کالای اساسی / رشد ۶۶٪ خودرو</span>
+            </div>
+        </section>
+
+        <!-- SECTION 1: GROUP 1 - COMMERCIAL & TRADING COMPANIES -->
+        <section id="sec-group1-trading" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-briefcase text-blue-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">گروه اول بخش خصوصی داخلی: «شرکت‌های تجاری، بازرگانی و تجار حرفه‌ای» (ذات کار = تجارت)</h2>
+                </div>
+                <span class="text-xs bg-blue-50 text-blue-800 px-3 py-1 rounded-lg border border-blue-200 font-medium">دارندگان کارت بازرگانی تجاری و شبکه بین‌المللی</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <div class="glass-card p-4 rounded-2xl border-t-4 border-t-blue-600">
+                    <span class="text-xs font-bold text-blue-700 block mb-1">۱. مدل کار و سبد کالایی</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">تجارت بر مبنای «سابقه بازرگانی»</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        فعالیت با <b>کارت بازرگانی تجاری</b> در سامانه جامع تجارت (NTSW)؛ واردات کالاهای اساسی (برنج، روغن، چای، نهاده دامی) و کالاهای واسطه‌ای عمومی (ورق فولادی، پلیمر پایه، چوب، کاغذ، قطعات یدکی بازار) که نقدشوندگی سریع دارند و صادرات خشکبار، زعفران، پتروشیمی و مواد معدنی.
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border-t-4 border-t-blue-600">
+                    <span class="text-xs font-bold text-blue-700 block mb-1">۲. دور زدن اسنپ‌بک و محاصره</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">شرکت‌های پوششی و Switch B/L</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        تجار حرفه‌ای به واسطه داشتن دفاتر و <b>شرکت‌های پوششی (Front Companies)</b> در دبی، استانبول، مرسین، مسقط و هنگ‌کنگ، کالا را به نام شرکت خارجی خریده، در بنادر واسط تخلیه و با <b>تغییر اسناد حمل (Switch Bill of Lading)</b> و تسویه با <b>تتر (USDT)</b> و صرافی وارد کشور کردند.
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border-t-4 border-t-blue-600">
+                    <span class="text-xs font-bold text-blue-700 block mb-1">۳. چابکی در تغییر مسیر (Route Shift)</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">حذف بار حجیم دریا و شیفت به خشکی</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        با ۵ برابر شدن کرایه دریایی جنوب، تجار بلافاصله صادرات کالای حجیم و ارزان را متوقف کردند (افت ۳۴٪ وزن صادرات) و به مرزهای زمینی شیفت دادند: <b>رشد ۵۶.۱٪ صادرات به ترکیه (4.28B$)</b>، <b>عراق (1.4B$)</b> و <b>پاکستان (1.39B$)</b> + پخش مویرگی ۲۴ ساعته در شهرهای مسافرپذیر هنگام موشک‌باران.
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border-t-4 border-t-blue-600">
+                    <span class="text-xs font-bold text-blue-700 block mb-1">۴. تعامل با گروه دوم (صنایع)</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">فروش کوتاژ صادراتی به تولیدکنندگان</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        در زمان قفل تخصیص ارز بانک مرکزی، شرکت‌های بازرگانی صادرکننده، پروانه‌ها (کوتاژهای) صادراتی خود را در قالب رویه <b>«واردات در مقابل صادرات غیر»</b> با نرخ توافقی به کارخانه‌های صنعتی و دارویی واگذار کردند تا صنایع بتوانند کالای خود را از گمرک ترخیص کنند.
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 2: GROUP 2 - INDUSTRIAL, CONSTRUCTION, FOOD & PHARMA FORCED INTO TRADE -->
+        <section id="sec-group2-forced" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-industry text-emerald-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">گروه دوم بخش خصوصی: «شرکت‌های صنعتی، ساختمانی، غذایی و دارویی که مجبور به تجارت هستند»</h2>
+                </div>
+                <span class="text-xs bg-emerald-50 text-emerald-800 px-3 py-1 rounded-lg border border-emerald-200 font-medium">تولیدکنندگانی که برای بقا ناگزیر به واردات و صادرات شده‌اند</span>
+            </div>
+
+            <!-- Why Forced + 4 Operational Traps -->
+            <div class="grid grid-cols-1 lg:grid-cols-12 gap-5">
+                <!-- Left Column: 4 Reasons Why Forced -->
+                <div class="lg:col-span-5 glass-card p-5 rounded-2xl border-r-4 border-r-emerald-600">
+                    <h3 class="text-base font-extrabold text-emerald-800 mb-3">چرا کارخانه دارویی، غذایی، صنعتی و شرکت ساختمانی در ایران «مجبور به تجارت» است؟</h3>
+                    <ul class="space-y-3 text-xs text-slate-700 leading-6">
+                        <li class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <b class="text-slate-900 block">۱. قفل قانونی «سهمیه تولیدی» در وزارت صمت:</b>
+                            واردات هزاران کد تعرفه (HS Code) مواد اولیه، قطعات CKD و ماشین‌آلات صرفاً به <b>«کارت بازرگانی تولیدی»</b> و بر مبنای ظرفیت پروانه بهره‌برداری در سامانه «بهین‌یاب» مجاز است و شرکت بازرگانی اصلاً اجازه واردات آن‌ها را ندارد!
+                        </li>
+                        <li class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <b class="text-slate-900 block">۲. تخصصی و سفارشی بودن نهاده‌ها (Granular Specs):</b>
+                            ماده مؤثره دارویی (API)، میکروکنترلر خودرو، پلیمر مهندسی، کاتالیست یا چیلر و آسانسور پروژه ساختمانی باید دقیقاً طبق <b>Spec مهندسی</b> از سازنده اصلی (OEM / Vendor) سفارش‌گذاری و ساخته شود و در انبار تجار وجود ندارد.
+                        </li>
+                        <li class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <b class="text-slate-900 block">۳. صادرات اجباری برای تأمین ارز واردات خود:</b>
+                            با قطع تخصیص ارز بانک مرکزی در جنگ، کارخانه‌های صنعتی و غذایی مجبور شدند حتی با سود صفر رأساً صادرات کنند تا با کوتاژ صادراتیِ خودشان بتوانند ماده اولیه خط تولید را تحت رویه <b>«واردات در مقابل صادرات خود»</b> ترخیص کنند!
+                        </li>
+                        <li class="bg-slate-50 p-3 rounded-xl border border-slate-200">
+                            <b class="text-slate-900 block">۴. سرکوب قیمت فروش در داخل (عدم توان پرداخت کارمزد تاجر):</b>
+                            قیمت‌گذاری دستوری محصول نهایی، حاشیه سود را چنان له کرده که تولیدکننده توان پرداخت کارمزد ۱۰ تا ۱۵ درصدی به شرکت‌های بازرگانی واسطه را ندارد.
+                        </li>
+                    </ul>
+                </div>
+
+                <!-- Right Column: 4 Operational Stages & Failure Points in War -->
+                <div class="lg:col-span-7 glass-card p-5 rounded-2xl border-t-4 border-t-amber-500">
+                    <h3 class="text-base font-extrabold text-slate-900 mb-3">کالبدشکافی ۴ مرحله عملیات تجاری شرکت‌های تولیدی در جنگ (بمب ساعتی زنجیره تأمین)</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 text-xs text-slate-700 leading-6">
+                        <div class="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200">
+                            <span class="font-bold text-amber-800 block mb-1">مرحله ۱: قفل دیجیتال در سامانه NTSW و EPL</span>
+                            ثبت سفارش نیازمند استعلام برخط (Handshaking) بین سرورهای صمت، غذا و دارو، گمرک و بانک مرکزی است. در اختلالات اینترنت و حملات سایبری، خطای <b>Time-out</b>، قفل شدن <b>«کد فیدار» (شناسه فروشنده خارجی)</b> و عدم سینک شدن کد تعرفه‌ها، ثبت سفارش را از ۳ روز به <b>۲۰ تا ۲۵ روز</b> رساند.
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-amber-50/50 border border-amber-200">
+                            <span class="font-bold text-amber-800 block mb-1">مرحله ۲: از دست رفتن اسلات کشتی (Vessel Slot)</span>
+                            لیدتایم عادی از چین/هند به بندرعباس ۴۵ تا ۵۰ روز است (۳۰ روز دریا + ۱۵ روز ترخیص). تأخیر ۱۵ روزه در ثبت سفارش و اخذ <b>«کد ساتا»</b> باعث نرسیدن بار به کشتی رزروشده (Vessel Closing Time) و انتظار ۲۱ روزه برای کشتی بعدی شد: <b>۳۵ تا ۴۵ روز تأخیر مرکب و توقف خط تولید!</b>
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-rose-50/50 border border-rose-200">
+                            <span class="font-bold text-rose-800 block mb-1">مرحله ۳: پدیده Ghosting و نقدی شدن ۱۰۰٪ خریدها</span>
+                            وقتی در جنگ ۱۲ و ۴۰ روزه ارتباط اینترنت و پیام‌رسان‌های تجاری (WeChat/Email) مدیر خرید کارخانه ایرانی برای چند روز قطع شد، وندور خارجی آن را «انصراف یا ورشکستگی» تلقی کرد؛ <b>اسلات تولیدی کارخانه را به رقیب ترک داد</b> و شرایط پرداخت را به <b>«۱۰۰٪ نقد پیش از تولید»</b> تغییر داد!
+                        </div>
+
+                        <div class="p-3.5 rounded-xl bg-rose-50/50 border border-rose-200">
+                            <span class="font-bold text-rose-800 block mb-1">مرحله ۴: سوزاندن Safety Stock و پرتگاه موجودی</span>
+                            کارخانه‌ها در طول جنگ، موجودی اطمینان ۳۰ روزه انبار (Safety Stock) را سوزاندند در حالی که محموله‌ای روی دریا (Pipeline) نبود. نتیجه در شامخ شهریور ۱۴۰۵: سقوط موجودی مواد اولیه به <b>36.7</b> و موجودی انبار محصول به <b>44.3</b> (اثبات ریاضی وقوع شوک عرضه).
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 3: 4 SPECIFIC SECTORS FORCED INTO TRADE -->
+        <section id="sec-sectors" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-pills text-amber-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">کالبدشکافی اختصاصی ۴ صنعت «مجبور به تجارت» در جنگ ۱۲ و ۴۰ روزه</h2>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <!-- Sector 1: Industrial & Auto Parts -->
+                <div class="glass-card p-4 rounded-2xl border-t-4 border-t-blue-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-blue-100 text-blue-800 px-2.5 py-0.5 rounded-md">۱. شرکت‌های صنعتی و قطعه‌سازی</span>
+                        <i class="fa-solid fa-car-battery text-blue-600"></i>
+                    </div>
+                    <ul class="space-y-2 text-xs text-slate-700 leading-5">
+                        <li>• <b>محور تجارت:</b> واردات ورق آلیاژی، پلیمر مهندسی، تراشه و میکروکنترلر (جهش ۴۰ تا ۶۰٪ قیمت جهانی به دلیل بحران هلیوم و اثر شلاقی).</li>
+                        <li>• <b>وضعیت شامخ ۱۴۰۵:</b> سقوط موجودی مواد اولیه در فرآورده‌های نفتی به <b>18.2</b> و ماشین‌سازی به <b>29.2</b>؛ رسیدن شاخص قیمت خرید نهاده به <b>100.0</b> و <b>97.6</b>!</li>
+                        <li>• <b>ضربه مضاعف:</b> خرید ۱۰۰٪ نقدی از چین در برابر <b>70 همت طلب معوق</b> از خودروسازان (۴۵ همت سایپا + ۲۵ همت ایران‌خودرو).</li>
+                    </ul>
+                </div>
+
+                <!-- Sector 2: Food & Agriculture -->
+                <div class="glass-card p-4 rounded-2xl border-t-4 border-t-emerald-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded-md">۲. شرکت‌های صنایع غذایی</span>
+                        <i class="fa-solid fa-wheat-awn text-emerald-600"></i>
+                    </div>
+                    <ul class="space-y-2 text-xs text-slate-700 leading-5">
+                        <li>• <b>محور تجارت:</b> واردات ذرت، کنجاله سویا، روغن خام، ویتامین‌ها و ورق‌های بسته‌بندی (تتراپک/قوطی) و صادرات لبنیات و شیرینی به همسایگان.</li>
+                        <li>• <b>شوک جنگ:</b> پدیده <b>فسخ قراردادهای کنجاله (Soymeal Washouts)</b> در آمریکای جنوبی و افت <b>11% (300M$)</b> واردات کالای اساسی در ۵ ماهه ۱۴۰۵.</li>
+                        <li>• <b>سقوط به قعر جدول شامخ:</b> قیمت خرید نهاده به <b>94.2</b> رسید اما با قیمت‌گذاری دستوری، شامخ غذایی به <b>38.6</b> (تولید 35.8 و صادرات 27.6) سقوط کرد!</li>
+                    </ul>
+                </div>
+
+                <!-- Sector 3: Pharma & Medical -->
+                <div class="glass-card p-4 rounded-2xl border-t-4 border-t-rose-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-0.5 rounded-md">۳. شرکت‌های دارویی و پزشکی</span>
+                        <i class="fa-solid fa-prescription-bottle-medical text-rose-600"></i>
+                    </div>
+                    <ul class="space-y-2 text-xs text-slate-700 leading-5">
+                        <li>• <b>محور تجارت:</b> واردات مستقیم مواد مؤثره دارویی (API)، اکسپینت، ویال و فیلترهای تخصصی از هند، چین و اروپا (وابسته به حمل هوایی و زنجیره سرد).</li>
+                        <li>• <b>شوک جنگ:</b> لغو پروازهای خارجی و <b>جهش ۴ تا ۵ برابری کرایه حمل هوایی</b> در جنگ ۱۲ و ۴۰ روزه.</li>
+                        <li>• <b>قفل داخلی:</b> رسوب محموله‌های API در گمرک فرودگاه امام به دلیل عدم صدور کد رهگیری بانک مرکزی + انباشت بدهی بیمارستان‌های دولتی و بیمه‌ها.</li>
+                    </ul>
+                </div>
+
+                <!-- Sector 4: Construction, Mining & EPC -->
+                <div class="glass-card p-4 rounded-2xl border-t-4 border-t-purple-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-purple-100 text-purple-800 px-2.5 py-0.5 rounded-md">۴. شرکت‌های ساختمانی، معدنی و EPC</span>
+                        <i class="fa-solid fa-trowel-bricks text-purple-600"></i>
+                    </div>
+                    <ul class="space-y-2 text-xs text-slate-700 leading-5">
+                        <li>• <b>محور تجارت:</b> واردات آسانسور، چیلر، تجهیزات الکترومکانیکال، ابزار دقیق، کاتالیست و ماشین‌آلات سنگین معدنی (<b>۹۵٪ وارداتی</b>).</li>
+                        <li>• <b>شوک جنگ:</b> جهش <b>+150% مواد ناریه</b> و <b>+100% قطعات</b> (+34% OPEX معادن) و سقوط <b>-12.3%</b> سرمایه‌گذاری ماشین‌آلات.</li>
+                        <li>• <b>ضربه کارفرمایان دولتی:</b> عدم پرداخت تا <b>79.5% پیش‌پرداخت‌ها</b>، حبس ۲۰۷ روزه مدارک، و تحمیل <b>فرم سلب حق ادعا (Waiver)</b> بابت نوسان ارز صرافی.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- SECTION 4: ROLE OF THE STATE TOWARDS BOTH GROUPS & CONSEQUENCES -->
+        <section id="sec-state-role" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-landmark text-rose-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">نقش دولت در قبال این دو گروه (بازرگانان و صنایع مجبور به تجارت) و تبعات آن در دوره جنگ</h2>
+                </div>
+                <span class="text-xs bg-rose-50 text-rose-800 px-3 py-1 rounded-lg border border-rose-200 font-medium">۵ مداخله مخرب تجاری-ارزی دولت در کنار اقدامات زیرساختی</span>
+            </div>
+
+            <!-- State Infrastructure Note -->
+            <div class="glass-card p-3.5 rounded-xl bg-blue-50/50 border border-blue-200 text-xs text-slate-700 flex items-center gap-3">
+                <i class="fa-solid fa-circle-info text-blue-600 text-lg"></i>
+                <div>
+                    <b class="text-blue-900">تفکیک منصفانه برای مصاحبه:</b> دولت در <b>مدیریت زیرساخت فیزیکی جنگ</b> (بای‌پس ۳ روزه ۴۸ مخزن نفت، تعمیر ۲,۰۰۰ نقطه شبکه برق، دفع ۱۰,۰۰۰ حمله سایبری روزانه، پرداخت ۲.۴ همت ودیعه مسکن جنگ رمضان و حمل یکسره ۳ میلیون تن کالای اساسی دولتی) موفق عمل کرد؛ اما در <b>حکمرانی تجاری و ارزی در قبال دو گروه بخش خصوصی</b>، با ۵ خطای بزرگ هر دو گروه را فلج کرد:
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div class="glass-card p-4 rounded-2xl border-r-4 border-r-rose-600">
+                    <span class="text-xs font-bold text-rose-700 block mb-1">خطای ۱ دولت در قبال دو گروه (وزارت صمت)</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">جنگ مصنوعی «سهمیه بازرگانی» و «سهمیه تولیدی»</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        حذف ناگهانی صدها کد تعرفه برای <b>شرکت‌های بازرگانی</b> (محدودیت به ۶۶ کد تعرفه در ابتدای ۱۴۰۵) به بهانه حذف واسطه؛ در نتیجه هزاران کارخانه کوچک (SME) که توان واردات مستقیم از چین را نداشتند و از تجار ماده اولیه می‌خریدند فلج شدند و به خودِ تولیدکنندگان هم به بهانه «سقف سابقه و کاهش برق»، سهمیه کافی داده نشد!
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border-r-4 border-r-rose-600">
+                    <span class="text-xs font-bold text-rose-700 block mb-1">خطای ۲ دولت در قبال دو گروه (بانک مرکزی vs گمرک)</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">گروگان‌گیری کالای هر دو گروه با «کد رهگیری»</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        در حالی که گمرک کالای واردشده توسط تاجر و تولیدکننده را ظرف <b>۷۳ ساعت</b> ارزیابی می‌کرد، بانک مرکزی خروج کالا از درب گمرک را منوط به صدور «کد رهگیری ارز» نگه داشت و ماه‌ها کد نداد! نتیجه: رسوب میلیون‌ها تن ماده اولیه، <b>95 میلیون ریال دموراژ</b> هر کانتینر و چک تضمین 3.2 تا 14.6 میلیارد ریالی.
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border-r-4 border-r-rose-600">
+                    <span class="text-xs font-bold text-rose-700 block mb-1">خطای ۳ دولت در قبال دو گروه (تخصیص ارز)</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">خلق ۴.۰۷ میلیارد یورو بدهی ارزی + انحراف خودرو</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        کالای اساسی، دارو و ماده اولیه توسط بخش خصوصی وارد و با قیمت مصوب توزیع شد اما بانک مرکزی ارز آن را نداد تا <b>4.07 میلیارد یورو بدهی ارزی بلاتکلیف</b> روی دست واردکنندگان بماند؛ همزمان در ۵ ماهه ۱۴۰۵ واردات کالای اساسی <b>11% کم شد</b> اما واردات خودرو <b>66% افزایش یافت!</b>
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border-r-4 border-r-rose-600">
+                    <span class="text-xs font-bold text-rose-700 block mb-1">خطای ۴ دولت در قبال دو گروه (صادرات و تعهد ارزی)</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">سرکوب صادرکننده و قفل واگذاری کوتاژ صادراتی</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        الزام صادرکننده بازرگانی و صنعتی (که نهاده را با دلار <b>272,500 تومانی</b> خریده) به فروش ارز با نرخ دستوری و تهدید قضایی تعهدات بالای ۳ میلیون دلار + سنگ‌اندازی در مسیر واگذاری کوتاژ صادراتی تاجر به تولیدکننده («واردات در مقابل صادرات غیر»). نتیجه: <b>۲۳ ماه رکود پیاپی صادرات (شامخ 37.4)</b>.
+                    </p>
+                </div>
+
+                <div class="glass-card p-4 rounded-2xl border-r-4 border-r-rose-600 md:col-span-2">
+                    <span class="text-xs font-bold text-rose-700 block mb-1">خطای ۵ دولت علیه تولیدکنندهِ مجبور به تجارت (سازمان حمایت + شبکه بانکی)</span>
+                    <h3 class="text-sm font-bold text-slate-900 mb-2">قیچی «قیمت‌گذاری دستوری» و «انقباض اعتباری» در برابر تورم ۹۳.۳ واحدی واردات</h3>
+                    <p class="text-xs text-slate-600 leading-6">
+                        از یک سو بانک مرکزی با <b>800 همت اضافه برداشت بانک‌های ناتراز</b> مماشات کرد (که تورم نقطه‌ای مهر ۱۴۰۵ را به <b>88.7%</b> رساند)، اما سرمایه در گردش کارخانه‌ای را که باید ۱۰۰٪ نقد از چین خرید کند با بهره بالای ۳۰-۳۵٪ و انحراف <b>90% در اوراق گام</b> خشکاند؛ و از سوی دیگر، سازمان حمایت کارخانه‌ای را که با شاخص قیمت خرید <b>93.3</b> ماده اولیه وارد کرده، مجبور به فروش با قیمت دستوری (شاخص فروش <b>74.5</b>؛ شکاف <b>18.8 واحدی</b>) کرد!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function copyText(text) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text.trim();
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = 'کپی شد: ' + (text.length > 45 ? text.substring(0, 45) + '...' : text);
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2800);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+
+            const sections = document.querySelectorAll('.tab-section');
+            if (tabId === 'all') {
+                sections.forEach(sec => sec.classList.remove('hidden'));
+            } else {
+                sections.forEach(sec => {
+                    if (sec.id === 'sec-' + tabId) {
+                        sec.classList.remove('hidden');
+                    } else {
+                        sec.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        function filterContent(query) {
+            const q = query.trim().toLowerCase();
+            const blocks = document.querySelectorAll('.searchable-block');
+            if (!q) {
+                blocks.forEach(b => b.classList.remove('hidden'));
+                return;
+            }
+            blocks.forEach(block => {
+                if (block.innerText.toLowerCase().includes(q)) {
+                    block.classList.remove('hidden');
+                } else {
+                    block.classList.add('hidden');
+                }
+            });
+        }
+
+        function resetSearch() {
+            const input = document.getElementById('globalSearch');
+            input.value = '';
+            filterContent('');
+            switchTab('all');
+        }
+    </script>
+</body>
+</html>
