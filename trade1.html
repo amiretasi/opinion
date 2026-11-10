@@ -48,118 +48,93 @@
 <body class="min-h-screen pb-12 custom-scrollbar">
 
     <!-- Toast Notification for Copy -->
-    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3 transition-all duration-300">
-        <i class="fa-solid fa-circle-check text-xl"></i>
-        <span id="toast-msg" class="text-sm font-bold">فکت آماری کپی شد!</span>
+    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-xl flex items-center gap-2 transition-all duration-300">
+        <i class="fa-solid fa-circle-check text-sm"></i>
+        <span id="toast-msg" class="text-xs font-bold">فکت آماری کپی شد!</span>
     </div>
 
-    <!-- Top Sticky Header & Interview Search Bar -->
+    <!-- Ultra-Compact Top Sticky Header (Search Removed, Tiny Tabs) -->
     <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
-        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3 w-full lg:w-auto justify-between">
-                <div class="flex items-center gap-3">
-                    <div class="w-11 h-11 rounded-xl bg-blue-50 border border-blue-200 flex items-center justify-center text-blue-700 text-xl font-black">
-                        ۱
-                    </div>
-                    <div>
-                        <span class="text-xs font-bold text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">برگه تقلب مصاحبه - Canvas 1</span>
-                        <h1 class="text-base md:text-lg font-extrabold text-slate-900 mt-0.5">داشبورد داده‌محور: اقتصاد کلان، شامخ، تجارت خارجی و تورم (۱۴۰۳ تا آبان ۱۴۰۵)</h1>
-                    </div>
-                </div>
+        <div class="max-w-7xl mx-auto px-3 py-1.5 flex flex-wrap items-center justify-between gap-2">
+            <div class="flex items-center gap-2">
+                <span class="w-6 h-6 rounded-md bg-blue-600 text-white flex items-center justify-center text-xs font-black">۱</span>
+                <h1 class="text-xs md:text-sm font-extrabold text-slate-900">داشبورد ۱: اقتصاد کلان، شامخ، تجارت خارجی ۱۴۰۵ و تورم</h1>
             </div>
 
-            <!-- Instant Search Filter for Live Interview -->
-            <div class="flex items-center gap-2 w-full lg:w-96">
-                <div class="relative w-full">
-                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-slate-400"></i>
-                    <input type="text" id="globalSearch" oninput="filterContent(this.value)" placeholder="جستجوی سریع در حین مصاحبه (مثلاً: ترکیه، شامخ، تورم، خودرو...)" 
-                        class="w-full bg-slate-100 text-sm text-slate-900 placeholder-slate-500 pr-10 pl-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-blue-600 focus:bg-white transition">
-                </div>
-                <button onclick="resetSearch()" title="پاک کردن جستجو" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-xl border border-slate-300 transition">
-                    <i class="fa-solid fa-rotate-right"></i>
+            <!-- Micro Navigation Tabs -->
+            <div class="flex flex-wrap items-center gap-1">
+                <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-grip text-[10px]"></i> همه
+                </button>
+                <button onclick="switchTab('soundbites')" id="tab-soundbites" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-microphone-lines text-amber-600 text-[10px]"></i> فکت مصاحبه
+                </button>
+                <button onclick="switchTab('macro')" id="tab-macro" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-chart-pie text-rose-600 text-[10px]"></i> رشد و سرمایه
+                </button>
+                <button onclick="switchTab('pmi')" id="tab-pmi" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-industry text-blue-600 text-[10px]"></i> شامخ
+                </button>
+                <button onclick="switchTab('trade')" id="tab-trade" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-ship text-emerald-600 text-[10px]"></i> تجارت ۱۴۰۵
+                </button>
+                <button onclick="switchTab('inflation')" id="tab-inflation" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-[11px] font-bold px-2.5 py-1 rounded-lg transition flex items-center gap-1">
+                    <i class="fa-solid fa-fire-flame-curved text-orange-600 text-[10px]"></i> تورم مهر ۱۴۰۵
                 </button>
             </div>
         </div>
-
-        <!-- Navigation Tabs -->
-        <div class="max-w-7xl mx-auto px-4 pb-2.5 flex flex-wrap gap-2">
-            <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-grip"></i> نمایش یکپارچه (همه بخش‌ها)
-            </button>
-            <button onclick="switchTab('soundbites')" id="tab-soundbites" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-microphone-lines text-amber-600"></i> فکت‌های طلایی مصاحبه
-            </button>
-            <button onclick="switchTab('macro')" id="tab-macro" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-chart-pie text-rose-600"></i> رشد کلان و سرمایه‌گذاری
-            </button>
-            <button onclick="switchTab('pmi')" id="tab-pmi" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-industry text-blue-600"></i> مقایسه شامخ (۱۴۰۴ و ۱۴۰۵)
-            </button>
-            <button onclick="switchTab('trade')" id="tab-trade" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-ship text-emerald-600"></i> آمار صادرات و واردات ۱۴۰۵
-            </button>
-            <button onclick="switchTab('inflation')" id="tab-inflation" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
-                <i class="fa-solid fa-fire-flame-curved text-orange-600"></i> تورم و ارز (مهر و آبان ۱۴۰۵)
-            </button>
-        </div>
     </header>
 
-    <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
+    <main class="max-w-7xl mx-auto px-3 mt-3 space-y-5">
 
-        <!-- TOP 6 CRITICAL KPIs (Always Visible at Top for Instant Reference) -->
-        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 searchable-block">
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer hover:border-rose-400 transition" onclick="copyText('رشد اقتصادی سال ۱۴۰۴ به منفی ۰.۷ درصد و در بهار ۱۴۰۵ (اوج جنگ ۴۰ روزه) به منفی ۱۰ تا ۱۱ درصد (و صنعت به منفی ۱۴ درصد) سقوط کرد.')">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-medium text-slate-500">رشد کل ۱۴۰۴ / بهار ۱۴۰۵</span>
-                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+        <!-- ULTRA-COMPACT TOP 6 KPIs -->
+        <section class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2">
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-rose-600 cursor-pointer hover:bg-slate-50 transition" onclick="copyText('رشد اقتصادی سال ۱۴۰۴ به منفی ۰.۷ درصد و در بهار ۱۴۰۵ (اوج جنگ ۴۰ روزه) به منفی ۱۰ تا ۱۱ درصد (و صنعت به منفی ۱۴ درصد) سقوط کرد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">رشد ۱۴۰۴ / بهار ۱۴۰۵</span>
+                    <span class="text-xs font-black text-rose-600" dir="ltr">-0.7% / -11%</span>
                 </div>
-                <div class="text-xl font-black text-rose-600 mt-1" dir="ltr">-0.7% / -11%</div>
-                <div class="text-[11px] text-slate-600 mt-1">رشد ارزش افزوده صنعت: <b class="text-rose-700">-14%</b></div>
+                <div class="text-[10px] text-slate-600">صنعت بهار: <b class="text-rose-700">-14%</b></div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer hover:border-amber-400 transition" onclick="copyText('تشکیل سرمایه ثابت ناخالص در بخش ماشین‌آلات در سال ۱۴۰۴ معادل منفی ۱۲.۳ درصد سقوط کرده که به معنای سرمایه‌زدایی خالص صنعتی است.')">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-medium text-slate-500">سرمایه‌گذاری ماشین‌آلات</span>
-                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-amber-500 cursor-pointer hover:bg-slate-50 transition" onclick="copyText('تشکیل سرمایه ثابت ناخالص در بخش ماشین‌آلات در سال ۱۴۰۴ معادل منفی ۱۲.۳ درصد سقوط کرده که به معنای سرمایه‌زدایی خالص صنعتی است.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">سرمایه ماشین‌آلات</span>
+                    <span class="text-xs font-black text-amber-600" dir="ltr">-12.3%</span>
                 </div>
-                <div class="text-xl font-black text-amber-600 mt-1" dir="ltr">-12.3%</div>
-                <div class="text-[11px] text-slate-600 mt-1">عدم‌النفع ۶ ماهه صنعت: <b class="text-amber-700">322 همت</b></div>
+                <div class="text-[10px] text-slate-600">عدم‌النفع صنعت: <b class="text-amber-700">322 همت</b></div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-blue-600 cursor-pointer hover:border-blue-400 transition" onclick="copyText('در شهریور ۱۴۰۵ شامخ کل اقتصاد برای ۱۸ ماه متوالی زیر ۵۰ ماند (۴۶.۲) و موجودی مواد اولیه صنعت به ۳۶.۷ و قیمت خرید مواد اولیه به رکورد ۷ ساله ۹۳.۳ رسید.')">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-medium text-slate-500">شامخ کل / صنعت (شهریور ۱۴۰۵)</span>
-                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-blue-600 cursor-pointer hover:bg-slate-50 transition" onclick="copyText('در شهریور ۱۴۰۵ شامخ کل اقتصاد برای ۱۸ ماه متوالی زیر ۵۰ ماند (۴۶.۲) و موجودی مواد اولیه صنعت به ۳۶.۷ و قیمت خرید مواد اولیه به رکورد ۷ ساله ۹۳.۳ رسید.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">شامخ کل / صنعت</span>
+                    <span class="text-xs font-black text-blue-700">۴۶.۲ / ۴۸.۵</span>
                 </div>
-                <div class="text-xl font-black text-blue-700 mt-1">۴۶.۲ / ۴۸.۵</div>
-                <div class="text-[11px] text-slate-600 mt-1">موجودی مواد اولیه صنعت: <b class="text-rose-600">36.7</b></div>
+                <div class="text-[10px] text-slate-600">موجودی نهاده: <b class="text-rose-600">36.7</b></div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-emerald-600 cursor-pointer hover:border-emerald-400 transition" onclick="copyText('در نیمه نخست سال ۱۴۰۵ حجم (وزن) صادرات غیرنفتی کشور ۳۴ درصد و ارزش دلاری آن ۲۰ تا ۲۵ درصد نسبت به نیمه نخست ۱۴۰۴ سقوط کرد.')">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-medium text-slate-500">صادرات ۶ ماهه نخست ۱۴۰۵</span>
-                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-emerald-600 cursor-pointer hover:bg-slate-50 transition" onclick="copyText('در نیمه نخست سال ۱۴۰۵ حجم (وزن) صادرات غیرنفتی کشور ۳۴ درصد و ارزش دلاری آن ۲۰ تا ۲۵ درصد نسبت به نیمه نخست ۱۴۰۴ سقوط کرد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">صادرات ۶ ماهه ۱۴۰۵</span>
+                    <span class="text-xs font-black text-emerald-700" dir="ltr">-34% وزنی</span>
                 </div>
-                <div class="text-xl font-black text-emerald-700 mt-1" dir="ltr">-34% وزنی</div>
-                <div class="text-[11px] text-slate-600 mt-1">افت ارزش دلاری: <b class="text-emerald-700">20% تا 25%-</b></div>
+                <div class="text-[10px] text-slate-600">افت ارزش: <b class="text-emerald-700">20% تا 25%-</b></div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-purple-600 cursor-pointer hover:border-purple-400 transition" onclick="copyText('واردات کشور در ۵ ماهه نخست ۱۴۰۵ معادل ۲۶.۱ درصد نسبت به ۱۴۰۴ و ۳۸ درصد نسبت به ۱۴۰۳ کاهش یافت و در ۶ ماهه با افت ۲۰ درصدی حجم مواجه شد.')">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-medium text-slate-500">واردات ۵ و ۶ ماهه ۱۴۰۵</span>
-                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-purple-600 cursor-pointer hover:bg-slate-50 transition" onclick="copyText('واردات کشور در ۵ ماهه نخست ۱۴۰۵ معادل ۲۶.۱ درصد نسبت به ۱۴۰۴ و ۳۸ درصد نسبت به ۱۴۰۳ کاهش یافت و در ۶ ماهه با افت ۲۰ درصدی حجم مواجه شد.')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">واردات ۵ ماهه ۱۴۰۵</span>
+                    <span class="text-xs font-black text-purple-700" dir="ltr">-26.1% ارزشی</span>
                 </div>
-                <div class="text-xl font-black text-purple-700 mt-1" dir="ltr">-26.1% ارزشی</div>
-                <div class="text-[11px] text-slate-600 mt-1">افت نسبت به ۱۴۰۳: <b class="text-purple-700">-38%</b></div>
+                <div class="text-[10px] text-slate-600">نسبت به ۱۴۰۳: <b class="text-purple-700">-38%</b></div>
             </div>
 
-            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-red-600 cursor-pointer hover:border-red-400 transition" onclick="copyText('تورم نقطه‌به‌نقطه مهر ۱۴۰۵ طبق مرکز آمار ایران به ۸۸.۷ درصد و تورم سالانه به ۷۶.۸ درصد رسید (تورم سالانه شهری بانک مرکزی: ۷۱.۴ درصد).')">
-                <div class="flex justify-between items-start">
-                    <span class="text-xs font-medium text-slate-500">تورم نقطه‌ای مهر ۱۴۰۵</span>
-                    <i class="fa-regular fa-copy text-xs text-slate-400"></i>
+            <div class="glass-card px-2.5 py-1.5 rounded-lg border-r-2 border-r-red-600 cursor-pointer hover:bg-slate-50 transition" onclick="copyText('تورم نقطه‌به‌نقطه مهر ۱۴۰۵ طبق مرکز آمار ایران به ۸۸.۷ درصد و تورم سالانه به ۷۶.۸ درصد رسید (تورم سالانه شهری بانک مرکزی: ۷۱.۴ درصد).')">
+                <div class="flex justify-between items-center">
+                    <span class="text-[10px] text-slate-500">تورم نقطه‌ای مهر</span>
+                    <span class="text-xs font-black text-red-600" dir="ltr">88.7%</span>
                 </div>
-                <div class="text-xl font-black text-red-600 mt-1" dir="ltr">88.7%</div>
-                <div class="text-[11px] text-slate-600 mt-1">سالانه مرکز آمار: <b class="text-red-700">76.8%</b> | ب.م: <b>71.4%</b></div>
+                <div class="text-[10px] text-slate-600">سالانه: <b class="text-red-700">76.8%</b> | ب.م: <b>71.4%</b></div>
             </div>
         </section>
 
