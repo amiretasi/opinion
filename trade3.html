@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>داشبورد ۳: تفکیک موانع ناگزیر جنگی از خطاهای تصمیم‌گیری دولت</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vazirmatn Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(15, 23, 42, 0.05);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #e11d48, #be123c);
+            color: #ffffff !important;
+            box-shadow: 0 4px 12px rgba(225, 29, 72, 0.3);
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-5 left-5 z-50 hidden bg-emerald-600 text-white px-5 py-3 rounded-xl shadow-2xl flex items-center gap-3">
+        <i class="fa-solid fa-circle-check text-xl"></i>
+        <span id="toast-msg" class="text-sm font-bold">مطلب کپی شد!</span>
+    </div>
+
+    <!-- Header -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <div class="w-11 h-11 rounded-xl bg-rose-50 border border-rose-200 flex items-center justify-center text-rose-700 text-xl font-black">
+                    ۳
+                </div>
+                <div>
+                    <span class="text-xs font-bold text-rose-700 bg-rose-50 px-2.5 py-0.5 rounded-full border border-rose-200">برگه تقلب مصاحبه - Canvas 3</span>
+                    <h1 class="text-base md:text-lg font-extrabold text-slate-900 mt-0.5">داشبورد تفکیک بحران: «موانع ناگزیر ناشی از جنگ» در برابر «خطاهای تصمیم‌گیری دولت»</h1>
+                </div>
+            </div>
+
+            <!-- Instant Search -->
+            <div class="flex items-center gap-2 w-full lg:w-96">
+                <div class="relative w-full">
+                    <i class="fa-solid fa-magnifying-glass absolute right-3.5 top-3 text-slate-400"></i>
+                    <input type="text" id="globalSearch" oninput="filterContent(this.value)" placeholder="جستجوی سریع (مثلاً: بیمه جنگ، کد رهگیری، ناریه، فورس‌ماژور...)" 
+                        class="w-full bg-slate-100 text-sm text-slate-900 placeholder-slate-500 pr-10 pl-4 py-2.5 rounded-xl border border-slate-300 focus:outline-none focus:border-rose-600 focus:bg-white transition">
+                </div>
+                <button onclick="resetSearch()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-3 py-2.5 rounded-xl border border-slate-300 transition">
+                    <i class="fa-solid fa-rotate-right"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="max-w-7xl mx-auto px-4 pb-2.5 flex flex-wrap gap-2">
+            <button onclick="switchTab('all')" id="tab-all" class="tab-btn tab-active text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-table-columns"></i> نمایش کامل و ماتریس تفکیک
+            </button>
+            <button onclick="switchTab('inevitable')" id="tab-inevitable" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-explosion text-amber-600"></i> بخش اول: ۵ مانع ناگزیر ناشی از ذات جنگ
+            </button>
+            <button onclick="switchTab('policy-errors')" id="tab-policy-errors" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-gavel text-rose-600"></i> بخش دوم: ۶ خطای تصمیم‌گیری دولت (خودتحریمی)
+            </button>
+            <button onclick="switchTab('solutions')" id="tab-solutions" class="tab-btn bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200 text-xs md:text-sm font-bold px-4 py-2 rounded-xl transition flex items-center gap-2">
+                <i class="fa-solid fa-lightbulb text-emerald-600"></i> بسته ۵ بندی راهکارهای فوری مصاحبه
+            </button>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-4 mt-6 space-y-8">
+
+        <!-- TOP 6 KPIs OF OBSTACLES -->
+        <section class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3 searchable-block">
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer" onclick="copyText('حق بیمه ریسک جنگ برای کشتی‌ها در تنگه هرمز ۱۰۰۰ درصد جهش یافت (از ۰.۲۵ درصد به ۳ تا ۱۰ درصد ارزش بدنه شناور) و ۳۰۰۰ دلار اضافه کرایه جنگی به هر کانتینر تحمیل شد.')">
+                <span class="text-xs text-amber-700 font-bold block">مانع جنگی: بیمه هرمز</span>
+                <div class="text-lg font-black text-slate-900 mt-1">جهش ۱,۰۰۰٪ بیمه</div>
+                <span class="text-[11px] text-slate-600">۳٪ تا ۱۰٪ بدنه | +3,000$ کانتینر</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer" onclick="copyText('طبق قوانین فیزیک ترانزیت، یک کشتی کانتینربر بزرگ ۲۰,۰۰۰ کانتینر حمل می‌کند اما یک قطار باری فقط ۱۰۰ کانتینر؛ یعنی جایگزینی یک کشتی نیازمند ۲۰۰ رام قطار است!')">
+                <span class="text-xs text-amber-700 font-bold block">مانع جنگی: فیزیک ترانزیت</span>
+                <div class="text-lg font-black text-slate-900 mt-1">۱ کشتی = ۲۰۰ قطار!</div>
+                <span class="text-[11px] text-slate-600">جهش ۴ تا ۵ برابری کرایه هوایی</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-amber-500 cursor-pointer" onclick="copyText('در بخش معدن، محدودیت امنیتی نیترات آمونیوم قیمت مواد ناریه را ۱۵۰ درصد و قطع واردات قیمت قطعات و لاستیک را ۱۰۰ درصد بالا برد و ۳۴ درصد به هزینه عملیاتی استخراج افزود.')">
+                <span class="text-xs text-amber-700 font-bold block">مانع جنگی: شوک فنی معادن</span>
+                <div class="text-lg font-black text-slate-900 mt-1">+۱۵۰٪ مواد ناریه</div>
+                <span class="text-[11px] text-slate-600">+۱۰۰٪ قطعات | +۳۴٪ OPEX</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer" onclick="copyText('بزرگ‌ترین خطای تصمیم‌گیری دولت در جنگ، منوط کردن خروج کالای ارزیابی‌شده از گمرک به صدور کد رهگیری ارز بانک مرکزی بود که میلیون‌ها تن ماده اولیه را در بنادر رسوب داد.')">
+                <span class="text-xs text-rose-700 font-bold block">خطای دولت: قفل گمرک</span>
+                <div class="text-lg font-black text-rose-600 mt-1">تله «کد رهگیری»</div>
+                <span class="text-[11px] text-slate-600">خنثی شدن ترخیص ۷۳ ساعته</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer" onclick="copyText('تغییرات خلق‌الساعه کدهای تعرفه ثبت سفارش در وزارت صمت و ناهماهنگی با بانک مرکزی، ۴.۰۷ میلیارد یورو بدهی و مطالبات ارزی بلاتکلیف برای واردکنندگان ایجاد کرد.')">
+                <span class="text-xs text-rose-700 font-bold block">خطای دولت: بدهی ارزی</span>
+                <div class="text-lg font-black text-rose-600 mt-1" dir="ltr">4.07 میلیارد یورو</div>
+                <span class="text-[11px] text-slate-600">مطالبات بلاتکلیف واردکنندگان</span>
+            </div>
+
+            <div class="glass-card p-3.5 rounded-2xl border-r-4 border-r-rose-600 cursor-pointer" onclick="copyText('بانک مرکزی در حالی که با ۸۰۰ همت اضافه برداشت بانک‌های ناتراز مماشات کرد (که تورم را به ۸۸.۷ درصد رساند)، سرمایه در گردش تولید را با نرخ بهره بالای ۳۰ درصد و انحراف ۹۰ درصدی اوراق گام خشکاند.')">
+                <span class="text-xs text-rose-700 font-bold block">خطای دولت: سیاست پولی</span>
+                <div class="text-lg font-black text-rose-600 mt-1">۸۰۰ همت اضافه برداشت</div>
+                <span class="text-[11px] text-slate-600">در برابر قحطی اعتبار برای تولید</span>
+            </div>
+        </section>
+
+        <!-- CORE INTERVIEW ARGUMENT BANNER -->
+        <section class="glass-card p-5 rounded-2xl border-r-4 border-r-blue-600 bg-blue-50/40 searchable-block cursor-pointer" onclick="copyText(this.innerText)">
+            <div class="flex justify-between items-center mb-1">
+                <span class="text-xs font-extrabold text-blue-700 uppercase"><i class="fa-solid fa-bullhorn ml-1"></i> تز اصلی مصاحبه در بخش سوم (تفاوت شوک برون‌زا و خطای درون‌زا)</span>
+                <span class="text-xs text-slate-500"><i class="fa-regular fa-copy ml-1"></i>کپی استدلال</span>
+            </div>
+            <p class="text-sm md:text-base font-medium text-slate-800 leading-7">
+                «مغالطه بزرگ دستگاه‌های دولتی این است که تمام رکود و تورم ۸۸.۷ درصدی سال ۱۴۰۵ را به گردن جنگ ۱۲ و ۴۰ روزه می‌اندازند؛ در حالی که بخش خصوصی با مهندسی تغییر مسیر و بانکداری سایه توان عبور از <b class="text-slate-900">موانع ناگزیر جنگی</b> را داشت، اما آنچه پای تولیدکننده را در داخل مرزها به زنجیر کشید، <b class="text-rose-700">خطاهای تصمیم‌گیری دولت</b> نظیر قفل کد رهگیری در گمرکات، سرکوب نرخ ارز صادراتی، قیمت‌گذاری دستوری و نکول مطالبات پیمانکاران بود.»
+            </p>
+        </section>
+
+        <!-- PART 1: 5 INEVITABLE WAR OBSTACLES (EXOGENOUS) -->
+        <section id="sec-inevitable" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-explosion text-amber-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">بخش اول: ۵ مانع ناگزیر ایجادشده از ذات جنگ و محاصره (شوک‌های برون‌زا)</h2>
+                </div>
+                <span class="text-xs bg-amber-50 text-amber-800 px-3 py-1 rounded-lg border border-amber-200 font-medium">خارج از کنترل فوری دولت؛ ناشی از برخورد نظامی</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-amber-500">
+                    <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md">مانع ناگزیر ۱</span>
+                    <h3 class="text-base font-bold text-slate-900 mt-2 mb-2">انسداد دوفاکتو (De-facto Blockade) در تنگه هرمز</h3>
+                    <ul class="space-y-2 text-xs text-slate-700 leading-6">
+                        <li>• وابستگی <b>75% کل تجارت خارجی ایران</b> در سال ۱۴۰۴ به بنادر جنوبی (بندر شهید رجایی و امام).</li>
+                        <li>• لغو پوشش کلوپ‌های P&I و جهش حق بیمه ریسک جنگ از 0.25% به <b>3% تا 10% ارزش بدنه کشتی</b> (تا ۱۵ میلیون دلار برای یک شناور).</li>
+                        <li>• ۵ برابر شدن کرایه دریایی، <b>3,000 دلار</b> اضافه کرایه جنگی هر کانتینر و پدیده <b>فسخ قراردادهای غلات و کنجاله (Soymeal Washouts)</b> در مبدأ.</li>
+                    </ul>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-amber-500">
+                    <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md">مانع ناگزیر ۲</span>
+                    <h3 class="text-base font-bold text-slate-900 mt-2 mb-2">قوانین سرسخت فیزیک در کریدورهای زمینی و هوایی</h3>
+                    <ul class="space-y-2 text-xs text-slate-700 leading-6">
+                        <li>• <b>عدم تناسب ظرفیت دریا و ریل:</b> ۱ کشتی کانتینربر (20,000 TEU) معادل <b>۲۰۰ رام قطار باری</b> است؛ مرزهای زمینی ذاتاً توان بلعیدن کل بار دریا را ندارند.</li>
+                        <li>• <b>گلوگاه تغییر عرض ریل (Gauge Break):</b> توقف در مرزهای سرخس و اینچه‌برون برای تعویض بوژی و محدودیت پذیرش گمرکات ترکیه (بازرگان/رازی).</li>
+                        <li>• <b>پروازهای باری:</b> لغو پروازهای خارجی و جهش <b>۴ تا ۵ برابری</b> نرخ بار هوایی (افت ۴۰٪ صادرات زعفران).</li>
+                    </ul>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-amber-500">
+                    <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md">مانع ناگزیر ۳</span>
+                    <h3 class="text-base font-bold text-slate-900 mt-2 mb-2">خسارات مستقیم فیزیکی و سایبری به زیرساخت‌ها</h3>
+                    <ul class="space-y-2 text-xs text-slate-700 leading-6">
+                        <li>• اصابت موشکی و هوایی به <b>48 مخزن سوخت</b> (انبار نفت تهران و فردیس کرج) و <b>2,000 نقطه</b> از شبکه برق کشور.</li>
+                        <li>• وقوع تا <b>10,000 حمله سایبری در روز</b> به زیرساخت‌های بانکی و لجستیکی و اصابت فیزیکی به مراکز داده برخی بانک‌ها.</li>
+                        <li>• کمیاب و گران شدن سوخت گازوئیل برای دیزل‌ژنراتورهای کارخانه‌ها و معادن در روزهای نبرد.</li>
+                    </ul>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-amber-500">
+                    <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md">مانع ناگزیر ۴</span>
+                    <h3 class="text-base font-bold text-slate-900 mt-2 mb-2">شوک امنیتی-فنی به نهاده‌های دوگانه‌مصرف (مثال معدن)</h3>
+                    <ul class="space-y-2 text-xs text-slate-700 leading-6">
+                        <li>• محدودیت شدید امنیتی در زنجیره نیترات آمونیوم (ANFO) و چاشنی‌های انفجاری در زمان جنگ و جهش <b>+150% قیمت مواد ناریه</b>.</li>
+                        <li>• وابستگی ۹۵٪ ناوگان معدنی به واردات و جهش <b>+100% قیمت قطعات و لاستیک</b> و <b>+34% هزینه عملیاتی (OPEX)</b>.</li>
+                        <li>• بالا رفتن مکانیکی <b>«عیار حد اقتصادی» (Cut-off Grade)</b> و تبدیل شدن سنگ‌های کم‌عیار به باطله غیراقتصادی.</li>
+                    </ul>
+                </div>
+
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-amber-500 md:col-span-2">
+                    <span class="text-xs font-bold bg-amber-100 text-amber-800 px-2.5 py-1 rounded-md">مانع ناگزیر ۵</span>
+                    <h3 class="text-base font-bold text-slate-900 mt-2 mb-2">الزام حقوقی اسنپ‌بک (Snapback)، اثر شلاقی جهانی و تغییر رفتار فروشندگان خارجی</h3>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-700 leading-6">
+                        <div>
+                            • <b>تغییر ماهیت تحریم با اسنپ‌بک:</b> تبدیل شدن تحریم از یک ریسک یک‌جانبه آمریکایی (OFAC) به یک الزام حقوقی فصل هفتم منشور ملل متحد برای تمام کشورها (حتی چین، روسیه و ترکیه).<br>
+                            • <b>حذف کامل اعتبار تجاری:</b> مطالبه <b>۱۰۰٪ وجه نقد پیش از حمل</b> توسط فروشندگان خارجی و انتقال تمام ریسک ترانزیت به خریدار ایرانی.
+                        </div>
+                        <div>
+                            • <b>اثر شلاقی (Bullwhip Effect):</b> افزایش ۲۵٪ تا ۶۰٪ قیمت جهانی و منطقه‌ای کالاهای واسطه‌ای (پلیمرها، مواد شیمیایی، تراشه‌ها و فلزات).<br>
+                            • <b>شوک تقاضای مصرف‌کننده در جنگ:</b> توقف خرید کالاهای بادوام، مسکن و پوشاک توسط خانوارها و تمرکز صرف بر ذخیره‌سازی کالای ضروری.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 2: 6 STATE POLICY & DECISION-MAKING ERRORS (ENDOGENOUS) -->
+        <section id="sec-policy-errors" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-gavel text-rose-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">بخش دوم: ۶ مشکل ناشی از خطاهای تصمیم‌گیری و سیاست‌گذاری دولت در جنگ (خودتحریمی‌ها)</h2>
+                </div>
+                <span class="text-xs bg-rose-50 text-rose-800 px-3 py-1 rounded-lg border border-rose-200 font-medium">قابل اجتناب؛ محصول مستقیم بوروکراسی و تصمیمات غلط دولتی</span>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
+                <!-- Error 1 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-rose-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-md">خطای تصمیم‌گیری ۱</span>
+                        <span class="text-xs text-rose-700 font-bold">بانک مرکزی vs گمرک</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">گروگان‌گیری کالا در گمرکات با «کد رهگیری ارز»</h3>
+                    <p class="text-xs text-slate-700 leading-6">
+                        در حالی که کالای تولیدکننده با عبور از موشک و محاصره به بندر رسیده و گمرک آن را در <b>۷۳ ساعت</b> ارزیابی کرده بود، بانک مرکزی خروج کالا از درب گمرک را منوط به صدور «کد رهگیری تخصیص ارز» نگه داشت و ماه‌ها کد صادر نکرد! تعلل دولت در آزادسازی «واردات بدون انتقال ارز» و «واردات در برابر صادرات»، کارخانه‌ها را به قحطی مواد اولیه (شامخ <b>36.7</b>) کشاند.
+                    </p>
+                </div>
+
+                <!-- Error 2 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-rose-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-md">خطای تصمیم‌گیری ۲</span>
+                        <span class="text-xs text-rose-700 font-bold">وزارت صمت و بانک مرکزی</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">قفل ثبت سفارش، انحراف ارزی و ۴.۰۷ میلیارد یورو بدهی</h3>
+                    <p class="text-xs text-slate-700 leading-6">
+                        تغییرات خلق‌الساعه کدهای تعرفه در ابتدای ۱۴۰۵ (محدود کردن ثبت سفارش به ۶۶ کد تعرفه و سپس تغییر به ۴,۵۵۰ قلم) باعث ایجاد <b>4.07 میلیارد یورو بدهی ارزی بلاتکلیف</b> برای واردکنندگان شد. نتیجه این سوءمدیریت در ۵ ماهه ۱۴۰۵: کاهش <b>11%</b> واردات کالای اساسی در برابر رشد <b>66%</b> واردات خودروی سواری!
+                    </p>
+                </div>
+
+                <!-- Error 3 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-rose-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-md">خطای تصمیم‌گیری ۳</span>
+                        <span class="text-xs text-rose-700 font-bold">سیاست ارزی</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">سرکوب صادرکننده با ارز چندنرخی و تعهد ارزی</h3>
+                    <p class="text-xs text-slate-700 leading-6">
+                        اصرار بانک مرکزی بر نرخ ارز دستوری و الزام صادرکننده (که نهاده و حمل را با دلار <b>272,500 تومانی</b> تأمین کرده) به فروش ارز با نرخ سرکوب‌شده، عملاً مالیات پنهان بر تولید و یارانه به رانت‌جویان وارداتی بود و به <b>۲۳ ماه رکود پیاپی صادرات (شامخ 37.4)</b> و فرار سرمایه انجامید.
+                    </p>
+                </div>
+
+                <!-- Error 4 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-rose-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-md">خطای تصمیم‌گیری ۴</span>
+                        <span class="text-xs text-rose-700 font-bold">سازمان حمایت و تعزیرات</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">قیمت‌گذاری دستوری در برابر تورم ۹۳.۳ واحدی نهاده</h3>
+                    <p class="text-xs text-slate-700 leading-6">
+                        سرکوب قیمت فروش درب کارخانه در زمانی که شاخص قیمت خرید مواد اولیه به رکورد ۷ ساله (<b>93.3</b>) رسید، شکاف <b>18.8 واحدی</b> ایجاد کرد؛ صنایع غذایی را با شامخ <b>38.6</b> به قعر جدول رکود فرستاد و در خودروسازی <b>352 همت زیان انباشته</b> و <b>70 همت بدهی معوق به قطعه‌سازان</b> خلق کرد.
+                    </p>
+                </div>
+
+                <!-- Error 5 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-rose-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-md">خطای تصمیم‌گیری ۵</span>
+                        <span class="text-xs text-rose-700 font-bold">سیاست پولی و اعتباری</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">تزریق به بانک‌های زامبی (۸۰۰ همت) و خفه کردن تولید</h3>
+                    <p class="text-xs text-slate-700 leading-6">
+                        بانک مرکزی در برابر <b>800 همت اضافه برداشت بانک‌های ناتراز</b> مماشات کرد (موتور تورم <b>88.7%</b> مهر ۱۴۰۵)، اما برای کنترل آماری نقدینگی، سقف تسهیلات، بهره مؤثر بالای ۳۰-۳۵٪ و انحراف <b>90% در صدور اوراق گام</b> را دقیقاً بر گلوی سرمایه در گردش تولید تحمیل کرد.
+                    </p>
+                </div>
+
+                <!-- Error 6 -->
+                <div class="glass-card p-5 rounded-2xl border-t-4 border-t-rose-600">
+                    <div class="flex justify-between items-center mb-2">
+                        <span class="text-xs font-bold bg-rose-100 text-rose-800 px-2.5 py-1 rounded-md">خطای تصمیم‌گیری ۶</span>
+                        <span class="text-xs text-rose-700 font-bold">سازمان برنامه و کارفرمایان</span>
+                    </div>
+                    <h3 class="text-base font-bold text-slate-900 mb-2">امتناع از ابلاغ فورس‌ماژور و تعدیل ویژه ارزی جنگ</h3>
+                    <p class="text-xs text-slate-700 leading-6">
+                        خودداری دولت از صدور بخشنامه سراسری فورس‌ماژور (قوه قهریه) و تعدیل ویژه ارزی برای پیمانکاران صنعتی و عمرانی، و در عوض اقدام کارفرمایان به حبس ۲۰۷ روزه مدارک، عدم پرداخت تا ۸۰٪ پیش‌پرداخت‌ها و مطالبه غیرقانونی افزایش تضامین به نرخ روز ارز!
+                    </p>
+                </div>
+            </div>
+        </section>
+
+        <!-- PART 3: MATRIX & 5 ACTIONABLE POLICY SOLUTIONS FOR INTERVIEW -->
+        <section id="sec-solutions" class="tab-section space-y-4 searchable-block">
+            <div class="flex items-center justify-between border-b border-slate-200 pb-3">
+                <div class="flex items-center gap-2.5">
+                    <i class="fa-solid fa-lightbulb text-emerald-600 text-xl"></i>
+                    <h2 class="text-lg font-extrabold text-slate-900">بخش سوم: ماتریس جمع‌بندی و ۵ راهکار فوری سیاستی (برای جمع‌بندی پایانی مصاحبه)</h2>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-right text-xs md:text-sm">
+                        <thead class="bg-slate-100 text-slate-800 border-b border-slate-200">
+                            <tr>
+                                <th class="py-3.5 px-4">حوزه بحران</th>
+                                <th class="py-3.5 px-4 text-amber-800">مانع ناگزیر ناشی از جنگ (برون‌زا)</th>
+                                <th class="py-3.5 px-4 text-rose-800">خطای تصمیم‌گیری دولت (درون‌زا)</th>
+                                <th class="py-3.5 px-4 text-emerald-800">راهکار فوری پیشنهادی در مصاحبه</th>
+                            </tr>
+                        </thead>
+                        <tbody class="divide-y divide-slate-200 text-slate-700">
+                            <tr class="hover:bg-slate-50 cursor-pointer" onclick="copyText('راهکار اول (گمرک و لجستیک): حذف فوری شرط کد رهگیری بانک مرکزی برای خروج کالا از گمرک و آزادسازی کامل واردات بدون انتقال ارز و واردات در برابر صادرات.')">
+                                <td class="py-3 px-4 font-bold text-slate-900">۱. حمل‌ونقل و گمرک</td>
+                                <td class="py-3 px-4">انسداد دوفاکتو هرمز، بیمه ۳ تا ۱۰٪، ۵ برابر شدن کرایه دریایی و محدودیت فیزیکی ریل.</td>
+                                <td class="py-3 px-4 text-rose-700 font-medium">منوط کردن خروج کالا به «کد رهگیری ارز بانک مرکزی» و رسوب دادن کالا در بنادر.</td>
+                                <td class="py-3 px-4 font-bold text-emerald-700">حذف فوری شرط کد رهگیری برای خروج کالا از گمرک؛ آزادسازی کامل واردات بدون انتقال ارز.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 cursor-pointer" onclick="copyText('راهکار دوم (ارز و تجارت): تک‌نرخی کردن واقعی ارز، حذف پیمان‌سپاری ارزی به نرخ دستوری و به رسمیت شناختن تسویه از طریق واردات در مقابل صادرات و رمزارزها.')">
+                                <td class="py-3 px-4 font-bold text-slate-900">۲. ارز و صادرات</td>
+                                <td class="py-3 px-4">قطع کامل سوئیفت و LC (اسنپ‌بک)، پیش‌پرداخت ۱۰۰٪ نقدی و پریمیوم ریسک تتر.</td>
+                                <td class="py-3 px-4 text-rose-700 font-medium">سرکوب نرخ ارز صادراتی، ارز چندنرخی، پرونده‌های تعهد ارزی و خلق 4.07B€ بدهی ارزی.</td>
+                                <td class="py-3 px-4 font-bold text-emerald-700">تک‌نرخی کردن واقعی ارز، حذف پیمان‌سپاری به نرخ دستوری و تسویه با واردات در برابر صادرات.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 cursor-pointer" onclick="copyText('راهکار سوم (تولید و بازار): توقف کامل قیمت‌گذاری دستوری برای کالاهای غیرانحصاری، تثبیت ۱ ساله کدهای تعرفه ثبت سفارش و انتقال یارانه به انتهای زنجیره (کالابرگ).')">
+                                <td class="py-3 px-4 font-bold text-slate-900">۳. تولید و بازار کالا</td>
+                                <td class="py-3 px-4">اثر شلاقی جهانی (+۲۵ تا ۶۰٪)، رشد ۱۵۰٪ مواد ناریه و ۱۰۰٪ قطعات معادن.</td>
+                                <td class="py-3 px-4 text-rose-700 font-medium">قیمت‌گذاری دستوری در برابر تورم 93.3 واحدی نهاده؛ تغییرات هفتگی کد تعرفه در صمت.</td>
+                                <td class="py-3 px-4 font-bold text-emerald-700">توقف کامل قیمت‌گذاری دستوری؛ تثبیت ۱ ساله مقررات ثبت سفارش و حمایت از مصرف‌کننده با کالابرگ.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 cursor-pointer" onclick="copyText('راهکار چهارم (پولی و بانکی): توقف اضافه برداشت ۸۰۰ همتی بانک‌های ناتراز و در مقابل، باز کردن خط اعتباری ویژه سرمایه در گردش و اوراق گام برای کارخانه‌ها متناسب با تورم نهاده‌ها.')">
+                                <td class="py-3 px-4 font-bold text-slate-900">۴. پولی و بانکی</td>
+                                <td class="py-3 px-4">افزایش هزینه تأمین مالی بین‌الملل و افت درآمدهای نفتی در دوره محاصره.</td>
+                                <td class="py-3 px-4 text-rose-700 font-medium">مماشات با ۸۰۰ همت اضافه برداشت بانک‌های ناتراز و اعمال انقباض اعتباری شدید بر تولید.</td>
+                                <td class="py-3 px-4 font-bold text-emerald-700">مهار بانک‌های ناتراز و باز کردن خط اعتباری ویژه سرمایه در گردش و اوراق گام متناسب با تورم نهاده.</td>
+                            </tr>
+                            <tr class="hover:bg-slate-50 cursor-pointer" onclick="copyText('راهکار پنجم (پروژه‌های عمرانی و EPC): ابلاغ مصوبه سراسری فورس‌ماژور و تعدیل ویژه ارزی دوره جنگ، ممنوعیت مطالبه مابه‌التفاوت تسعیر ضمانت‌نامه‌ها و تهاتر مطالبات ۷۰ همتی قطعه‌سازان و پیمانکاران.')">
+                                <td class="py-3 px-4 font-bold text-slate-900">۵. پیمانکاری و EPC</td>
+                                <td class="py-3 px-4">خروج وندورهای خارجی، اختلال حمل تجهیزات سنگین و توقف کارگاه‌ها در بمباران.</td>
+                                <td class="py-3 px-4 text-rose-700 font-medium">عدم پرداخت پیش‌پرداخت، حبس ۲۰۰ روزه مدارک، مطالبه افزایش تضامین به نرخ روز ارز و فرم Waiver.</td>
+                                <td class="py-3 px-4 font-bold text-emerald-700">ابلاغ مصوبه سراسری فورس‌ماژور و تعدیل ویژه ارزی جنگ؛ ممنوعیت تسعیر تضامین و تسویه مطالبات.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function copyText(text) {
+            const tempInput = document.createElement('textarea');
+            tempInput.value = text.trim();
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toast-msg');
+            toastMsg.innerText = 'کپی شد: ' + (text.length > 45 ? text.substring(0, 45) + '...' : text);
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2800);
+        }
+
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById('tab-' + tabId);
+            activeBtn.classList.add('tab-active');
+            activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+
+            const sections = document.querySelectorAll('.tab-section');
+            if (tabId === 'all') {
+                sections.forEach(sec => sec.classList.remove('hidden'));
+            } else {
+                sections.forEach(sec => {
+                    if (sec.id === 'sec-' + tabId) {
+                        sec.classList.remove('hidden');
+                    } else {
+                        sec.classList.add('hidden');
+                    }
+                });
+            }
+        }
+
+        function filterContent(query) {
+            const q = query.trim().toLowerCase();
+            const blocks = document.querySelectorAll('.searchable-block');
+            if (!q) {
+                blocks.forEach(b => b.classList.remove('hidden'));
+                return;
+            }
+            blocks.forEach(block => {
+                if (block.innerText.toLowerCase().includes(q)) {
+                    block.classList.remove('hidden');
+                } else {
+                    block.classList.add('hidden');
+                }
+            });
+        }
+
+        function resetSearch() {
+            const input = document.getElementById('globalSearch');
+            input.value = '';
+            filterContent('');
+            switchTab('all');
+        }
+    </script>
+</body>
+</html>
