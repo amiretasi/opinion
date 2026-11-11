@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>تله‌پرامپتر داده و اسکریپت کامل مصاحبه لایو: تجارت در شرایط جنگی (مهندس امیررضا اعطاسی)</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Vazirmatn Font -->
+    <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Vazirmatn', sans-serif;
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        .glass-card {
+            background: #ffffff;
+            border: 1px solid #cbd5e1;
+            box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
+        }
+        .tab-active {
+            background: linear-gradient(135deg, #1d4ed8, #1e3a8a);
+            color: #ffffff !important;
+            box-shadow: 0 2px 8px rgba(29, 78, 216, 0.35);
+        }
+        .num-badge {
+            display: inline-block;
+            padding: 0px 6px;
+            border-radius: 6px;
+            font-weight: 800;
+            background-color: #fef2f2;
+            color: #be123c;
+            border: 1px solid #fecdd3;
+            direction: ltr;
+        }
+        .num-badge-green {
+            display: inline-block;
+            padding: 0px 6px;
+            border-radius: 6px;
+            font-weight: 800;
+            background-color: #ecfdf5;
+            color: #047857;
+            border: 1px solid #a7f3d0;
+            direction: ltr;
+        }
+        .num-badge-blue {
+            display: inline-block;
+            padding: 0px 6px;
+            border-radius: 6px;
+            font-weight: 800;
+            background-color: #eff6ff;
+            color: #1d4ed8;
+            border: 1px solid #bfdbfe;
+            direction: ltr;
+        }
+        .term-badge {
+            display: inline-block;
+            padding: 0px 5px;
+            border-radius: 5px;
+            font-weight: 700;
+            font-size: 0.78rem;
+            background-color: #f1f5f9;
+            color: #334155;
+            border: 1px solid #cbd5e1;
+        }
+    </style>
+</head>
+<body class="min-h-screen pb-12">
+
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 left-4 z-50 hidden bg-emerald-600 text-white px-4 py-2 rounded-lg shadow-xl flex items-center gap-2">
+        <i class="fa-solid fa-circle-check text-sm"></i>
+        <span id="toast-msg" class="text-xs font-bold">متن کپی شد!</span>
+    </div>
+
+    <!-- Ultra-Compact Sticky Top Bar (No Search, Tiny Buttons) -->
+    <header class="sticky top-0 z-40 bg-white/95 backdrop-blur-md border-b border-slate-300 shadow-sm">
+        <div class="max-w-7xl mx-auto px-3 py-1.5 flex flex-wrap items-center justify-between gap-1.5">
+            <div class="flex items-center gap-1.5">
+                <span class="w-5 h-5 rounded bg-blue-700 text-white flex items-center justify-center text-[11px] font-black"><i class="fa-solid fa-tv"></i></span>
+                <h1 class="text-xs font-black text-slate-900">تله‌پرامپتر لایو: «تجارت در شرایط جنگی» | مهندس امیررضا اعطاسی</h1>
+            </div>
+
+            <!-- Tiny Question Filter Buttons -->
+            <div class="flex flex-wrap items-center gap-1">
+                <button onclick="showQ('all')" id="btn-all" class="q-tab tab-active text-[11px] font-bold px-2 py-0.5 rounded-md transition">همه (۱ تا ۷)</button>
+                <button onclick="showQ('q1')" id="btn-q1" class="q-tab bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold px-2 py-0.5 rounded-md transition">س ۱: آمار و ترکیب</button>
+                <button onclick="showQ('q2')" id="btn-q2" class="q-tab bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold px-2 py-0.5 rounded-md transition">س ۲: بازار جدید/موجود</button>
+                <button onclick="showQ('q3')" id="btn-q3" id="btn-q3" class="q-tab bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold px-2 py-0.5 rounded-md transition">س ۳: قاتل معامله</button>
+                <button onclick="showQ('q4')" id="btn-q4" class="q-tab bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold px-2 py-0.5 rounded-md transition">س ۴: تغییر بخشنامه</button>
+                <button onclick="showQ('q5')" id="btn-q5" class="q-tab bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold px-2 py-0.5 rounded-md transition">س ۵: سهم دولت/خصوصی</button>
+                <button onclick="showQ('q6')" id="btn-q6" class="q-tab bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold px-2 py-0.5 rounded-md transition">س ۶: آمادگی خصوصی</button>
+                <button onclick="showQ('q7')" id="btn-q7" class="q-tab bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-300 text-[11px] font-bold px-2 py-0.5 rounded-md transition">س ۷: چشم‌انداز آینده</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-7xl mx-auto px-3 mt-2.5 space-y-5">
+
+        <!-- ==========================================
+             QUESTION 1
+        =========================================== -->
+        <section id="sec-q1" class="q-card glass-card rounded-2xl overflow-hidden border-r-4 border-r-blue-700">
+            <!-- Question Header -->
+            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="bg-blue-700 text-white text-xs font-black px-2.5 py-0.5 rounded">سؤال ۱ (اختصاصی آقای اعطاسی)</span>
+                    <h2 class="text-xs md:text-sm font-black text-slate-900">«اگر بخواهیم بر اساس آخرین اعلامی، وضعیت تجارت را ارزیابی کنیم، مهم‌ترین نکاتی که در این داده‌ها به چشم می‌خورد چیست؟ به غیر از اختلال فاحش داده‌ها، تغییرات در ترکیب کالاهای صادراتی و وارداتی هست؟ یا تغییر در مقاصد تجاری؟»</h2>
+                </div>
+                <button onclick="copySection('sec-q1')" class="text-[11px] bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700 shrink-0"><i class="fa-regular fa-copy ml-1"></i>کپی</button>
+            </div>
+
+            <!-- Instant Data Strip for Q1 -->
+            <div class="bg-slate-50 px-4 py-1.5 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1.5 text-[11px]">
+                <div><span class="text-slate-500">وزن صادرات ۶ماهه:</span> <b class="text-rose-700" dir="ltr">-34%</b></div>
+                <div><span class="text-slate-500">ارزش صادرات ۶ماهه:</span> <b class="text-rose-700" dir="ltr">-20% to -25%</b></div>
+                <div><span class="text-slate-500">واردات ۵ماهه:</span> <b class="text-rose-700" dir="ltr">-26.1% (-38%)</b></div>
+                <div><span class="text-slate-500">سهم تولید از واردات:</span> <b class="text-blue-700">85%</b></div>
+                <div><span class="text-slate-500">اساسی vs خودرو:</span> <b class="text-rose-700" dir="ltr">-11% vs +66%</b></div>
+                <div><span class="text-slate-500">موجودی نهاده صنعت:</span> <b class="text-rose-700">36.7 (نفت 18.2)</b></div>
+                <div><span class="text-slate-500">ترکیه (۶ماهه):</span> <b class="text-emerald-700" dir="ltr">+56.1% (4.284B$)</b></div>
+                <div><span class="text-slate-500">عراق و پاکستان:</span> <b class="text-emerald-700" dir="ltr">1.4B$ | 1.395B$</b></div>
+            </div>
+
+            <div class="p-4 space-y-3.5">
+                <!-- 1. Opening Hook -->
+                <div class="bg-blue-50/80 border border-blue-200 p-3 rounded-xl text-xs md:text-sm leading-7 text-slate-900">
+                    <span class="font-black text-blue-800 block mb-0.5"><i class="fa-solid fa-bolt ml-1"></i>۱. ورود طوفانی (۱۰ ثانیه اول):</span>
+                    «اگر بخواهیم کارنامه تجارت خارجی کشور در نیمه نخست سال ۱۴۰۵ را در یک جمله خلاصه کنیم، ما با پدیده <b>"آب رفتن همزمان دو کفه ترازو، تغییر اجباری سبد کالایی به دلیل اقتصاد لجستیک، و مهاجرت تاریخی تجارت ایران از دریا به خشکی"</b> روبه‌رو هستیم. در ۶ ماهه اول ۱۴۰۵ حجم صادرات ما <span class="num-badge">34%</span> و ارزش آن <span class="num-badge">20% تا 25%</span> سقوط کرده و در سمت واردات هم در ۵ ماهه اول شاهد سقوط <span class="num-badge">26.1%</span> نسبت به سال ۱۴۰۴ (و <span class="num-badge">38%</span> نسبت به سال ۱۴۰۳) و ثبت تراز منفی <span class="num-badge">2 میلیارد دلاری</span> هستیم.»
+                </div>
+
+                <!-- 2. Analytical Pillars -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 text-xs md:text-[13px] leading-6">
+                    <!-- Pillar 1 -->
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-blue-900 border-b border-slate-200 pb-1.5">محور اول: تغییر بنیادین در ترکیب کالاهای صادراتی (حذف کالاهای حجیم و ضربه به بار هوایی)</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li>• <b>معمای آماری:</b> چرا در نیمه اول ۱۴۰۵ وزن صادرات ما <span class="num-badge">34%</span> ریخته اما ارزش دلاری آن <span class="num-badge">20%</span> کاهش یافته است؟ پاسخ در <b>«مهندسی هزینه حمل‌ونقل»</b> است.</li>
+                            <li>• پیش از جنگ، بخش بزرگی از تناژ صادرات ایران شامل <b>کالاهای حجیم و کم‌ارزش در هر تن</b> (سنگ‌آهن، کنسانتره، سیمان، کلینکر، قیر و مواد معدنی و پتروشیمی فله) بود که از بنادر جنوبی صادر می‌شدند. وقتی در جنگ ۴۰ روزه حق بیمه ریسک جنگ در تنگه هرمز از <span class="num-badge-blue">0.25%</span> به <span class="num-badge">3% تا 10%</span> ارزش بدنه کشتی رسید و کرایه حمل دریایی <b>۵ برابر</b> شد (تحمیل حداقل <span class="num-badge">3,000 دلار</span> اضافه کرایه جنگی به هر کانتینر)، صادرات کالای حجیم و ارزان‌قیمت از بنادر جنوب کاملاً غیراقتصادی شد و از سبد صادرات حذف گردید.</li>
+                            <li>• در نقطه مقابل، در کالاهای کم‌وزن و پرارزش هم به دلیل لغو پروازهای خارجی و افزایش <b>۴ تا ۵ برابری کرایه بار هوایی</b> (<span class="term-badge">Air Freight</span>)، صادرات کالای استراتژیکی مثل <b>زعفران در نیمه نخست امسال <span class="num-badge">40%</span> سقوط کرد</b>.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pillar 2 -->
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-rose-900 border-b border-slate-200 pb-1.5">محور دوم: تغییر خطرناک در ترکیب کالاهای وارداتی (قحطی نهاده تولید در برابر رشد واردات خودرو)</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li>• طبق آمار رسمی سازمان توسعه تجارت، <span class="num-badge-blue">85%</span> <b>کل واردات ایران</b> کالای مصرفی نیست، بلکه مواد اولیه، کالاهای واسطه‌ای، دارو، نهاده دامی و ماشین‌آلات خطوط تولید است. بنابراین سقوط <span class="num-badge">26.1%</span> ارزش و <span class="num-badge">20%</span> وزن واردات در نیمه اول ۱۴۰۵، مستقیماً یعنی <b>نرسیدن خوراک به کارخانه‌ها!</b></li>
+                            <li>• اما فاجعه در <b>تغییر ترکیب واردات به دلیل خطای تخصیص ارز</b> است: در ۵ ماهه نخست ۱۴۰۵، واردات کالاهای اساسی و دارو <span class="num-badge">11%</span> (معادل <span class="num-badge">300 میلیون دلار</span>) کاهش یافته و سرمایه‌گذاری در ماشین‌آلات <span class="num-badge">-12.3%</span> سقوط کرده، اما در همین مدت <b>واردات خودروهای سواری <span class="num-badge-green">+66%</span> رشد داشته است!</b></li>
+                            <li>• اثر این تغییر ترکیب واردات را در <b>گزارش شامخ شهریور ۱۴۰۵</b> می‌بینیم: شاخص موجودی مواد اولیه بخش صنعت برای هفدهمین ماه متوالی سقوط کرده و به عدد بحرانی <span class="num-badge">36.7</span> رسیده است (در فرآورده‌های نفت و گاز <span class="num-badge">18.2</span>، در ماشین‌سازی <span class="num-badge">29.2</span> و در صنایع غذایی <span class="num-badge">31.3</span>).</li>
+                        </ul>
+                    </div>
+
+                    <!-- Pillar 3 -->
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-emerald-900 border-b border-slate-200 pb-1.5">محور سوم: تغییر جغرافیا و مقاصد تجاری (شیفت از ۷۵٪ دریا به مرزهای زمینی)</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li>• در سال ۱۴۰۴، <span class="num-badge-blue">75%</span> تجارت خارجی ایران دریایی و متکی به بنادر جنوب (شهید رجایی و امام) بود. با انسداد دوفاکتو در جنوب، تجار و تولیدکنندگان ایرانی یک تغییر مسیر سریع (<span class="term-badge">Route Shifting</span>) به سمت مرزهای زمینی همسایگان انجام دادند:</li>
+                            <li><b>۱. ترکیه:</b> در ۶ ماهه اول ۱۴۰۵، صادرات ما به ترکیه از نظر ارزش <span class="num-badge-green">+56.1%</span> جهش کرد و به <span class="num-badge-green">4.284 میلیارد دلار</span> رسید و از نظر وزنی هم با <span class="num-badge-green">+41.8%</span> رشد به <span class="num-badge-blue">7.172 میلیون تن</span> بالغ شد.</li>
+                            <li><b>۲. عراق:</b> صادرات از مرزهای زمینی غرب کشور (به‌ویژه مرزهای کرمانشاه مثل پرویزخان و خسروی) در ۶ ماهه اول از <span class="num-badge-green">1.4 میلیارد دلار</span> عبور کرد.</li>
+                            <li><b>۳. پاکستان:</b> صادرات به پاکستان با رشد <span class="num-badge-green">+12%</span> به رکورد <span class="num-badge-green">1.395 میلیارد دلار</span> رسید و تنها در خرداد/ژوئن (پس از جنگ ۴۰ روزه) <span class="num-badge-green">+47%</span> جهش ماهانه ثبت کرد.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Punchline -->
+                <div class="bg-slate-900 text-white p-3 rounded-xl text-xs md:text-sm leading-6">
+                    <span class="text-amber-400 font-black ml-1"><i class="fa-solid fa-bullseye ml-1"></i>۳. جمله کلیدی پایانی (Punchline):</span>
+                    «بنابراین داده‌ها به ما می‌گویند که تجارت ایران در سال ۱۴۰۵ از <b>"دریا و کالاهای حجیم"</b> به سمت <b>"مرزهای زمینی و کالاهای با تراکم ارزش بالاتر"</b> کوچ کرده، اما کاهش ۲۶ درصدی واردات نهاده‌ها، زنگ خطر توقف خطوط تولید در نیمه دوم سال را به صدا درآورده است.»
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             QUESTION 2
+        =========================================== -->
+        <section id="sec-q2" class="q-card glass-card rounded-2xl overflow-hidden border-r-4 border-r-emerald-600">
+            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="bg-emerald-600 text-white text-xs font-black px-2.5 py-0.5 rounded">سؤال ۲ (مشترک از هر دو مهمان)</span>
+                    <h2 class="text-xs md:text-sm font-black text-slate-900">«در شرایط فعلی می‌شود به بازارهای جدید روی آورد یا باید تجار در همین مسیر موجود حرکت کنند؟»</h2>
+                </div>
+                <button onclick="copySection('sec-q2')" class="text-[11px] bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700 shrink-0"><i class="fa-regular fa-copy ml-1"></i>کپی</button>
+            </div>
+
+            <!-- Instant Data Strip for Q2 -->
+            <div class="bg-slate-50 px-4 py-1.5 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                <div><span class="text-slate-500">تحریم حقوقی و بانکی:</span> <b class="text-rose-700">اسنپ‌بک + لیست سیاه FATF</b></div>
+                <div><span class="text-slate-500">وابستگی قبلی به دریا:</span> <b class="text-blue-700">75% (بنادر جنوب)</b></div>
+                <div><span class="text-slate-500">بیمه جنگ و کرایه دریایی:</span> <b class="text-rose-700">10% ارزش کشتی | 5 برابر</b></div>
+                <div><span class="text-slate-500">راهکار بخش خصوصی:</span> <b class="text-emerald-700">15 همسایه + Hub & Spoke</b></div>
+            </div>
+
+            <div class="p-4 space-y-3.5">
+                <!-- 1. Opening Hook -->
+                <div class="bg-emerald-50/80 border border-emerald-200 p-3 rounded-xl text-xs md:text-sm leading-7 text-slate-900">
+                    <span class="font-black text-emerald-800 block mb-0.5"><i class="fa-solid fa-bolt ml-1"></i>۱. ورود طوفانی (۱۰ ثانیه اول):</span>
+                    «پاسخ علمی و عملیاتی به این سؤال، نه "توقف در مسیر سنتی قبلی" است و نه "ماجراجویی پرهزینه در بازارهای دوردست جدید"؛ استراتژی صحیح در اقتصاد جنگی، <b>"تثبیت بازارهای موجود از طریق مهندسی مجدد مسیرهای عبوری و هاب‌های واسطه"</b> است.»
+                </div>
+
+                <!-- 2. Analytical Pillars -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 text-xs md:text-[13px] leading-6">
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-rose-800 border-b border-slate-200 pb-1.5">چرا باز کردن «بازار کاملاً جدید و دوردست» در میانه جنگ ممکن نیست؟</h3>
+                        <p class="text-slate-800">
+                            در شرایطی که مکانیسم ماشه (اسنپ‌بک) فعال شده، ایران در لیست سیاه <span class="term-badge">FATF</span> قرار دارد و خط کشتیرانی مستقیم و <span class="term-badge">LC</span> بانکی نداریم، نفوذ به یک بازار کاملاً جدید (مثلاً در آفریقا یا آمریکای لاتین یا شرق دور) نیازمند <b>هزینه بازاریابی سنگین، فروش اعتباری و تضمین تحویل بهنگام</b> (<span class="term-badge">On-time Delivery</span>) است که در شرایط جنگی برای صادرکننده ایرانی غیرممکن است.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-amber-800 border-b border-slate-200 pb-1.5">چرا ماندن در «مسیر سنتی قبلی» هم خودکشی تجاری است؟</h3>
+                        <p class="text-slate-800">
+                            مسیر قبلی تجارت ما تا سال ۱۴۰۴، وابستگی <span class="num-badge-blue">75%</span> به حمل‌ونقل دریایی مستقیم از بنادر جنوب بود. ماندن در آن مسیر یعنی پذیرش <b>۵ برابر شدن کرایه حمل و حق بیمه جنگی <span class="num-badge">10%</span></b> که حاشیه سود را کاملاً نابود می‌کند.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-emerald-800 border-b border-slate-200 pb-1.5">راهکار ترکیبی که بخش خصوصی هوشمند در سال ۱۴۰۵ اجرا کرد چیست؟</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li><b>۱. عمق‌بخشی به بازارهای همسایه زمینی و اوراسیا:</b> تمرکز بر <b>۱۵ کشور همسایه</b> که به آبراه‌های پرخطر جنوبی وابسته نیستند (چنان‌که در ۶ ماهه ۱۴۰۵ ترکیه، عراق و پاکستان بار اصلی صادرات را به دوش کشیدند).</li>
+                            <li><b>۲. حفظ بازارهای قبلی با تغییر معماری لجستیک (<span class="term-badge">Hub & Spoke</span>):</b> برای حفظ مشتریان قبلی در آسیا و اروپا، تجار ما به جای ارسال مستقیم از بندرعباس، از شرکت‌های پوششی (<span class="term-badge">Front Companies</span>) و بنادر واسط در ترکیه (مرسین و استانبول)، امارات و عمان و مکانیسم تغییر بارنامه (<span class="term-badge">Switch Bill of Lading</span>) استفاده می‌کنند؛ یعنی <b>"مشتری و بازارِ موجود را حفظ می‌کنیم، اما مسیر فیزیکی و مالی رسیدن به او را تغییر می‌دهیم."</b></li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Punchline -->
+                <div class="bg-slate-900 text-white p-3 rounded-xl text-xs md:text-sm leading-6">
+                    <span class="text-amber-400 font-black ml-1"><i class="fa-solid fa-bullseye ml-1"></i>۳. جمله کلیدی پایانی (Punchline):</span>
+                    «در شرایط جنگی، هنر تاجر ایرانی "کشف قاره‌های جدید" نیست؛ هنر اصلی، <b>"حفظ زنجیره تأمین و مشتریان فعلی از طریق جایگزینی کریدورهای زمینی و هاب‌های منطقه‌ای به جای مسیرهای دریایی مسدودشده"</b> است.»
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             QUESTION 3
+        =========================================== -->
+        <section id="sec-q3" class="q-card glass-card rounded-2xl overflow-hidden border-r-4 border-r-amber-500">
+            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="bg-amber-600 text-white text-xs font-black px-2.5 py-0.5 rounded">سؤال ۳ (مشترک از هر دو مهمان)</span>
+                    <h2 class="text-xs md:text-sm font-black text-slate-900">«از میان این موانع، کدام‌یک مستقیماً می‌تواند باعث توقف یک معامله تجاری شود؟»</h2>
+                </div>
+                <button onclick="copySection('sec-q3')" class="text-[11px] bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700 shrink-0"><i class="fa-regular fa-copy ml-1"></i>کپی</button>
+            </div>
+
+            <!-- Instant Data Strip for Q3 -->
+            <div class="bg-slate-50 px-4 py-1.5 border-b border-slate-200 grid grid-cols-1 sm:grid-cols-3 gap-2 text-[11px]">
+                <div><span class="text-slate-500">قاتل ۱ (مبدأ خارجی):</span> <b class="text-amber-800">Ghosting + شرط ۱۰۰٪ نقد پیش از تولید</b></div>
+                <div><span class="text-slate-500">قاتل ۲ (مسیر دریایی):</span> <b class="text-amber-800">لغو بیمه P&I تا ۱۰٪ + Soymeal Washouts</b></div>
+                <div><span class="text-slate-500">قاتل ۳ (داخل کشور):</span> <b class="text-rose-700">قفل کد رهگیری گمرک + 4.07B€ بدهی ارزی</b></div>
+            </div>
+
+            <div class="p-4 space-y-3.5">
+                <!-- 1. Opening Hook -->
+                <div class="bg-amber-50/80 border border-amber-200 p-3 rounded-xl text-xs md:text-sm leading-7 text-slate-900">
+                    <span class="font-black text-amber-900 block mb-0.5"><i class="fa-solid fa-bolt ml-1"></i>۱. ورود طوفانی (۱۰ ثانیه اول):</span>
+                    «ما در ادبیات مدیریت زنجیره تأمین و تجارت، موانع را به دو دسته تقسیم می‌کنیم: <b>"موانع هزینه‌زا"</b> (که معامله را گران می‌کنند اما متوقف نمی‌کنند) و <b>"موانع قاتل معامله"</b> (<span class="term-badge">Deal-Killers</span>) که مستقیماً معامله را در نطفه خفه می‌کنند. امروز <b>سه مانع اصلی، قاتل مستقیم معاملات تجاری ایران هستند</b>: دو مانع در بیرون مرزها و یک مانع بسیار کشنده‌تر در داخل مرزها!»
+                </div>
+
+                <!-- 2. Analytical Pillars -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 text-xs md:text-[13px] leading-6">
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-amber-900 border-b border-slate-200 pb-1.5">مانع اول (در مبدأ خارجی): قطع ارتباطات، پدیده <span class="term-badge">Ghosting</span> و الزام به «پرداخت ۱۰۰ درصد نقدی پیش از تولید»</h3>
+                        <p class="text-slate-800">
+                            در تجارت صنعتی، وقتی به دلیل اسنپ‌بک هیچ اعتبار اسنادی (<span class="term-badge">LC</span>) باز نمی‌شود و همزمان به دلیل اختلالات اینترنت و قطعی ارتباطات در جنگ ۱۲ روزه و ۴۰ روزه، مدیر خرید کارخانه ایرانی برای چند روز قادر به پاسخگویی آنی در ایمیل یا <span class="term-badge">WeChat</span> به کارخانه چینی، هندی یا اروپایی نیست (پدیده <span class="term-badge">Ghosting</span>)، فروشنده خارجی احساس ریسک نکول می‌کند؛ بلافاصله <b>اسلات تولیدی (<span class="term-badge">Production Slot</span>) رزروشده برای ایران را لغو کرده و به رقیب ترک یا ویتنامی می‌دهد</b> و اعلام می‌کند تنها در صورت <b>پرداخت <span class="num-badge">100%</span> نقدی پیش از شروع تولید</b> حاضر به معامله است. شرکت تولیدی ایرانی که سرمایه‌اش در داخل قفل است، توان پرداخت ۱۰۰٪ نقدی ندارد و معامله مستقیماً متوقف می‌شود.
+                        </p>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-amber-900 border-b border-slate-200 pb-1.5">مانع دوم (در مسیر حمل): لغو پوشش بیمه‌ای کلوپ‌های <span class="term-badge">P&I</span> و پدیده «فسخ قرارداد در مبدأ» (<span class="term-badge">Washouts</span>)</h3>
+                        <p class="text-slate-800">
+                            وقتی سندیکاهای بیمه دریایی پوشش ریسک جنگ را برای تنگه هرمز لغو می‌کنند یا به <span class="num-badge">10%</span> ارزش بدنه کشتی می‌رسانند، پدیده‌ای رخ می‌دهد که در جنگ ۴۰ روزه در بازار غلات و نهاده‌ها شاهدش بودیم به نام <span class="term-badge">Soymeal Washouts</span> (<b>فسخ یک‌طرفه قراردادهای کنجاله و غلات</b>)؛ یعنی فروشنده بین‌المللی ترجیح می‌دهد جریمه فسخ قرارداد را بپردازد اما بار را به مقصد بنادر ایران بارگیری نکند!
+                        </p>
+                    </div>
+
+                    <div class="bg-rose-50/70 p-3.5 rounded-xl border border-rose-200 space-y-2">
+                        <h3 class="font-black text-rose-900 border-b border-rose-200 pb-1.5">مانع سوم (در داخل کشور - کشنده‌ترین مانع): قفل «کد رهگیری ارز بانک مرکزی» در گمرک و عدم قطعیت نرخ تسعیر</h3>
+                        <p class="text-slate-800">
+                            فرض کنید تاجر و تولیدکننده ایرانی با هزار ترفند از دو مانع قبلی عبور کرد و کالا را به بندر شهید رجایی یا مرز بازرگان رساند؛ اینجا <b>قفل نرم‌افزاری بانک مرکزی ایران</b> معامله را متوقف می‌کند!<br>
+                            منوط کردن ترخیص کالا به صدور «کد رهگیری ارز» و ایجاد <span class="num-badge">4.07 میلیارد یورو</span> بدهی ارزی بلاتکلیف برای واردکنندگانی که کالایشان را قبلاً با قیمت دستوری فروخته‌اند اما بانک مرکزی ارزشان را نداده است، باعث می‌شود تاجر ایرانی از ترس ورشکستگی ناشی از تفاوت نرخ تسعیر ارز، <b>اصلاً جرئت امضای قرارداد بعدی را نداشته باشد!</b>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- 3. Punchline -->
+                <div class="bg-slate-900 text-white p-3 rounded-xl text-xs md:text-sm leading-6">
+                    <span class="text-amber-400 font-black ml-1"><i class="fa-solid fa-bullseye ml-1"></i>۳. جمله کلیدی پایانی (Punchline):</span>
+                    «افزایش کرایه حمل یا کارمزد صرافی معامله را متوقف نمی‌کند، بلکه سود را کم می‌کند؛ آنچه معامله را مستقیماً متوقف می‌کند <b>"نقدی شدن ۱۰۰ درصدی خرید در خارج به دلیل سلب اعتماد، و قفل کد رهگیری و ابهام نرخ ارز در بانک مرکزی در داخل"</b> است.»
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             QUESTION 4
+        =========================================== -->
+        <section id="sec-q4" class="q-card glass-card rounded-2xl overflow-hidden border-r-4 border-r-rose-600">
+            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="bg-rose-600 text-white text-xs font-black px-2.5 py-0.5 rounded">سؤال ۴ (اختصاصی آقای اعطاسی)</span>
+                    <h2 class="text-xs md:text-sm font-black text-slate-900">«یکی از مشکلاتی که فعالان اقتصادی همواره مطرح می‌کنند، بی‌ثباتی مقررات و تغییرات مکرر در سیاست‌های تجاری است. در شرایط جنگی، تغییر بخشنامه‌ها و تصمیمات ناگهانی چه اثری بر فعالیت تجار و تولیدکنندگان دارد؟»</h2>
+                </div>
+                <button onclick="copySection('sec-q4')" class="text-[11px] bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700 shrink-0"><i class="fa-regular fa-copy ml-1"></i>کپی</button>
+            </div>
+
+            <!-- Instant Data Strip for Q4 -->
+            <div class="bg-slate-50 px-4 py-1.5 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-6 gap-2 text-[11px]">
+                <div><span class="text-slate-500">محدودیت صمت:</span> <b class="text-rose-700">66 کد تعرفه (بعد 4,550)</b></div>
+                <div><span class="text-slate-500">لیدتایم عادی چین/هند:</span> <b class="text-blue-700">45 تا 50 روز</b></div>
+                <div><span class="text-slate-500">قفل NTSW (فیدار/ساتا):</span> <b class="text-rose-700">3 روز ← 20 تا 25 روز</b></div>
+                <div><span class="text-slate-500">تأخیر مرکب کشتی:</span> <b class="text-rose-700">35 تا 45 روز (اتمام انبار)</b></div>
+                <div><span class="text-slate-500">بدهی ارزی بلاتکلیف:</span> <b class="text-rose-700" dir="ltr">4.07 B€</b></div>
+                <div><span class="text-slate-500">خرید vs فروش (غذایی):</span> <b class="text-rose-700">93.3 vs 74.5 (شامخ 38.6)</b></div>
+            </div>
+
+            <div class="p-4 space-y-3.5">
+                <!-- 1. Opening Hook -->
+                <div class="bg-rose-50/80 border border-rose-200 p-3 rounded-xl text-xs md:text-sm leading-7 text-slate-900">
+                    <span class="font-black text-rose-800 block mb-0.5"><i class="fa-solid fa-bolt ml-1"></i>۱. ورود طوفانی (۱۰ ثانیه اول):</span>
+                    «برای درک فاجعه بخشنامه‌های خلق‌الساعه در شرایط جنگی، ابتدا باید یک واقعیت ساختاری اقتصاد ایران را باز کنیم: در کشور ما بخش خصوصی حاضر در تجارت دو گروه است؛ <b>گروه اول شرکت‌های بازرگانی حرفه‌ای</b> هستند که ذات کارشان تجارت است، اما <b>گروه دوم شرکت‌های صنعتی، دارویی، غذایی، قطعه‌سازی و ساختمانی هستند که "مجبور به تجارت" شده‌اند!</b> برای این گروه دوم، تغییر ناگهانی یک بخشنامه در وزارت صمت یا بانک مرکزی، صرفاً کاهش سود یک معامله نیست، بلکه به معنای <b>"انفجار بمب ساعتی در خط تولید و توقف کامل کارخانه"</b> است.»
+                </div>
+
+                <!-- 2. Analytical Pillars -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 text-xs md:text-[13px] leading-6">
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-rose-900 border-b border-slate-200 pb-1.5">۱. چرا تولیدکننده ما مجبور به تجارت است و چگونه بخشنامه‌ها او را فلج می‌کنند؟</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li>• وزارت صمت واردات هزاران کد تعرفه مواد اولیه و قطعات را منحصراً به «کارت بازرگانی تولیدی» و سهمیه سامانه «بهین‌یاب» محدود کرده است. در ابتدای سال ۱۴۰۵، وزارت صمت ناگهان ثبت سفارش صدها کد تعرفه بازرگانی را مسدود کرد (و در مقطعی کل ثبت سفارش‌ها را به <span class="num-badge">66 کد تعرفه</span> محدود نمود و بعد پس از اعتراضات به <span class="num-badge-blue">4,550 قلم</span> تغییر داد).</li>
+                            <li>• <b>نتیجه چه شد؟</b> شرکت بازرگانی که کانال تأمین و شرکت پوششی داشت از چرخه حذف شد، و هزاران کارخانه کوچک و متوسط (<span class="term-badge">SME</span>) که توان خرید مستقیم از چین را نداشتند و مواد اولیه‌شان را در داخل از تجار می‌خریدند، ناگهان بی‌ماده اولیه ماندند!</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-rose-900 border-b border-slate-200 pb-1.5">۲. ریاضیاتِ از دست رفتن پنجره زمانی کشتی (<span class="term-badge">Vessel Closing Time</span>) در اثر تغییرات سامانه جامع تجارت (<span class="term-badge">NTSW</span>)</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li>• بیایید با زبان مهندسی زنجیره تأمین (<span class="term-badge">MRP</span>) صحبت کنیم: لیدتایم عادی واردات ماده اولیه از شانگهای یا هند به خط تولید در ایران <span class="num-badge-blue">45 تا 50 روز</span> است (۳۰ روز حمل دریایی + ۱۵ روز ترخیص).</li>
+                            <li>• وقتی وزارت صمت یا بانک مرکزی در اوج شرایط جنگی بخشنامه کد تعرفه، سهمیه بهین‌یاب یا اولویت ارزی را تغییر می‌دهد و فرآیند ثبت سفارش و اخذ کد «فیدار» و کد «ساتا» در سامانه جامع تجارت از ۳ روز به <span class="num-badge">20 تا 25 روز</span> افزایش می‌یابد، محموله تولیدکننده ایرانی به تاریخ بسته شدن کشتی رزروشده (<span class="term-badge">Vessel Closing Time</span>) نمی‌رسد!</li>
+                            <li>• از آنجا که کشتی‌های خط ایران محدودند و کشتی بعدی <span class="num-badge">14 تا 21 روز</span> بعد حرکت می‌کند، یک بخشنامه ناگهانی و ۱۵ روز توقف در کارتابل وزارت صمت، به <span class="num-badge">35 تا 45 روز</span> <b>تأخیر مرکب در ورود کالا</b> تبدیل می‌شود. در این ۴۵ روز، کارخانه «موجودی اطمینان ۳۰ روزه انبار» (<span class="term-badge">Safety Stock</span>) خود را می‌سوزاند و در روز سی‌ویکم به <b>«پرتگاه موجودی» (<span class="term-badge">Inventory Cliff</span>)</b> می‌رسد و خط تولید می‌خوابد!</li>
+                        </ul>
+                    </div>
+
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-rose-900 border-b border-slate-200 pb-1.5">۳. خلق ۴.۰۷ میلیارد یورو بدهی ارزی بلاتکلیف و نابودی قدرت قیمت‌گذاری</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li>• طبق آمار رسمی شورای گفت‌وگوی دولت و بخش خصوصی در آبان ۱۴۰۵، تغییر بخشنامه‌های ارزی و تعلیق ثبت سفارش‌های دارای قبض انبار، <span class="num-badge">4.07 میلیارد یورو</span> بدهی ارزی بلاتکلیف روی دست واردکنندگان گذاشته است.</li>
+                            <li>• از طرف دیگر، در شامخ شهریور ۱۴۰۵ شاخص قیمت خرید مواد اولیه صنعت به رکورد ۷ ساله (<span class="num-badge">93.3</span>) رسیده، اما بخشنامه‌های تعزیراتی و قیمت‌گذاری دستوری مانع تعدیل قیمت فروش (شاخص <span class="num-badge-blue">74.5</span>) شده‌اند. نتیجه این عدم قطعیت مقرراتی در صنایع غذایی، سقوط شامخ این صنعت حیاتی به عدد فاجعه‌بار <span class="num-badge">38.6</span> (بدترین صنعت کشور) بوده است.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Punchline -->
+                <div class="bg-slate-900 text-white p-3 rounded-xl text-xs md:text-sm leading-6">
+                    <span class="text-amber-400 font-black ml-1"><i class="fa-solid fa-bullseye ml-1"></i>۳. جمله کلیدی پایانی (Punchline):</span>
+                    «در شرایط جنگی که خودِ دشمن و محاصره دریایی عدم قطعیت بیرونی ایجاد کرده، دولت نباید با بخشنامه‌های هفتگی به <b>"منبع دوم عدم قطعیت"</b> تبدیل شود؛ در زنجیره تأمین پیوسته، ۱۵ روز توقف پرونده پشت یک بخشنامه جدید در تهران، دقیقاً مساوی است با ۳۰ روز خاموشی خط تولید کارخانه در دو ماه بعد!»
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             QUESTION 5
+        =========================================== -->
+        <section id="sec-q5" class="q-card glass-card rounded-2xl overflow-hidden border-r-4 border-r-purple-600">
+            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="bg-purple-600 text-white text-xs font-black px-2.5 py-0.5 rounded">سؤال ۵ (اختصاصی آقای اعطاسی)</span>
+                    <h2 class="text-xs md:text-sm font-black text-slate-900">«می‌خواهم بدانم در این شرایط چه کسی باید مسئولیت مدیریت این وضعیت را برعهده بگیرد؟ دولت یا بخش خصوصی؟ سهم هر کدام چقدر است؟»</h2>
+                </div>
+                <button onclick="copySection('sec-q5')" class="text-[11px] bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700 shrink-0"><i class="fa-regular fa-copy ml-1"></i>کپی</button>
+            </div>
+
+            <!-- Instant Data Strip for Q5 -->
+            <div class="bg-slate-50 px-4 py-1.5 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-4 gap-2 text-[11px]">
+                <div><span class="text-slate-500">ترمیم زیرساخت توسط دولت:</span> <b class="text-purple-700">48 مخزن نفت (3 روزه) + 2,000 نقطه برق</b></div>
+                <div><span class="text-slate-500">پدافند سایبری دولت:</span> <b class="text-purple-700">دفع 10,000 حمله روزانه</b></div>
+                <div><span class="text-slate-500">حبس مطالبات توسط دولتی‌ها:</span> <b class="text-rose-700">70 همت قطعه‌ساز | 80% پیش‌پرداخت EPC</b></div>
+                <div><span class="text-slate-500">سهم بخش خصوصی از اشتغال:</span> <b class="text-emerald-700">> 2/3 اشتغال سه دهک پایین + پخش ۲۴ ساعته</b></div>
+            </div>
+
+            <div class="p-4 space-y-3.5">
+                <!-- 1. Opening Hook -->
+                <div class="bg-purple-50/80 border border-purple-200 p-3 rounded-xl text-xs md:text-sm leading-7 text-slate-900">
+                    <span class="font-black text-purple-900 block mb-0.5"><i class="fa-solid fa-bolt ml-1"></i>۱. ورود طوفانی (۱۰ ثانیه اول):</span>
+                    «مشکل اصلی اقتصاد ایران در جنگ ۱۲ روزه و ۴۰ روزه این بود که <b>جایگاه دولت و بخش خصوصی دقیقاً برعکس شده است!</b> دولت وارد تصدی‌گری خرد، قیمت‌گذاری و تخصیص تک‌به‌تک کدهای ارزی شده که مطلقاً در توان بوروکراسی دولتی نیست، و در عوض از وظایف حاکمیتی و پشتیبانی خود بازمانده است. در جنگ اقتصادی و نظامی، <b>"فرماندهی پشتیبانی، زیرساخت و مقررات‌زدایی ۱۰۰ درصد با دولت است، و فرماندهی میدان عملیات، منبع‌یابی و توزیع ۱۰۰ درصد با بخش خصوصی."</b>»
+                </div>
+
+                <!-- 2. Analytical Pillars -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs md:text-[13px] leading-6">
+                    <!-- State Share -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-purple-200 space-y-2">
+                        <h3 class="font-black text-purple-900 border-b border-purple-200 pb-1.5 text-sm"><i class="fa-solid fa-landmark ml-1"></i>سهم دولت چیست؟ (۳ وظیفه حاکمیتی که بخش خصوصی نمی‌تواند انجام دهد):</h3>
+                        <ul class="space-y-2 text-slate-800">
+                            <li><b>۱. پدافند زیرساختی و پایداری فیزیکی و سایبری (نقطه قوت دولت):</b> همان‌طور که در جنگ ۴۰ روزه وقتی <span class="num-badge-blue">48 مخزن نفت</span> و <span class="num-badge-blue">2,000 نقطه شبکه برق</span> هدف قرار گرفت، تیم‌های فنی دولت ظرف <b>۳ روز</b> خطوط لوله را بای‌پس کردند و <span class="num-badge-blue">10,000 حمله سایبری روزانه</span> را دفع نمودند، دولت باید پایداری برق شهرک‌های صنعتی، سوخت دیزل‌ژنراتورها و مهم‌تر از همه <b>«پایداری اینترنت تجاری و بین‌الملل»</b> را تضمین کند.</li>
+                            <li><b>۲. دیپلماسی لجستیک و توافقات حاکمیتی مرزی:</b> وقتی تجارت ما به مرزهای زمینی ترکیه، عراق، پاکستان و ریلی اوراسیا شیفت کرده، بخش خصوصی نمی‌تواند ظرفیت گمرک بازرگان و رازی را در خاک ترکیه افزایش دهد یا مشکل تغییر عرض ریل (<span class="term-badge">Gauge Break</span>) در سرخس و اینچه‌برون را حل کند یا چتر بیمه اتکایی حاکمیتی برای کشتی‌ها صادر نماید؛ این‌ها وظیفه ۱۰۰ درصدی دولت است.</li>
+                            <li><b>۳. جراحی خودتحریمی‌های داخلی و ابلاغ فورس‌ماژور:</b> دولت باید فوراً شرط «کد رهگیری بانک مرکزی» برای خروج کالا از گمرک را حذف کند، «واردات بدون انتقال ارز» و «واگذاری کوتاژ صادراتی» را کاملاً آزاد بگذارد، و برای پیمانکاران صنعتی و تولیدکنندگان <b>«بخشنامه سراسری فورس‌ماژور (قوه قهریه) و تعدیل ویژه ارزی جنگ»</b> صادر کند، نه اینکه کارفرماهای دولتی <span class="num-badge">70 همت</span> پول قطعه‌ساز و <span class="num-badge">80%</span> پیش‌پرداخت پیمانکار <span class="term-badge">EPC</span> را حبس کنند!</li>
+                        </ul>
+                    </div>
+
+                    <!-- Private Sector Share -->
+                    <div class="bg-slate-50 p-4 rounded-xl border border-emerald-200 space-y-2">
+                        <h3 class="font-black text-emerald-900 border-b border-emerald-200 pb-1.5 text-sm"><i class="fa-solid fa-users-gear ml-1"></i>سهم بخش خصوصی چیست؟ (۳ مأموریت عملیاتی که دولت هرگز نمی‌تواند انجام دهد):</h3>
+                        <ul class="space-y-2 text-slate-800">
+                            <li><b>۱. تأمین نیازهای دانه‌بندی‌شده و تخصصی (<span class="term-badge">Granular Needs</span>):</b> دولت حداکثر می‌تواند با تهاتر نفت (<span class="term-badge">G2G</span>)، گندم یا ذرت فله وارد کند؛ اما تأمین هزاران قلم ماده مؤثره دارویی (<span class="term-badge">API</span>)، میکروکنترلر خودرو، پلیمر مهندسی، کاتالیست و قطعات یدکی معادن از طریق شبکه شرکت‌های پوششی و تغییر بارنامه، فقط از دست بخش خصوصی (هم شرکت‌های بازرگانی و هم واحدهای بازرگانی کارخانه‌ها) برمی‌آید.</li>
+                            <li><b>۲. توزیع مویرگی و چابک در بحران:</b> در جنگ ۱۲ روزه و ۴۰ روزه، زمانی که جمعیت از تهران به سمت شهرهای حومه و شمال جابه‌جا شد، این شبکه پخش و خرده‌فروشی بخش خصوصی بود که در کمتر از <span class="num-badge-green">24 ساعت</span> الگوریتم توزیع را تغییر داد و نگذاشت یک ساعت قحطی شکل بگیرد (موضوعی که خود سخنگوی دولت هم رسماً به آن اذعان کرد).</li>
+                            <li><b>۳. حفظ اشتغال و تولید در کف کارخانه‌ها:</b> بخش خصوصی واقعی ایران <b>بیش از دو سوم اشتغال سه دهک پایین جامعه</b> را تأمین کرده و در جنگ با مصرف کردن ذخایر انبار خود، بازار را سرپا نگه داشته است.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Punchline -->
+                <div class="bg-slate-900 text-white p-3 rounded-xl text-xs md:text-sm leading-6">
+                    <span class="text-amber-400 font-black ml-1"><i class="fa-solid fa-bullseye ml-1"></i>۳. جمله کلیدی پایانی (Punchline):</span>
+                    «تقسیم کار در شرایط جنگی بسیار روشن است: <b>دولت باید از صندلی "تاجر، قیمت‌گذار و نگهبان درب گمرک" پایین بیاید و روی صندلی "پشتیبان زیرساخت، دیپلمات مرزی و تسهیل‌گر مقررات" بنشیند</b> و عملیات میدان را به بخش خصوصی واگذار کند.»
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             QUESTION 6
+        =========================================== -->
+        <section id="sec-q6" class="q-card glass-card rounded-2xl overflow-hidden border-r-4 border-r-indigo-600">
+            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="bg-indigo-600 text-white text-xs font-black px-2.5 py-0.5 rounded">سؤال ۶ (اختصاصی آقای اعطاسی)</span>
+                    <h2 class="text-xs md:text-sm font-black text-slate-900">«آیا بخش خصوصی ایران از نظر ساختار، سرمایه، دسترسی به شبکه‌های بین‌المللی و ابزارهای مالی، آمادگی لازم برای مدیریت تجارت در شرایط جنگی را دارد؟»</h2>
+                </div>
+                <button onclick="copySection('sec-q6')" class="text-[11px] bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700 shrink-0"><i class="fa-regular fa-copy ml-1"></i>کپی</button>
+            </div>
+
+            <!-- Instant Data Strip for Q6 -->
+            <div class="bg-slate-50 px-4 py-1.5 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-[11px]">
+                <div><span class="text-slate-500">تجارت مدیریت‌شده ۶ماهه:</span> <b class="text-emerald-700" dir="ltr">> 44 B$</b></div>
+                <div><span class="text-slate-500">قیمت خرید نهاده و دلار:</span> <b class="text-rose-700">93.3 | 272,500 تومان</b></div>
+                <div><span class="text-slate-500">دموراژ و چک تضمین کانتینر:</span> <b class="text-rose-700">95M ریال | 3.2-14.6B ریال</b></div>
+                <div><span class="text-slate-500">مطالبات قطعه و پیش‌پرداخت:</span> <b class="text-rose-700">70 همت | 79.5% EPCC</b></div>
+                <div><span class="text-slate-500">اضافه برداشت بانک‌های ناتراز:</span> <b class="text-rose-700">800 همت</b></div>
+                <div><span class="text-slate-500">بهره بانکی و انحراف گام:</span> <b class="text-rose-700">> 30-35% | 90% انحراف</b></div>
+            </div>
+
+            <div class="p-4 space-y-3.5">
+                <!-- 1. Opening Hook -->
+                <div class="bg-indigo-50/80 border border-indigo-200 p-3 rounded-xl text-xs md:text-sm leading-7 text-slate-900">
+                    <span class="font-black text-indigo-900 block mb-0.5"><i class="fa-solid fa-bolt ml-1"></i>۱. ورود طوفانی (۱۰ ثانیه اول):</span>
+                    «پاسخ به این سؤال را باید با تفکیک دقیق میان <b>"آمادگی عملیاتی و شبکه‌ای"</b> و <b>"آمادگی سرمایه‌ای و ترازنامه‌ای"</b> بدهیم: بخش خصوصی ایران از نظر <b>مغزافزار، شبکه بین‌المللی و ابزارهای مالی جایگزین در بالاترین سطح آمادگی و چابکی</b> قرار دارد؛ اما از نظر <b>سرمایه در گردش و ترازنامه، با ترازنامه‌های مجروح و خون‌ریزی شدید نقدینگی</b> روبه‌روست!»
+                </div>
+
+                <!-- 2. Analytical Pillars -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 text-xs md:text-[13px] leading-6">
+                    <!-- Dimension 1 -->
+                    <div class="bg-emerald-50/50 p-4 rounded-xl border border-emerald-200 space-y-2">
+                        <h3 class="font-black text-emerald-900 border-b border-emerald-200 pb-1.5 text-sm">وجه اول: آمادگی بسیار بالا در «ساختار عملیاتی، شبکه بین‌المللی و ابزارهای مالی جایگزین»</h3>
+                        <p class="text-slate-800">
+                            بیش از یک دهه تحریم‌های سنگین، تجار و مدیران زنجیره تأمین ایران را به ورزیده‌ترین مدیران بحران جهان تبدیل کرده است. در جریان جنگ ۱۲ روزه و ۴۰ روزه، در حالی که بانکداری رسمی به دلیل اسنپ‌بک و <span class="term-badge">FATF</span> کاملاً مرده بود، بخش خصوصی ایران با سه ابزار توانست بیش از <span class="num-badge-green">44 میلیارد دلار</span> تجارت غیرنفتی نیمه نخست ۱۴۰۵ را مدیریت کند:
+                        </p>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li><b>۱. شبکه شرکت‌های پوششی (<span class="term-badge">Front Companies</span>) و هاب‌های منطقه‌ای:</b> ثبت و مدیریت زنجیره‌ای از شرکت‌ها در ترکیه، امارات، عمان و شرق آسیا برای دور زدن تحریم فروشندگان اصلی و انجام عملیات <span class="term-badge">Switch B/L</span>.</li>
+                            <li><b>۲. بانکداری سایه و دلاریزاسیون دیجیتال:</b> استفاده هوشمندانه از شبکه صرافی‌ها و تسویه آنی با رمزارزها (به‌ویژه استیبل‌کوین <b>تتر / <span class="term-badge">USDT</span></b> بر بستر <span class="term-badge">TRC-20</span>) در روزهایی که حتی جابه‌جایی فیزیکی اسکناس متوقف شده بود.</li>
+                            <li><b>۳. چابکی لجستیکی:</b> تغییر مسیر سریع از بنادر جنوب به مرزهای زمینی و رشد <span class="num-badge-green">56%</span> صادرات به ترکیه در عرض چند ماه.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Dimension 2 -->
+                    <div class="bg-rose-50/50 p-4 rounded-xl border border-rose-200 space-y-2">
+                        <h3 class="font-black text-rose-900 border-b border-rose-200 pb-1.5 text-sm">وجه دوم: بحران شدید در «سرمایه در گردش و ترازنامه» (به‌ویژه در شرکت‌های تولیدیِ مجبور به تجارت)</h3>
+                        <p class="text-slate-800">
+                            اینجا باید بین دو گروه بخش خصوصی تفکیک قائل شویم: <b>شرکت‌های بازرگانی صرف</b> چون سرمایه‌شان سیال است، سریع‌تر خود را تطبیق می‌دهند؛ اما <b>شرکت‌های صنعتی، دارویی، غذایی، معدنی و پیمانکاری (<span class="term-badge">EPC</span>) که مجبور به تجارت هستند</b>، از نظر سرمایه در وضعیت بحرانی قرار دارند، چرا؟
+                        </p>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li><b>۱. چهار برابر شدن نیاز به سرمایه در گردش:</b> از یک سو شاخص قیمت خرید مواد اولیه صنعت در شهریور ۱۴۰۵ به رکورد ۷ ساله (<span class="num-badge">93.3</span>) و دلار آزاد در آبان به <span class="num-badge">272,500 تومان</span> رسیده، و از سوی دیگر فروشندگان خارجی خرید اعتباری را لغو کرده و <span class="num-badge">100%</span> پول نقد پیش از حمل می‌خواهند.</li>
+                            <li><b>۲. حبس نقدینگی در گمرک و شرکت‌های دولتی:</b> برای هر کانتینر ۴۰ فوت، ۲۵ روز توقف در گمرک <span class="num-badge">95 میلیون ریال</span> دموراژ و چک‌های تضمین <span class="num-badge">3.2 تا 14.6 میلیارد ریالی</span> به بنگاه تحمیل می‌کند. همزمان، خودروسازان <span class="num-badge">70 همت</span> بدهی سررسیدگذشته به قطعه‌سازان دارند، کارفرمایان دولتی تا <span class="num-badge">79.5%</span> پیش‌پرداخت پروژه‌های <span class="term-badge">EPCC</span> را نپرداخته‌اند و بیمارستان‌ها و بیمه‌ها بدهی شرکت‌های دارویی را قفل کرده‌اند!</li>
+                            <li><b>۳. قحطی اعتبار بانکی برای بخش خصوصی مولد:</b> در حالی که بانک مرکزی با <span class="num-badge">800 همت</span> اضافه برداشت بانک‌های ناتراز مماشات کرده، تسهیلات سرمایه در گردش تولید را با نرخ بهره بالای <span class="num-badge">30% تا 35%</span> و انحراف <span class="num-badge">90%</span> در صدور اوراق گام قفل کرده است!</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Punchline -->
+                <div class="bg-slate-900 text-white p-3 rounded-xl text-xs md:text-sm leading-6">
+                    <span class="text-amber-400 font-black ml-1"><i class="fa-solid fa-bullseye ml-1"></i>۳. جمله کلیدی پایانی (Punchline):</span>
+                    «خلاصه وضعیت این است: بخش خصوصی ایران <b>"مغز، مهارت، شبکه بین‌المللی و رگ‌های ارتباطی"</b> مدیریت تجارت در جنگ را به بهترین شکل دارد، اما سیاست‌های دستوری و انقباضی دولت <b>"خونِ درون این رگ‌ها یعنی سرمایه در گردش"</b> را خشک کرده است!»
+                </div>
+            </div>
+        </section>
+
+        <!-- ==========================================
+             QUESTION 7
+        =========================================== -->
+        <section id="sec-q7" class="q-card glass-card rounded-2xl overflow-hidden border-r-4 border-r-red-600">
+            <div class="bg-slate-100 px-4 py-2.5 border-b border-slate-200 flex flex-wrap justify-between items-center gap-2">
+                <div class="flex items-center gap-2">
+                    <span class="bg-red-600 text-white text-xs font-black px-2.5 py-0.5 rounded">سؤال ۷ (اختصاصی آقای اعطاسی - جمع‌بندی)</span>
+                    <h2 class="text-xs md:text-sm font-black text-slate-900">«با توجه به داده‌های تجارت و شرایطی که بررسی کردیم، چشم‌انداز تجارت خارجی ایران در ماه‌های پیش‌رو چگونه قابل ارزیابی است؟»</h2>
+                </div>
+                <button onclick="copySection('sec-q7')" class="text-[11px] bg-white border border-slate-300 hover:bg-slate-50 px-2 py-0.5 rounded font-bold text-slate-700 shrink-0"><i class="fa-regular fa-copy ml-1"></i>کپی</button>
+            </div>
+
+            <!-- Instant Data Strip for Q7 -->
+            <div class="bg-slate-50 px-4 py-1.5 border-b border-slate-200 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2 text-[11px]">
+                <div><span class="text-slate-500">وقفه اثرگذاری واردات:</span> <b class="text-blue-700">45 تا 60 روز بعد</b></div>
+                <div><span class="text-slate-500">انتظارات تولید و صادرات:</span> <b class="text-rose-700">45.6 | 37.4 (23 ماه رکود)</b></div>
+                <div><span class="text-slate-500">تورم مهر (مرکز آمار/ب.م):</span> <b class="text-rose-700">88.7% نقطه‌ای | 71.4% شهری</b></div>
+                <div><span class="text-slate-500">سناریوی ۱ (صادرات ۱۴۰۵):</span> <b class="text-rose-700" dir="ltr">57.8B$ ← 38-41B$</b></div>
+                <div><span class="text-slate-500">سناریوی ۱ (واردات ۱۴۰۵):</span> <b class="text-rose-700" dir="ltr">72.3B$ ← 43-45B$</b></div>
+                <div><span class="text-slate-500">سناریوی ۲ (نجات):</span> <b class="text-emerald-700">۵ جراحی فوری بدون بودجه</b></div>
+            </div>
+
+            <div class="p-4 space-y-3.5">
+                <!-- 1. Opening Hook -->
+                <div class="bg-red-50/80 border border-red-200 p-3 rounded-xl text-xs md:text-sm leading-7 text-slate-900">
+                    <span class="font-black text-red-900 block mb-0.5"><i class="fa-solid fa-bolt ml-1"></i>۱. ورود طوفانی (۱۰ ثانیه اول):</span>
+                    «اگر به شاخص‌های پیش‌نگر (<span class="term-badge">Leading Indicators</span>) در گزارش شامخ شهریور ۱۴۰۵ و وقفه‌های زمانی زنجیره تأمین نگاه کنیم، ماه‌های پیش‌رو (پاییز و زمستان ۱۴۰۵) <b>حساس‌ترین مقطع برای جلوگیری از برخورد اقتصاد به "دیوار شوک عرضه و توقف خطوط تولید"</b> است و چشم‌انداز ما مستقیماً به انتخاب دولت میان دو سناریو بستگی دارد.»
+                </div>
+
+                <!-- 2. Analytical Pillars -->
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-3.5 text-xs md:text-[13px] leading-6">
+                    <!-- Leading Indicators -->
+                    <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200 space-y-2">
+                        <h3 class="font-black text-slate-900 border-b border-slate-200 pb-1.5">هشدار شاخص‌های پیش‌نگر برای ماه‌های آینده (اثر تأخیری ۴۵ تا ۶۰ روزه)</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li>• در علم مدیریت زنجیره تأمین، افت واردات امروز، اثر خود را <span class="num-badge-blue">45 تا 60 روز</span> بعد در کف کارخانه‌ها و بازار مصرف نشان می‌دهد.</li>
+                            <li>• وقتی در نیمه اول ۱۴۰۵ واردات کشور بیش از <span class="num-badge">26%</span> کاهش یافته و در شامخ شهریور ۱۴۰۵ شاخص موجودی مواد اولیه صنعت به <span class="num-badge">36.7</span> (در نفت و گاز به <span class="num-badge">18.2</span>، در ماشین‌سازی به <span class="num-badge">29.2</span> و در غذا به <span class="num-badge">31.3</span>) سقوط کرده، و همزمان شاخص صادرات برای <b>۲۳ ماه متوالی در رکود (<span class="num-badge">37.4</span>)</b> مانده و انتظارات تولید ماه آینده به <span class="num-badge">45.6</span> (کمترین سطح ۵ ماهه پساجنگ) رسیده است، این اعداد یک پیام روشن دارند: <b>انبارهای استراتژیک کارخانه‌ها خالی شده است!</b></li>
+                            <li>• همچنین رسیدن شاخص قیمت خرید مواد اولیه صنعت به <span class="num-badge">93.3</span> در شهریور، پیشران موج جدید تورم تولیدکننده است که در مهرماه اثر اولیه خود را با <b>تورم نقطه‌به‌نقطه <span class="num-badge">88.7%</span> مرکز آمار (و <span class="num-badge">71.4%</span> سالانه شهری بانک مرکزی)</b> نشان داد و در صورت عدم تزریق کالا، در زمستان تشدید خواهد شد.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Scenario 1 -->
+                    <div class="bg-rose-50/50 p-3.5 rounded-xl border border-rose-200 space-y-2">
+                        <h3 class="font-black text-rose-900 border-b border-rose-200 pb-1.5">سناریوی اول: ادامه دست فرمان فعلی دولت (سناریوی فرسایش و رکود تورمی عمیق)</h3>
+                        <p class="text-slate-800">
+                            اگر بانک مرکزی و وزارت صمت به قفل «کد رهگیری در گمرک»، «سهمیه‌بندی‌های دستوری»، «نرخ ارز چندگانه و سرکوب صادرکننده» و «انقباض سرمایه در گردش» ادامه دهند:
+                        </p>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li>• <b>صادرات غیرنفتی</b> در پایان سال ۱۴۰۵ با افت ۲۰ تا ۲۵ درصدی در محدوده <span class="num-badge">38 تا 41 میلیارد دلار</span> (در مقایسه با <span class="num-badge-blue">57.8 میلیارد دلار</span> سال ۱۴۰۳) متوقف خواهد شد.</li>
+                            <li>• <b>واردات کشور</b> از کانال <span class="num-badge-blue">72.3 میلیارد دلار</span> سال ۱۴۰۳ به محدوده <span class="num-badge">43 تا 45 میلیارد دلار</span> سقوط می‌کند و در زمستان ۱۴۰۵ شاهد تعطیلی خطوط تولید در صنایع غذایی، دارویی، قطعه‌سازی و ماشین‌سازی و تشدید کمبود کالا خواهیم بود.</li>
+                        </ul>
+                    </div>
+
+                    <!-- Scenario 2 -->
+                    <div class="bg-emerald-50/60 p-3.5 rounded-xl border border-emerald-300 space-y-2">
+                        <h3 class="font-black text-emerald-900 border-b border-emerald-200 pb-1.5">سناریوی دوم: چرخش فوری به «پروتکل تجارت اضطراری زمان جنگ» (۵ جراحی بدون بودجه)</h3>
+                        <ul class="space-y-1.5 text-slate-800">
+                            <li><b>۱. حذف فوری شرط کد رهگیری بانک مرکزی</b> برای خروج مواد اولیه، دارو و قطعات از گمرک (ترخیص فوری کالای موجود در بنادر).</li>
+                            <li><b>۲. آزادسازی کامل و بی‌قیدوشرط «واردات بدون انتقال ارز» و رویه «واردات در مقابل صادرات خود و غیر»</b> (واگذاری روان کوتاژهای صادراتی تجار به تولیدکنندگان).</li>
+                            <li><b>۳. پذیرش واقعیت بازار ارز،</b> حذف پیمان‌سپاری ارزی به نرخ دستوری و تعیین تکلیف <span class="num-badge">4.07 میلیارد یورو</span> بدهی ارزی واردکنندگان.</li>
+                            <li><b>۴. توقف کامل قیمت‌گذاری دستوری</b> در صنایع غذایی، دارویی و قطعه‌سازی و انتقال یارانه به مصرف‌کننده نهایی (کالابرگ).</li>
+                            <li><b>۵. گشایش خط اعتباری ویژه سرمایه در گردش و اوراق گام</b> برای بنگاه‌های تولیدیِ مجبور به تجارت، از محل مهار اضافه برداشت بانک‌های ناتراز.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- 3. Punchline -->
+                <div class="bg-slate-900 text-white p-3 rounded-xl text-xs md:text-sm leading-6">
+                    <span class="text-amber-400 font-black ml-1"><i class="fa-solid fa-bullseye ml-1"></i>۳. جمله کلیدی پایانی (Punchline):</span>
+                    «در یک کلام: در ماه‌های پیش‌رو، <b>تحریم و جنگ خارجی ما را متوقف نخواهد کرد</b>؛ چرا که بخش خصوصی مسیرهای زمینی و کانال‌های مالی جایگزین را ساخته است. چشم‌انداز تجارت در نیمه دوم ۱۴۰۵ فقط به یک چیز بستگی دارد: <b>اینکه آیا بانک مرکزی و وزارت صمت حاضرند پای خود را از روی شلنگ اکسیژنِ گمرک، نرخ ارز و سرمایه در گردش تولید بردارند یا خیر!</b>»
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        function showQ(qId) {
+            document.querySelectorAll('.q-tab').forEach(btn => {
+                btn.classList.remove('tab-active');
+                btn.classList.add('bg-slate-100', 'text-slate-700');
+            });
+            const activeBtn = document.getElementById('btn-' + qId);
+            if (activeBtn) {
+                activeBtn.classList.add('tab-active');
+                activeBtn.classList.remove('bg-slate-100', 'text-slate-700');
+            }
+
+            const cards = document.querySelectorAll('.q-card');
+            if (qId === 'all') {
+                cards.forEach(c => c.classList.remove('hidden'));
+            } else {
+                cards.forEach(c => {
+                    if (c.id === 'sec-' + qId) {
+                        c.classList.remove('hidden');
+                    } else {
+                        c.classList.add('hidden');
+                    }
+                });
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function copySection(secId) {
+            const el = document.getElementById(secId);
+            if (!el) return;
+            const tempInput = document.createElement('textarea');
+            tempInput.value = el.innerText.trim();
+            document.body.appendChild(tempInput);
+            tempInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(tempInput);
+
+            const toast = document.getElementById('toast');
+            toast.classList.remove('hidden');
+            setTimeout(() => {
+                toast.classList.add('hidden');
+            }, 2500);
+        }
+    </script>
+</body>
+</html>
